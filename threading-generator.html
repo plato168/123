@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>車牙程式自動產生器</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22d3ee;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --code-bg: #0b1220;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header {
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 820px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 460px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    .field small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .segmented label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel-2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .segmented input {
+      width: auto;
+      margin: 0;
+    }
+
+    .segmented label:has(input:checked) {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+      color: #e0f2fe;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #082f49;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    #output {
+      width: 100%;
+      min-height: 560px;
+      resize: vertical;
+      font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      background: var(--code-bg);
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      padding: 14px;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    .error {
+      display: none;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+      line-height: 1.5;
+    }
+
+    .error.show { display: block; }
+
+    .note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .advanced {
+      border-top: 1px dashed var(--border);
+      padding-top: 14px;
+      margin-top: 4px;
+    }
+
+    .advanced summary {
+      cursor: pointer;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>車牙程式自動產生器</h1>
+      <p class="subtitle">
+        依輸入參數自動產生標準 CNC 車床 G92 左右交替車牙程式。沿切削角度與單次車削量，
+        交替切削左邊與右邊牙面，直到達到目標牙頂或牙底直徑。
+      </p>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-head"><h2>參數輸入</h2></div>
+        <div class="card-body">
+          <form id="threadForm">
+            <div class="field">
+              <label>內徑 / 外徑</label>
+              <div class="segmented">
+                <label><input type="radio" name="threadType" value="outer" checked>外徑車牙</label>
+                <label><input type="radio" name="threadType" value="inner">內徑車牙</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>牙頂 / 牙底</label>
+              <div class="segmented">
+                <label><input type="radio" name="targetType" value="root" checked>車到牙底直徑</label>
+                <label><input type="radio" name="targetType" value="crest">車到牙頂直徑</label>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="targetDiameter">目標直徑 (mm)</label>
+                <input id="targetDiameter" type="number" step="0.0001" value="130.0500" required>
+                <small>依上方選擇，為牙頂或牙底目標直徑。</small>
+              </div>
+              <div class="field">
+                <label for="initialDiameter">起始切削直徑 (mm)</label>
+                <input id="initialDiameter" type="number" step="0.0001" value="120.7500" required>
+                <small>第一刀 G92 的 X 起點直徑。</small>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="cutStartZ">切削起點 Z (mm)</label>
+                <input id="cutStartZ" type="number" step="0.0001" value="19.0000" required>
+                <small>左右牙面 Z 中心參考位置（第一刀左邊 Z ≈ 起點 - 牙距/2）。</small>
+              </div>
+              <div class="field">
+                <label for="threadEndZ">車牙終點 Z (mm)</label>
+                <input id="threadEndZ" type="number" step="0.0001" value="-52.0000" required>
+                <small>左邊 G92 使用的螺紋終點 Z。</small>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="cuttingAngle">切削角度 (°)</label>
+                <input id="cuttingAngle" type="number" step="0.01" value="12.00" required>
+                <small>左右斜進角度，用於計算每刀 Z 偏移。</small>
+              </div>
+              <div class="field">
+                <label for="cutAmount">單次車削量 (mm)</label>
+                <input id="cutAmount" type="number" step="0.0001" value="0.1000" required>
+                <small>每一邊刀路的 X 方向進刀量。</small>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="pitch">牙距 (mm)</label>
+                <input id="pitch" type="number" step="0.001" value="2.000" required>
+                <small>G92 的 F 值，同時用於左右 Z 分離計算。</small>
+              </div>
+              <div class="field">
+                <label for="spindleSpeed">主軸轉速 S</label>
+                <input id="spindleSpeed" type="number" step="1" value="294" required>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="programStartX">程式起點 X (mm)</label>
+                <input id="programStartX" type="number" step="0.0001" value="119.0000" required>
+              </div>
+              <div class="field">
+                <label for="programStartZ">程式起點 Z (mm)</label>
+                <input id="programStartZ" type="number" step="0.0001" value="20.0000" required>
+              </div>
+            </div>
+
+            <details class="advanced">
+              <summary>進階設定</summary>
+              <div class="grid-2">
+                <div class="field">
+                  <label for="threadEndZRight">右邊車牙終點 Z (mm)</label>
+                  <input id="threadEndZRight" type="number" step="0.0001" value="-215.0000">
+                  <small>留空則與左邊相同。</small>
+                </div>
+                <div class="field">
+                  <label for="toolNumber">刀號 T</label>
+                  <input id="toolNumber" type="text" value="0505">
+                </div>
+              </div>
+              <div class="grid-2">
+                <div class="field">
+                  <label for="safeX">安全退刀 X (mm)</label>
+                  <input id="safeX" type="number" step="0.0001" value="200.0000">
+                </div>
+                <div class="field">
+                  <label for="safeZ">安全退刀 Z (mm)</label>
+                  <input id="safeZ" type="number" step="0.0001" value="120.0000">
+                </div>
+              </div>
+            </details>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary">產生車牙程式</button>
+              <button type="button" id="loadSample" class="btn-secondary">載入 N2 範例</button>
+              <button type="button" id="copyOutput" class="btn-secondary">複製程式碼</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>CNC 程式輸出</h2></div>
+        <div class="card-body">
+          <div id="errorBox" class="error"></div>
+          <div class="summary">
+            <div class="stat"><div class="label">深度層數</div><div class="value" id="statDepths">-</div></div>
+            <div class="stat"><div class="label">總刀數</div><div class="value" id="statPasses">-</div></div>
+            <div class="stat"><div class="label">最終 X</div><div class="value" id="statFinalX">-</div></div>
+            <div class="stat"><div class="label">總進刀量</div><div class="value" id="statTotalCut">-</div></div>
+          </div>
+          <textarea id="output" readonly placeholder="按「產生車牙程式」後，G-code 會顯示在這裡。"></textarea>
+          <p class="note">
+            產生邏輯：每一層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + (層數+1)×單次車削量×tan(角度)，
+            右邊 Z = 切削起點 + 牙距/2 - (層數+1)×單次車削量×tan(角度)。外徑車牙 X 逐刀增大，內徑車牙 X 逐刀減小。
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('threadForm');
+    const output = document.getElementById('output');
+    const errorBox = document.getElementById('errorBox');
+
+    function fmt(value, digits = 4) {
+      return Number(value).toFixed(digits);
+    }
+
+    function fmtCoord(value) {
+      const text = Number(value).toFixed(4);
+      return text
+        .replace(/(\.\d*?[1-9])0+$/u, '$1')
+        .replace(/\.0+$/u, '');
+    }
+
+    function fmtFeed(value) {
+      const text = Number(value).toFixed(4);
+      return text.replace(/\.?0+$/u, '');
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.add('show');
+    }
+
+    function clearError() {
+      errorBox.textContent = '';
+      errorBox.classList.remove('show');
+    }
+
+    function readParams() {
+      const threadType = form.threadType.value;
+      const targetType = form.targetType.value;
+      const targetDiameter = Number(document.getElementById('targetDiameter').value);
+      const initialDiameter = Number(document.getElementById('initialDiameter').value);
+      const cutStartZ = Number(document.getElementById('cutStartZ').value);
+      const threadEndZ = Number(document.getElementById('threadEndZ').value);
+      const threadEndZRightRaw = document.getElementById('threadEndZRight').value.trim();
+      const threadEndZRight = threadEndZRightRaw === '' ? threadEndZ : Number(threadEndZRightRaw);
+      const cuttingAngle = Number(document.getElementById('cuttingAngle').value);
+      const cutAmount = Number(document.getElementById('cutAmount').value);
+      const pitch = Number(document.getElementById('pitch').value);
+      const programStartX = Number(document.getElementById('programStartX').value);
+      const programStartZ = Number(document.getElementById('programStartZ').value);
+      const spindleSpeed = Number(document.getElementById('spindleSpeed').value);
+      const toolNumber = document.getElementById('toolNumber').value.trim() || '0101';
+      const safeX = Number(document.getElementById('safeX').value);
+      const safeZ = Number(document.getElementById('safeZ').value);
+
+      return {
+        threadType,
+        targetType,
+        targetDiameter,
+        initialDiameter,
+        cutStartZ,
+        threadEndZ,
+        threadEndZRight,
+        cuttingAngle,
+        cutAmount,
+        pitch,
+        programStartX,
+        programStartZ,
+        spindleSpeed,
+        toolNumber,
+        safeX,
+        safeZ
+      };
+    }
+
+    function validateParams(p) {
+      const checks = [
+        [p.targetDiameter > 0, '目標直徑必須大於 0。'],
+        [p.initialDiameter > 0, '起始切削直徑必須大於 0。'],
+        [p.cutAmount > 0, '單次車削量必須大於 0。'],
+        [p.pitch > 0, '牙距必須大於 0。'],
+        [p.cuttingAngle > 0 && p.cuttingAngle < 90, '切削角度需介於 0 到 90 度。'],
+        [p.spindleSpeed > 0, '主軸轉速必須大於 0。']
+      ];
+
+      for (const [ok, message] of checks) {
+        if (!ok) return message;
+      }
+
+      if (p.threadType === 'outer' && p.initialDiameter >= p.targetDiameter) {
+        return '外徑車牙時，起始切削直徑必須小於目標直徑。';
+      }
+
+      if (p.threadType === 'inner' && p.initialDiameter <= p.targetDiameter) {
+        return '內徑車牙時，起始切削直徑必須大於目標直徑。';
+      }
+
+      return null;
+    }
+
+    function generateThreadingProgram(p) {
+      const angleRad = p.cuttingAngle * Math.PI / 180;
+      const tanA = Math.tan(angleRad);
+      const zStep = p.cutAmount * tanA;
+      const leftZ0 = p.cutStartZ - p.pitch / 2 + p.cutAmount * tanA;
+      const rightZ0 = p.cutStartZ + p.pitch / 2 - p.cutAmount * tanA;
+      const increasing = p.threadType === 'outer';
+      const depthPerCycle = 2 * p.cutAmount;
+
+      const lines = [];
+      lines.push(`N2  G0  X${fmtCoord(p.safeX)}. Z${fmtCoord(p.safeZ)}.`);
+      lines.push(`        T${p.toolNumber}`);
+      lines.push(`    G97 S${Math.round(p.spindleSpeed)}`);
+      lines.push('        M3');
+      lines.push('M8');
+      lines.push(`    G00 X${fmtCoord(p.programStartX)}. Z${fmtCoord(p.programStartZ)}.`);
+
+      let depth = 0;
+      let totalPasses = 0;
+      let finalX = p.initialDiameter;
+      let leftFeedUsed = false;
+      let rightFeedUsed = false;
+
+      while (true) {
+        const leftX = increasing
+          ? p.initialDiameter + depth * depthPerCycle
+          : p.initialDiameter - depth * depthPerCycle;
+        const rightX = increasing
+          ? leftX + p.cutAmount
+          : leftX - p.cutAmount;
+
+        if (increasing && leftX > p.targetDiameter) break;
+        if (!increasing && leftX < p.targetDiameter) break;
+
+        const leftZ = leftZ0 + depth * zStep;
+        const rightZ = rightZ0 - depth * zStep;
+        const leftFeed = !leftFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
+        const rightFeed = !rightFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
+        const finishRightX = increasing
+          ? Math.min(rightX, p.targetDiameter)
+          : Math.max(rightX, p.targetDiameter);
+        const rightReached = increasing
+          ? finishRightX >= p.targetDiameter
+          : finishRightX <= p.targetDiameter;
+
+        lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+        lines.push(`    G00 Z${fmt(leftZ)}`);
+        totalPasses += 1;
+        leftFeedUsed = true;
+
+        lines.push(`    G92 X${fmt(finishRightX)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
+        lines.push(`    G00 Z${fmt(rightZ)}`);
+        totalPasses += 1;
+        rightFeedUsed = true;
+        finalX = finishRightX;
+        depth += 1;
+
+        if (rightReached) break;
+      }
+
+      if (totalPasses === 0) {
+        throw new Error('無法產生任何刀路，請檢查直徑與進刀量設定。');
+      }
+
+      lines.push('        M09');
+      lines.push(`    G0  X${fmtCoord(p.safeX)}. Z${fmtCoord(p.safeZ)}. M5`);
+      lines.push('        M1');
+
+      return {
+        code: lines.join('\n'),
+        depthCount: depth,
+        passCount: totalPasses,
+        finalX,
+        totalCut: Math.abs(finalX - p.initialDiameter)
+      };
+    }
+
+    function updateStats(result) {
+      document.getElementById('statDepths').textContent = String(result.depthCount);
+      document.getElementById('statPasses').textContent = String(result.passCount);
+      document.getElementById('statFinalX').textContent = fmt(result.finalX);
+      document.getElementById('statTotalCut').textContent = `${fmt(result.totalCut)} mm`;
+    }
+
+    function generate() {
+      clearError();
+      try {
+        const params = readParams();
+        const error = validateParams(params);
+        if (error) {
+          showError(error);
+          return;
+        }
+
+        const result = generateThreadingProgram(params);
+        output.value = result.code;
+        updateStats(result);
+      } catch (err) {
+        showError(err.message || '產生程式時發生錯誤。');
+      }
+    }
+
+    function loadSample() {
+      form.threadType.value = 'outer';
+      form.targetType.value = 'root';
+      document.getElementById('targetDiameter').value = '130.0500';
+      document.getElementById('initialDiameter').value = '120.7500';
+      document.getElementById('cutStartZ').value = '19.0000';
+      document.getElementById('threadEndZ').value = '-52.0000';
+      document.getElementById('threadEndZRight').value = '-215.0000';
+      document.getElementById('cuttingAngle').value = '12.00';
+      document.getElementById('cutAmount').value = '0.1000';
+      document.getElementById('pitch').value = '2.000';
+      document.getElementById('programStartX').value = '119.0000';
+      document.getElementById('programStartZ').value = '20.0000';
+      document.getElementById('spindleSpeed').value = '294';
+      document.getElementById('toolNumber').value = '0505';
+      document.getElementById('safeX').value = '200.0000';
+      document.getElementById('safeZ').value = '120.0000';
+      generate();
+    }
+
+    async function copyOutput() {
+      if (!output.value.trim()) {
+        showError('目前沒有可複製的程式碼。');
+        return;
+      }
+      clearError();
+      try {
+        await navigator.clipboard.writeText(output.value);
+      } catch (err) {
+        output.select();
+        document.execCommand('copy');
+      }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      generate();
+    });
+
+    document.getElementById('loadSample').addEventListener('click', loadSample);
+    document.getElementById('copyOutput').addEventListener('click', copyOutput);
+
+    loadSample();
+  </script>
+</body>
+</html>
