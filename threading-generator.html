@@ -248,11 +248,32 @@
 
     .error.show { display: block; }
 
+    .offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      background: rgba(52, 211, 153, 0.12);
+      color: #bbf7d0;
+      font-size: 0.88rem;
+    }
+
     .note {
       margin-top: 12px;
       color: var(--muted);
       font-size: 0.88rem;
       line-height: 1.55;
+    }
+
+    .usage-steps {
+      margin: 14px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.92rem;
     }
 
     .advanced {
@@ -277,6 +298,12 @@
         依輸入參數自動產生標準 CNC 車床 G92 左右交替車牙程式。沿切削角度與單次車削量，
         交替切削左邊與右邊牙面，直到達到目標牙頂或牙底直徑。
       </p>
+      <div class="offline-badge">本機離線執行 · 單一 HTML 檔 · 不需安裝 · 不需伺服器</div>
+      <ol class="usage-steps">
+        <li>將 <code>threading-generator.html</code> 下載到電腦任意資料夾</li>
+        <li>直接用 Chrome、Edge 或 Firefox 雙擊開啟</li>
+        <li>輸入參數後按「產生車牙程式」，再複製或下載 .NC 檔</li>
+      </ol>
     </header>
 
     <div class="layout">
@@ -371,15 +398,22 @@
                   <small>留空則與左邊相同。</small>
                 </div>
                 <div class="field">
-                  <label for="toolNumber">刀號 T</label>
-                  <input id="toolNumber" type="text" value="0505">
+                  <label for="outputFileName">下載檔名</label>
+                  <input id="outputFileName" type="text" value="threading.nc">
+                  <small>下載到本機時使用的檔名。</small>
                 </div>
               </div>
               <div class="grid-2">
                 <div class="field">
+                  <label for="toolNumber">刀號 T</label>
+                  <input id="toolNumber" type="text" value="0505">
+                </div>
+                <div class="field">
                   <label for="safeX">安全退刀 X (mm)</label>
                   <input id="safeX" type="number" step="0.0001" value="200.0000">
                 </div>
+              </div>
+              <div class="grid-2">
                 <div class="field">
                   <label for="safeZ">安全退刀 Z (mm)</label>
                   <input id="safeZ" type="number" step="0.0001" value="120.0000">
@@ -391,6 +425,7 @@
               <button type="submit" class="btn-primary">產生車牙程式</button>
               <button type="button" id="loadSample" class="btn-secondary">載入 N2 範例</button>
               <button type="button" id="copyOutput" class="btn-secondary">複製程式碼</button>
+              <button type="button" id="downloadOutput" class="btn-secondary">下載 .NC 檔</button>
             </div>
           </form>
         </div>
@@ -640,11 +675,41 @@
       }
       clearError();
       try {
-        await navigator.clipboard.writeText(output.value);
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(output.value);
+          return;
+        }
+        throw new Error('clipboard unavailable');
       } catch (err) {
+        output.focus();
         output.select();
         document.execCommand('copy');
       }
+    }
+
+    function sanitizeFileName(name) {
+      const trimmed = (name || 'threading.nc').trim() || 'threading.nc';
+      const base = trimmed.replace(/[\\/:*?"<>|]+/g, '_');
+      return base.toLowerCase().endsWith('.nc') ? base : `${base}.nc`;
+    }
+
+    function downloadOutput() {
+      if (!output.value.trim()) {
+        showError('請先產生程式碼，再下載 .NC 檔。');
+        return;
+      }
+      clearError();
+
+      const fileName = sanitizeFileName(document.getElementById('outputFileName').value);
+      const blob = new Blob([output.value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     }
 
     form.addEventListener('submit', (event) => {
@@ -654,6 +719,7 @@
 
     document.getElementById('loadSample').addEventListener('click', loadSample);
     document.getElementById('copyOutput').addEventListener('click', copyOutput);
+    document.getElementById('downloadOutput').addEventListener('click', downloadOutput);
 
     loadSample();
   </script>
