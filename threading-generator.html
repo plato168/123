@@ -368,6 +368,22 @@
 
             <div class="grid-2">
               <div class="field">
+                <label for="toolNoseWidth">刀尖寬度 (mm)</label>
+                <input id="toolNoseWidth" type="number" step="0.0001" min="0" value="0.0000">
+                <small>車刀刀尖寬度，右邊 Z 位移會扣除此值以避免過切。</small>
+              </div>
+              <div class="field">
+                <label for="toolNoseCompSide">刀寬扣減邊</label>
+                <select id="toolNoseCompSide">
+                  <option value="right" selected>右邊（預設）</option>
+                  <option value="left">左邊</option>
+                </select>
+                <small>選擇哪一邊的 Z 位移需扣掉刀尖寬度。</small>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
                 <label for="pitch">牙距 (mm)</label>
                 <input id="pitch" type="number" step="0.001" value="2.000" required>
                 <small>G92 的 F 值，同時用於左右 Z 分離計算。</small>
@@ -443,8 +459,9 @@
           </div>
           <textarea id="output" readonly placeholder="按「產生車牙程式」後，G-code 會顯示在這裡。"></textarea>
           <p class="note">
-            產生邏輯：每一層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + (層數+1)×單次車削量×tan(角度)，
-            右邊 Z = 切削起點 + 牙距/2 - (層數+1)×單次車削量×tan(角度)。外徑車牙 X 逐刀減小，內徑車牙 X 逐刀增大。
+            產生邏輯：每一層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + 層數×單次車削量×tan(角度)，
+            右邊 Z = 切削起點 + 牙距/2 - 層數×單次車削量×tan(角度)。指定邊的 Z 位移另扣刀尖寬度以防過切。
+            外徑車牙 X 逐刀減小，內徑車牙 X 逐刀增大。
           </p>
         </div>
       </section>
@@ -500,6 +517,8 @@
       const toolNumber = document.getElementById('toolNumber').value.trim() || '0101';
       const safeX = Number(document.getElementById('safeX').value);
       const safeZ = Number(document.getElementById('safeZ').value);
+      const toolNoseWidth = Number(document.getElementById('toolNoseWidth').value) || 0;
+      const toolNoseCompSide = document.getElementById('toolNoseCompSide').value;
 
       return {
         threadType,
@@ -517,7 +536,9 @@
         spindleSpeed,
         toolNumber,
         safeX,
-        safeZ
+        safeZ,
+        toolNoseWidth,
+        toolNoseCompSide
       };
     }
 
@@ -528,7 +549,8 @@
         [p.cutAmount > 0, '單次車削量必須大於 0。'],
         [p.pitch > 0, '牙距必須大於 0。'],
         [p.cuttingAngle > 0 && p.cuttingAngle < 90, '切削角度需介於 0 到 90 度。'],
-        [p.spindleSpeed > 0, '主軸轉速必須大於 0。']
+        [p.spindleSpeed > 0, '主軸轉速必須大於 0。'],
+        [p.toolNoseWidth >= 0, '刀尖寬度不可為負數。']
       ];
 
       for (const [ok, message] of checks) {
@@ -552,6 +574,9 @@
       const zStep = p.cutAmount * tanA;
       const leftZ0 = p.cutStartZ - p.pitch / 2 + p.cutAmount * tanA;
       const rightZ0 = p.cutStartZ + p.pitch / 2 - p.cutAmount * tanA;
+      const toolW = p.toolNoseWidth || 0;
+      const leftComp = p.toolNoseCompSide === 'left' ? toolW : 0;
+      const rightComp = p.toolNoseCompSide === 'right' ? toolW : 0;
       const increasing = p.threadType === 'inner';
       const depthPerCycle = 2 * p.cutAmount;
 
@@ -580,8 +605,8 @@
         if (increasing && leftX > p.targetDiameter) break;
         if (!increasing && leftX < p.targetDiameter) break;
 
-        const leftZ = leftZ0 + depth * zStep;
-        const rightZ = rightZ0 - depth * zStep;
+        const leftZ = leftZ0 + depth * zStep - leftComp;
+        const rightZ = rightZ0 - depth * zStep - rightComp;
         const leftFeed = !leftFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
         const rightFeed = !rightFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
         const finishRightX = increasing
@@ -658,6 +683,8 @@
       document.getElementById('threadEndZRight').value = '-215.0000';
       document.getElementById('cuttingAngle').value = '12.00';
       document.getElementById('cutAmount').value = '0.1000';
+      document.getElementById('toolNoseWidth').value = '0.0000';
+      document.getElementById('toolNoseCompSide').value = 'right';
       document.getElementById('pitch').value = '2.000';
       document.getElementById('programStartX').value = '119.0000';
       document.getElementById('programStartZ').value = '20.0000';
