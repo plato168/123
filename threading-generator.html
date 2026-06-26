@@ -318,7 +318,7 @@
       <h1>ACME 車牙程式自動產生器</h1>
       <p class="subtitle">
         依 ACME 29°（常用稱 30°）螺牙標準，自動產生 G92 左右交替車牙 CNC 程式。
-        外徑車到牙底直徑、內徑車到牙頂直徑；左右兩邊 Z 進刀皆扣除刀片寬度，避免過切。
+        外徑車到目標直徑（牙底）、內徑車到目標直徑（牙頂）；左右兩邊 Z 進刀皆扣除刀片寬度，避免過切。
       </p>
       <div class="offline-badge">本機離線執行 · 單一 HTML 檔 · 不需安裝 · 不需伺服器</div>
       <ol class="usage-steps">
@@ -336,23 +336,23 @@
             <div class="field">
               <label>內徑 / 外徑</label>
               <div class="segmented">
-                <label><input type="radio" name="threadType" value="outer" checked>外徑車牙（車到牙底）</label>
-                <label><input type="radio" name="threadType" value="inner">內徑車牙（車到牙頂）</label>
+                <label><input type="radio" name="threadType" value="outer" checked>外徑車牙</label>
+                <label><input type="radio" name="threadType" value="inner">內徑車牙</label>
               </div>
             </div>
 
-            <div id="targetTypeHint" class="target-hint">外徑 ACME 車牙：目標為<strong>牙底直徑</strong>（小徑），起始直徑需大於目標。</div>
+            <div id="targetTypeHint" class="target-hint">外徑 ACME 車牙：目標直徑為牙底（小徑），材料加工起始外徑需大於目標直徑。</div>
 
             <div class="grid-2">
               <div class="field">
-                <label for="targetDiameter" id="targetDiameterLabel">牙底直徑 (mm)</label>
+                <label for="targetDiameter" id="targetDiameterLabel">目標直徑 (mm)</label>
                 <input id="targetDiameter" type="number" step="0.0001" value="120.7500" required>
-                <small id="targetDiameterHelp">外徑 ACME 車牙完成後的牙底（小徑）尺寸。</small>
+                <small id="targetDiameterHelp">外徑 ACME 車牙完成後的目標直徑（牙底小徑）。</small>
               </div>
               <div class="field">
-                <label for="initialDiameter">起始切削直徑 (mm)</label>
+                <label for="initialDiameter" id="initialDiameterLabel">材料加工起始外徑 (mm)</label>
                 <input id="initialDiameter" type="number" step="0.0001" value="130.0500" required>
-                <small>第一刀 G92 的 X 起點。外徑為較大毛胚直徑，內徑為較小孔徑。</small>
+                <small id="initialDiameterHelp">第一刀 G92 的 X 起點，外徑為材料加工起始外徑。</small>
               </div>
             </div>
 
@@ -530,20 +530,23 @@
     function updateThreadTypeUI() {
       const threadType = form.threadType.value;
       const isOuter = threadType === 'outer';
-      const label = document.getElementById('targetDiameterLabel');
-      const help = document.getElementById('targetDiameterHelp');
+      const targetHelp = document.getElementById('targetDiameterHelp');
+      const initialLabel = document.getElementById('initialDiameterLabel');
+      const initialHelp = document.getElementById('initialDiameterHelp');
       const hint = document.getElementById('targetTypeHint');
       const refText = document.getElementById('acmeRefBladeText');
 
       if (isOuter) {
-        label.textContent = '牙底直徑 (mm)';
-        help.textContent = '外徑 ACME 車牙完成後的牙底（小徑）尺寸。';
-        hint.innerHTML = '外徑 ACME 車牙：目標為<strong>牙底直徑</strong>（小徑），起始直徑需大於目標。';
+        targetHelp.textContent = '外徑 ACME 車牙完成後的目標直徑（牙底小徑）。';
+        initialLabel.textContent = '材料加工起始外徑 (mm)';
+        initialHelp.textContent = '第一刀 G92 的 X 起點，外徑為材料加工起始外徑。';
+        hint.innerHTML = '外徑 ACME 車牙：目標直徑為牙底（小徑），材料加工起始外徑需大於目標直徑。';
         refText.textContent = `外徑牙刀標準刀片寬度 ≈ ${fmt(acmeReferenceBladeWidth(Number(document.getElementById('pitch').value || 0), 'outer'))} mm（0.3707 × 牙距）`;
       } else {
-        label.textContent = '牙頂直徑 (mm)';
-        help.textContent = '內徑 ACME 車牙完成後的牙頂（大徑）尺寸。';
-        hint.innerHTML = '內徑 ACME 車牙：目標為<strong>牙頂直徑</strong>（大徑），起始直徑需小於目標。';
+        targetHelp.textContent = '內徑 ACME 車牙完成後的目標直徑（牙頂大徑）。';
+        initialLabel.textContent = '材料加工起始內徑 (mm)';
+        initialHelp.textContent = '第一刀 G92 的 X 起點，內徑為材料加工起始內徑。';
+        hint.innerHTML = '內徑 ACME 車牙：目標直徑為牙頂（大徑），材料加工起始內徑需小於目標直徑。';
         refText.textContent = `內徑牙刀標準刀片寬度 ≈ ${fmt(acmeReferenceBladeWidth(Number(document.getElementById('pitch').value || 0), 'inner'))} mm（0.3707 × 牙距）`;
       }
     }
@@ -622,7 +625,7 @@
     function validateParams(p) {
       const checks = [
         [p.targetDiameter > 0, '目標直徑必須大於 0。'],
-        [p.initialDiameter > 0, '起始切削直徑必須大於 0。'],
+        [p.initialDiameter > 0, '材料加工起始外(內)徑必須大於 0。'],
         [p.cutAmount > 0, '單次車削量必須大於 0。'],
         [p.pitch > 0, '牙距必須大於 0。'],
         [p.cuttingAngle > 0 && p.cuttingAngle < 90, '切削進刀角度需介於 0 到 90 度。'],
@@ -635,11 +638,11 @@
       }
 
       if (p.threadType === 'outer' && p.initialDiameter <= p.targetDiameter) {
-        return '外徑 ACME 車牙時，起始切削直徑必須大於牙底直徑。';
+        return '外徑 ACME 車牙時，材料加工起始外徑必須大於目標直徑。';
       }
 
       if (p.threadType === 'inner' && p.initialDiameter >= p.targetDiameter) {
-        return '內徑 ACME 車牙時，起始切削直徑必須小於牙頂直徑。';
+        return '內徑 ACME 車牙時，材料加工起始內徑必須小於目標直徑。';
       }
 
       return null;
