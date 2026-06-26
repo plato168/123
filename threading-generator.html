@@ -318,7 +318,7 @@
       <h1>ACME 車牙程式自動產生器</h1>
       <p class="subtitle">
         依 ACME 29°（常用稱 30°）螺牙標準，自動產生 G92 左右交替車牙 CNC 程式。
-        外徑車到牙底直徑、內徑車到牙頂直徑；刀片寬度會自動補償到另一邊 Z 進刀，避免過切。
+        外徑車到牙底直徑、內徑車到牙頂直徑；左右兩邊 Z 進刀皆扣除刀片寬度，避免過切。
       </p>
       <div class="offline-badge">本機離線執行 · 單一 HTML 檔 · 不需安裝 · 不需伺服器</div>
       <ol class="usage-steps">
@@ -404,7 +404,7 @@
               <div class="field">
                 <label for="toolNoseWidth">實際牙刀刀片寬度 (mm)</label>
                 <input id="toolNoseWidth" type="number" step="0.0001" min="0" value="0.7414">
-                <small>輸入目前真實刀尖/刀片寬度；另一邊 Z 進刀會扣除此值。</small>
+                <small>輸入目前真實刀尖/刀片寬度；左右兩邊 Z 進刀都會扣除此值以防過切。</small>
               </div>
               <div class="field">
                 <label>&nbsp;</label>
@@ -486,9 +486,9 @@
           </div>
           <textarea id="output" readonly placeholder="按「產生車牙程式」後，G-code 會顯示在這裡。"></textarea>
           <p class="note">
-            ACME 29° 車牙：每層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + 層數×單次車削量×tan(14.5°)，
-            右邊 Z = 切削起點 + 牙距/2 - 層數×單次車削量×tan(14.5°) - 刀片寬度。
-            刀片寬度補償在另一邊（右邊）Z 進刀，避免刀尖過切。外徑 X 逐刀減小，內徑 X 逐刀增大。
+            ACME 29° 車牙：每層先左邊再右邊。左邊 Z = 基準左 Z + 層數×單次車削量×tan(角度) - 刀片寬度，
+            右邊 Z = 基準右 Z - 層數×單次車削量×tan(角度) - 刀片寬度。左右兩邊皆扣刀寬避免過切。
+            外徑 X 逐刀減小，內徑 X 逐刀增大。
           </p>
         </div>
       </section>
@@ -652,8 +652,6 @@
       const leftZ0 = p.cutStartZ - p.pitch / 2 + p.cutAmount * tanA;
       const rightZ0 = p.cutStartZ + p.pitch / 2 - p.cutAmount * tanA;
       const toolW = p.toolNoseWidth || 0;
-      const leftComp = 0;
-      const rightComp = toolW;
       const increasing = p.threadType === 'inner';
       const depthPerCycle = 2 * p.cutAmount;
 
@@ -684,8 +682,8 @@
         if (increasing && leftX > p.targetDiameter) break;
         if (!increasing && leftX < p.targetDiameter) break;
 
-        const leftZ = leftZ0 + depth * zStep - leftComp;
-        const rightZ = rightZ0 - depth * zStep - rightComp;
+        const leftZ = leftZ0 + depth * zStep - toolW;
+        const rightZ = rightZ0 - depth * zStep - toolW;
         const leftFeed = !leftFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
         const rightFeed = !rightFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
         const finishRightX = increasing
