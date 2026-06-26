@@ -488,7 +488,7 @@
           <p class="note">
             ACME 29° 車牙：每層先左邊再右邊。左邊 Z = 基準左 Z + 層數×單次車削量×tan(角度) - 刀片寬度，
             右邊 Z = 基準右 Z - 層數×單次車削量×tan(角度) - 刀片寬度。左右兩邊皆扣刀寬避免過切。
-            外徑 X 逐刀減小，內徑 X 逐刀增大。
+            外徑 X 逐刀減小，內徑 X 逐刀增大。到達目標直徑時僅輸出一刀終點 G92，不重複相同 X。
           </p>
         </div>
       </section>
@@ -686,26 +686,70 @@
         const rightZ = rightZ0 - depth * zStep - toolW;
         const leftFeed = !leftFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
         const rightFeed = !rightFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
-        const finishRightX = increasing
-          ? Math.min(rightX, p.targetDiameter)
-          : Math.max(rightX, p.targetDiameter);
-        const rightReached = increasing
-          ? finishRightX >= p.targetDiameter
-          : finishRightX <= p.targetDiameter;
+
+        if (!increasing) {
+          if (leftX <= p.targetDiameter) {
+            lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+            lines.push(`    G00 Z${fmt(leftZ)}`);
+            totalPasses += 1;
+            leftFeedUsed = true;
+            finalX = leftX;
+            depth += 1;
+            break;
+          }
+
+          if (rightX <= p.targetDiameter) {
+            lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+            lines.push(`    G00 Z${fmt(leftZ)}`);
+            totalPasses += 1;
+            leftFeedUsed = true;
+
+            lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
+            lines.push(`    G00 Z${fmt(rightZ)}`);
+            totalPasses += 1;
+            rightFeedUsed = true;
+            finalX = p.targetDiameter;
+            depth += 1;
+            break;
+          }
+        } else {
+          if (leftX >= p.targetDiameter) {
+            lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+            lines.push(`    G00 Z${fmt(leftZ)}`);
+            totalPasses += 1;
+            leftFeedUsed = true;
+            finalX = p.targetDiameter;
+            depth += 1;
+            break;
+          }
+
+          if (rightX >= p.targetDiameter) {
+            lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+            lines.push(`    G00 Z${fmt(leftZ)}`);
+            totalPasses += 1;
+            leftFeedUsed = true;
+
+            lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
+            lines.push(`    G00 Z${fmt(rightZ)}`);
+            totalPasses += 1;
+            rightFeedUsed = true;
+            finalX = p.targetDiameter;
+            depth += 1;
+            break;
+          }
+        }
 
         lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
         lines.push(`    G00 Z${fmt(leftZ)}`);
         totalPasses += 1;
         leftFeedUsed = true;
 
-        lines.push(`    G92 X${fmt(finishRightX)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
+        lines.push(`    G92 X${fmt(rightX)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
         lines.push(`    G00 Z${fmt(rightZ)}`);
         totalPasses += 1;
         rightFeedUsed = true;
-        finalX = finishRightX;
+        finalX = rightX;
         depth += 1;
-
-        if (rightReached) break;
       }
 
       if (totalPasses === 0) {
