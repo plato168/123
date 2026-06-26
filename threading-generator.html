@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>車牙程式自動產生器</title>
+  <title>ACME 車牙程式自動產生器</title>
   <style>
     :root {
       --bg: #0f1419;
@@ -288,15 +288,37 @@
       margin-bottom: 12px;
       font-weight: 600;
     }
+
+    .ref-box {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: rgba(56, 189, 248, 0.08);
+      color: #dbeafe;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .ref-box strong { color: #f0f9ff; }
+
+    .target-hint {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1>車牙程式自動產生器</h1>
+      <h1>ACME 車牙程式自動產生器</h1>
       <p class="subtitle">
-        依輸入參數自動產生標準 CNC 車床 G92 左右交替車牙程式。沿切削角度與單次車削量，
-        交替切削左邊與右邊牙面，直到達到目標牙頂或牙底直徑。
+        依 ACME 29°（常用稱 30°）螺牙標準，自動產生 G92 左右交替車牙 CNC 程式。
+        外徑車到牙底直徑、內徑車到牙頂直徑；刀片寬度會自動補償到另一邊 Z 進刀，避免過切。
       </p>
       <div class="offline-badge">本機離線執行 · 單一 HTML 檔 · 不需安裝 · 不需伺服器</div>
       <ol class="usage-steps">
@@ -314,24 +336,18 @@
             <div class="field">
               <label>內徑 / 外徑</label>
               <div class="segmented">
-                <label><input type="radio" name="threadType" value="outer" checked>外徑車牙</label>
-                <label><input type="radio" name="threadType" value="inner">內徑車牙</label>
+                <label><input type="radio" name="threadType" value="outer" checked>外徑車牙（車到牙底）</label>
+                <label><input type="radio" name="threadType" value="inner">內徑車牙（車到牙頂）</label>
               </div>
             </div>
 
-            <div class="field">
-              <label>牙頂 / 牙底</label>
-              <div class="segmented">
-                <label><input type="radio" name="targetType" value="root" checked>車到牙底直徑</label>
-                <label><input type="radio" name="targetType" value="crest">車到牙頂直徑</label>
-              </div>
-            </div>
+            <div id="targetTypeHint" class="target-hint">外徑 ACME 車牙：目標為<strong>牙底直徑</strong>（小徑），起始直徑需大於目標。</div>
 
             <div class="grid-2">
               <div class="field">
-                <label for="targetDiameter">目標直徑 (mm)</label>
+                <label for="targetDiameter" id="targetDiameterLabel">牙底直徑 (mm)</label>
                 <input id="targetDiameter" type="number" step="0.0001" value="120.7500" required>
-                <small>車牙完成後的牙頂或牙底直徑。外徑應小於起始直徑。</small>
+                <small id="targetDiameterHelp">外徑 ACME 車牙完成後的牙底（小徑）尺寸。</small>
               </div>
               <div class="field">
                 <label for="initialDiameter">起始切削直徑 (mm)</label>
@@ -355,9 +371,9 @@
 
             <div class="grid-2">
               <div class="field">
-                <label for="cuttingAngle">切削角度 (°)</label>
-                <input id="cuttingAngle" type="number" step="0.01" value="12.00" required>
-                <small>左右斜進角度，用於計算每刀 Z 偏移。</small>
+                <label for="cuttingAngle">切削進刀角度 (°)</label>
+                <input id="cuttingAngle" type="number" step="0.01" value="14.50" required>
+                <small>ACME 單邊牙面角，標準為 14.5°（全角 29°）。</small>
               </div>
               <div class="field">
                 <label for="cutAmount">單次車削量 (mm)</label>
@@ -368,29 +384,38 @@
 
             <div class="grid-2">
               <div class="field">
-                <label for="toolNoseWidth">刀尖寬度 (mm)</label>
-                <input id="toolNoseWidth" type="number" step="0.0001" min="0" value="0.0000">
-                <small>車刀刀尖寬度，右邊 Z 位移會扣除此值以避免過切。</small>
-              </div>
-              <div class="field">
-                <label for="toolNoseCompSide">刀寬扣減邊</label>
-                <select id="toolNoseCompSide">
-                  <option value="right" selected>右邊（預設）</option>
-                  <option value="left">左邊</option>
-                </select>
-                <small>選擇哪一邊的 Z 位移需扣掉刀尖寬度。</small>
-              </div>
-            </div>
-
-            <div class="grid-2">
-              <div class="field">
                 <label for="pitch">牙距 (mm)</label>
                 <input id="pitch" type="number" step="0.001" value="2.000" required>
-                <small>G92 的 F 值，同時用於左右 Z 分離計算。</small>
+                <small>G92 的 F 值，亦用於 ACME 標準刀寬計算。</small>
               </div>
               <div class="field">
                 <label for="spindleSpeed">主軸轉速 S</label>
                 <input id="spindleSpeed" type="number" step="1" value="294" required>
+              </div>
+            </div>
+
+            <div class="ref-box" id="acmeRefBox">
+              <strong>ACME 標準參考（ANSI B1.5 通用型）</strong><br>
+              全牙形角 29°（≈30°） · 單邊角 14.5°<br>
+              <span id="acmeRefBladeText">外徑牙刀標準刀片寬度 ≈ 0.7414 mm（0.3707 × 牙距）</span>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="toolNoseWidth">實際牙刀刀片寬度 (mm)</label>
+                <input id="toolNoseWidth" type="number" step="0.0001" min="0" value="0.7414">
+                <small>輸入目前真實刀尖/刀片寬度；另一邊 Z 進刀會扣除此值。</small>
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 0;color:#cbd5e1;">
+                  <input type="checkbox" id="useReferenceBlade" checked style="width:auto;">
+                  自動套用 ACME 標準參考刀寬
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:0;color:#cbd5e1;">
+                  <input type="checkbox" id="useAcmeAngle" checked style="width:auto;">
+                  自動套用 ACME 標準進刀角 14.5°
+                </label>
               </div>
             </div>
 
@@ -455,13 +480,15 @@
             <div class="stat"><div class="label">深度層數</div><div class="value" id="statDepths">-</div></div>
             <div class="stat"><div class="label">總刀數</div><div class="value" id="statPasses">-</div></div>
             <div class="stat"><div class="label">最終 X</div><div class="value" id="statFinalX">-</div></div>
+            <div class="stat"><div class="label">ACME 參考刀寬</div><div class="value" id="statRefBlade">-</div></div>
+            <div class="stat"><div class="label">補償刀寬</div><div class="value" id="statToolBlade">-</div></div>
             <div class="stat"><div class="label">總進刀量</div><div class="value" id="statTotalCut">-</div></div>
           </div>
           <textarea id="output" readonly placeholder="按「產生車牙程式」後，G-code 會顯示在這裡。"></textarea>
           <p class="note">
-            產生邏輯：每一層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + 層數×單次車削量×tan(角度)，
-            右邊 Z = 切削起點 + 牙距/2 - 層數×單次車削量×tan(角度)。指定邊的 Z 位移另扣刀尖寬度以防過切。
-            外徑車牙 X 逐刀減小，內徑車牙 X 逐刀增大。
+            ACME 29° 車牙：每層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + 層數×單次車削量×tan(14.5°)，
+            右邊 Z = 切削起點 + 牙距/2 - 層數×單次車削量×tan(14.5°) - 刀片寬度。
+            刀片寬度補償在另一邊（右邊）Z 進刀，避免刀尖過切。外徑 X 逐刀減小，內徑 X 逐刀增大。
           </p>
         </div>
       </section>
@@ -472,6 +499,9 @@
     const form = document.getElementById('threadForm');
     const output = document.getElementById('output');
     const errorBox = document.getElementById('errorBox');
+    const ACME_INCLUDED_ANGLE = 29;
+    const ACME_FLANK_ANGLE = 14.5;
+    const ACME_FLAT_FACTOR = 0.3707;
 
     function fmt(value, digits = 4) {
       return Number(value).toFixed(digits);
@@ -489,6 +519,51 @@
       return text.replace(/\.?0+$/u, '');
     }
 
+    function acmeReferenceBladeWidth(pitch, threadType) {
+      return ACME_FLAT_FACTOR * pitch;
+    }
+
+    function getTargetType(threadType) {
+      return threadType === 'outer' ? 'root' : 'crest';
+    }
+
+    function updateThreadTypeUI() {
+      const threadType = form.threadType.value;
+      const isOuter = threadType === 'outer';
+      const label = document.getElementById('targetDiameterLabel');
+      const help = document.getElementById('targetDiameterHelp');
+      const hint = document.getElementById('targetTypeHint');
+      const refText = document.getElementById('acmeRefBladeText');
+
+      if (isOuter) {
+        label.textContent = '牙底直徑 (mm)';
+        help.textContent = '外徑 ACME 車牙完成後的牙底（小徑）尺寸。';
+        hint.innerHTML = '外徑 ACME 車牙：目標為<strong>牙底直徑</strong>（小徑），起始直徑需大於目標。';
+        refText.textContent = `外徑牙刀標準刀片寬度 ≈ ${fmt(acmeReferenceBladeWidth(Number(document.getElementById('pitch').value || 0), 'outer'))} mm（0.3707 × 牙距）`;
+      } else {
+        label.textContent = '牙頂直徑 (mm)';
+        help.textContent = '內徑 ACME 車牙完成後的牙頂（大徑）尺寸。';
+        hint.innerHTML = '內徑 ACME 車牙：目標為<strong>牙頂直徑</strong>（大徑），起始直徑需小於目標。';
+        refText.textContent = `內徑牙刀標準刀片寬度 ≈ ${fmt(acmeReferenceBladeWidth(Number(document.getElementById('pitch').value || 0), 'inner'))} mm（0.3707 × 牙距）`;
+      }
+    }
+
+    function syncAcmeDefaults() {
+      const pitch = Number(document.getElementById('pitch').value) || 0;
+      const threadType = form.threadType.value;
+      const refWidth = acmeReferenceBladeWidth(pitch, threadType);
+
+      if (document.getElementById('useAcmeAngle').checked) {
+        document.getElementById('cuttingAngle').value = ACME_FLANK_ANGLE.toFixed(2);
+      }
+
+      if (document.getElementById('useReferenceBlade').checked && pitch > 0) {
+        document.getElementById('toolNoseWidth').value = refWidth.toFixed(4);
+      }
+
+      updateThreadTypeUI();
+    }
+
     function showError(message) {
       errorBox.textContent = message;
       errorBox.classList.add('show');
@@ -501,7 +576,7 @@
 
     function readParams() {
       const threadType = form.threadType.value;
-      const targetType = form.targetType.value;
+      const targetType = getTargetType(threadType);
       const targetDiameter = Number(document.getElementById('targetDiameter').value);
       const initialDiameter = Number(document.getElementById('initialDiameter').value);
       const cutStartZ = Number(document.getElementById('cutStartZ').value);
@@ -518,7 +593,7 @@
       const safeX = Number(document.getElementById('safeX').value);
       const safeZ = Number(document.getElementById('safeZ').value);
       const toolNoseWidth = Number(document.getElementById('toolNoseWidth').value) || 0;
-      const toolNoseCompSide = document.getElementById('toolNoseCompSide').value;
+      const referenceBladeWidth = acmeReferenceBladeWidth(pitch, threadType);
 
       return {
         threadType,
@@ -538,7 +613,9 @@
         safeX,
         safeZ,
         toolNoseWidth,
-        toolNoseCompSide
+        referenceBladeWidth,
+        acmeIncludedAngle: ACME_INCLUDED_ANGLE,
+        acmeFlankAngle: ACME_FLANK_ANGLE
       };
     }
 
@@ -548,9 +625,9 @@
         [p.initialDiameter > 0, '起始切削直徑必須大於 0。'],
         [p.cutAmount > 0, '單次車削量必須大於 0。'],
         [p.pitch > 0, '牙距必須大於 0。'],
-        [p.cuttingAngle > 0 && p.cuttingAngle < 90, '切削角度需介於 0 到 90 度。'],
+        [p.cuttingAngle > 0 && p.cuttingAngle < 90, '切削進刀角度需介於 0 到 90 度。'],
         [p.spindleSpeed > 0, '主軸轉速必須大於 0。'],
-        [p.toolNoseWidth >= 0, '刀尖寬度不可為負數。']
+        [p.toolNoseWidth >= 0, '刀片寬度不可為負數。']
       ];
 
       for (const [ok, message] of checks) {
@@ -558,11 +635,11 @@
       }
 
       if (p.threadType === 'outer' && p.initialDiameter <= p.targetDiameter) {
-        return '外徑車牙時，起始切削直徑必須大於目標直徑。';
+        return '外徑 ACME 車牙時，起始切削直徑必須大於牙底直徑。';
       }
 
       if (p.threadType === 'inner' && p.initialDiameter >= p.targetDiameter) {
-        return '內徑車牙時，起始切削直徑必須小於目標直徑。';
+        return '內徑 ACME 車牙時，起始切削直徑必須小於牙頂直徑。';
       }
 
       return null;
@@ -575,12 +652,14 @@
       const leftZ0 = p.cutStartZ - p.pitch / 2 + p.cutAmount * tanA;
       const rightZ0 = p.cutStartZ + p.pitch / 2 - p.cutAmount * tanA;
       const toolW = p.toolNoseWidth || 0;
-      const leftComp = p.toolNoseCompSide === 'left' ? toolW : 0;
-      const rightComp = p.toolNoseCompSide === 'right' ? toolW : 0;
+      const leftComp = 0;
+      const rightComp = toolW;
       const increasing = p.threadType === 'inner';
       const depthPerCycle = 2 * p.cutAmount;
 
       const lines = [];
+      lines.push(`(ACME ${p.acmeIncludedAngle} DEG THREAD - ${p.threadType === 'outer' ? 'OD TO ROOT' : 'ID TO CREST'})`);
+      lines.push(`(PITCH ${fmtFeed(p.pitch)} MM  FLANK ANGLE ${fmt(p.cuttingAngle, 2)}  TOOL FLAT ${fmt(toolW)})`);
       lines.push(`N2  G0  X${fmtCoord(p.safeX)}. Z${fmtCoord(p.safeZ)}.`);
       lines.push(`        T${p.toolNumber}`);
       lines.push(`    G97 S${Math.round(p.spindleSpeed)}`);
@@ -644,7 +723,9 @@
         depthCount: depth,
         passCount: totalPasses,
         finalX,
-        totalCut: Math.abs(finalX - p.initialDiameter)
+        totalCut: Math.abs(finalX - p.initialDiameter),
+        referenceBladeWidth: p.referenceBladeWidth,
+        toolNoseWidth: toolW
       };
     }
 
@@ -652,12 +733,15 @@
       document.getElementById('statDepths').textContent = String(result.depthCount);
       document.getElementById('statPasses').textContent = String(result.passCount);
       document.getElementById('statFinalX').textContent = fmt(result.finalX);
+      document.getElementById('statRefBlade').textContent = `${fmt(result.referenceBladeWidth)} mm`;
+      document.getElementById('statToolBlade').textContent = `${fmt(result.toolNoseWidth)} mm`;
       document.getElementById('statTotalCut').textContent = `${fmt(result.totalCut)} mm`;
     }
 
     function generate() {
       clearError();
       try {
+        syncAcmeDefaults();
         const params = readParams();
         const error = validateParams(params);
         if (error) {
@@ -675,23 +759,22 @@
 
     function loadSample() {
       form.threadType.value = 'outer';
-      form.targetType.value = 'root';
       document.getElementById('targetDiameter').value = '120.7500';
       document.getElementById('initialDiameter').value = '130.0500';
       document.getElementById('cutStartZ').value = '19.0000';
       document.getElementById('threadEndZ').value = '-52.0000';
       document.getElementById('threadEndZRight').value = '-215.0000';
-      document.getElementById('cuttingAngle').value = '12.00';
       document.getElementById('cutAmount').value = '0.1000';
-      document.getElementById('toolNoseWidth').value = '0.0000';
-      document.getElementById('toolNoseCompSide').value = 'right';
       document.getElementById('pitch').value = '2.000';
+      document.getElementById('useAcmeAngle').checked = true;
+      document.getElementById('useReferenceBlade').checked = true;
       document.getElementById('programStartX').value = '119.0000';
       document.getElementById('programStartZ').value = '20.0000';
       document.getElementById('spindleSpeed').value = '294';
       document.getElementById('toolNumber').value = '0505';
       document.getElementById('safeX').value = '200.0000';
       document.getElementById('safeZ').value = '120.0000';
+      syncAcmeDefaults();
       generate();
     }
 
@@ -743,6 +826,15 @@
       event.preventDefault();
       generate();
     });
+
+    form.threadType.addEventListener('change', () => {
+      syncAcmeDefaults();
+      generate();
+    });
+
+    document.getElementById('pitch').addEventListener('input', syncAcmeDefaults);
+    document.getElementById('useAcmeAngle').addEventListener('change', syncAcmeDefaults);
+    document.getElementById('useReferenceBlade').addEventListener('change', syncAcmeDefaults);
 
     document.getElementById('loadSample').addEventListener('click', loadSample);
     document.getElementById('copyOutput').addEventListener('click', copyOutput);
