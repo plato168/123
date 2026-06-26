@@ -330,13 +330,13 @@
             <div class="grid-2">
               <div class="field">
                 <label for="targetDiameter">目標直徑 (mm)</label>
-                <input id="targetDiameter" type="number" step="0.0001" value="130.0500" required>
-                <small>依上方選擇，為牙頂或牙底目標直徑。</small>
+                <input id="targetDiameter" type="number" step="0.0001" value="120.7500" required>
+                <small>車牙完成後的牙頂或牙底直徑。外徑應小於起始直徑。</small>
               </div>
               <div class="field">
                 <label for="initialDiameter">起始切削直徑 (mm)</label>
-                <input id="initialDiameter" type="number" step="0.0001" value="120.7500" required>
-                <small>第一刀 G92 的 X 起點直徑。</small>
+                <input id="initialDiameter" type="number" step="0.0001" value="130.0500" required>
+                <small>第一刀 G92 的 X 起點。外徑為較大毛胚直徑，內徑為較小孔徑。</small>
               </div>
             </div>
 
@@ -444,7 +444,7 @@
           <textarea id="output" readonly placeholder="按「產生車牙程式」後，G-code 會顯示在這裡。"></textarea>
           <p class="note">
             產生邏輯：每一層先左邊再右邊。左邊 Z = 切削起點 - 牙距/2 + (層數+1)×單次車削量×tan(角度)，
-            右邊 Z = 切削起點 + 牙距/2 - (層數+1)×單次車削量×tan(角度)。外徑車牙 X 逐刀增大，內徑車牙 X 逐刀減小。
+            右邊 Z = 切削起點 + 牙距/2 - (層數+1)×單次車削量×tan(角度)。外徑車牙 X 逐刀減小，內徑車牙 X 逐刀增大。
           </p>
         </div>
       </section>
@@ -535,12 +535,12 @@
         if (!ok) return message;
       }
 
-      if (p.threadType === 'outer' && p.initialDiameter >= p.targetDiameter) {
-        return '外徑車牙時，起始切削直徑必須小於目標直徑。';
+      if (p.threadType === 'outer' && p.initialDiameter <= p.targetDiameter) {
+        return '外徑車牙時，起始切削直徑必須大於目標直徑。';
       }
 
-      if (p.threadType === 'inner' && p.initialDiameter <= p.targetDiameter) {
-        return '內徑車牙時，起始切削直徑必須大於目標直徑。';
+      if (p.threadType === 'inner' && p.initialDiameter >= p.targetDiameter) {
+        return '內徑車牙時，起始切削直徑必須小於目標直徑。';
       }
 
       return null;
@@ -552,7 +552,7 @@
       const zStep = p.cutAmount * tanA;
       const leftZ0 = p.cutStartZ - p.pitch / 2 + p.cutAmount * tanA;
       const rightZ0 = p.cutStartZ + p.pitch / 2 - p.cutAmount * tanA;
-      const increasing = p.threadType === 'outer';
+      const increasing = p.threadType === 'inner';
       const depthPerCycle = 2 * p.cutAmount;
 
       const lines = [];
@@ -651,8 +651,8 @@
     function loadSample() {
       form.threadType.value = 'outer';
       form.targetType.value = 'root';
-      document.getElementById('targetDiameter').value = '130.0500';
-      document.getElementById('initialDiameter').value = '120.7500';
+      document.getElementById('targetDiameter').value = '120.7500';
+      document.getElementById('initialDiameter').value = '130.0500';
       document.getElementById('cutStartZ').value = '19.0000';
       document.getElementById('threadEndZ').value = '-52.0000';
       document.getElementById('threadEndZRight').value = '-215.0000';
