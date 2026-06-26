@@ -317,8 +317,8 @@
     <header>
       <h1>ACME 車牙程式自動產生器</h1>
       <p class="subtitle">
-        依 ACME 29°（常用稱 30°）螺牙標準，自動產生 G92 左右交替車牙 CNC 程式。
-        外徑車到目標直徑（牙底）、內徑車到目標直徑（牙頂）；左右兩邊 Z 進刀皆扣除刀片寬度，避免過切。
+        依 ACME 29°（常用稱 30°）螺牙標準分層進刀：每層左右兩邊 X 切深相同（雙邊同時切深），
+        分層切深依牙刀刀片寬度與進刀角計算，Z 進刀兩邊皆扣刀寬避免過切。
       </p>
       <div class="offline-badge">本機離線執行 · 單一 HTML 檔 · 不需安裝 · 不需伺服器</div>
       <ol class="usage-steps">
@@ -376,9 +376,9 @@
                 <small>ACME 單邊牙面角，標準為 14.5°（全角 29°）。</small>
               </div>
               <div class="field">
-                <label for="cutAmount">單次車削量 (mm)</label>
-                <input id="cutAmount" type="number" step="0.0001" value="0.1000" required>
-                <small>每一邊刀路的 X 方向進刀量。</small>
+                <label for="cutAmount">分層切深 (mm)</label>
+                <input id="cutAmount" type="number" step="0.0001" value="0.1919" required>
+                <small id="cutAmountHelp">每層 X 方向切深（左右同深）。可自動依刀寬×tan(進刀角) 計算。</small>
               </div>
             </div>
 
@@ -397,7 +397,8 @@
             <div class="ref-box" id="acmeRefBox">
               <strong>ACME 標準參考（ANSI B1.5 通用型）</strong><br>
               全牙形角 29°（≈30°） · 單邊角 14.5°<br>
-              <span id="acmeRefBladeText">外徑牙刀標準刀片寬度 ≈ 0.7414 mm（0.3707 × 牙距）</span>
+              <span id="acmeRefBladeText">外徑牙刀標準刀片寬度 ≈ 0.7414 mm（0.3707 × 牙距）</span><br>
+              <span id="acmeRefLayerText">建議分層切深 ≈ 0.1919 mm（刀寬 × tan14.5°）</span>
             </div>
 
             <div class="grid-2">
@@ -411,6 +412,10 @@
                 <label style="display:flex;align-items:center;gap:8px;padding:10px 0;color:#cbd5e1;">
                   <input type="checkbox" id="useReferenceBlade" checked style="width:auto;">
                   自動套用 ACME 標準參考刀寬
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:0 0 8px;color:#cbd5e1;">
+                  <input type="checkbox" id="useAcmeLayerDepth" checked style="width:auto;">
+                  自動依刀寬計算分層切深（刀寬×tan進刀角）
                 </label>
                 <label style="display:flex;align-items:center;gap:8px;padding:0;color:#cbd5e1;">
                   <input type="checkbox" id="useAcmeAngle" checked style="width:auto;">
@@ -480,15 +485,15 @@
             <div class="stat"><div class="label">深度層數</div><div class="value" id="statDepths">-</div></div>
             <div class="stat"><div class="label">總刀數</div><div class="value" id="statPasses">-</div></div>
             <div class="stat"><div class="label">最終 X</div><div class="value" id="statFinalX">-</div></div>
-            <div class="stat"><div class="label">ACME 參考刀寬</div><div class="value" id="statRefBlade">-</div></div>
+            <div class="stat"><div class="label">分層切深</div><div class="value" id="statLayerDepth">-</div></div>
             <div class="stat"><div class="label">補償刀寬</div><div class="value" id="statToolBlade">-</div></div>
             <div class="stat"><div class="label">總進刀量</div><div class="value" id="statTotalCut">-</div></div>
           </div>
           <textarea id="output" readonly placeholder="按「產生車牙程式」後，G-code 會顯示在這裡。"></textarea>
           <p class="note">
-            ACME 29° 車牙：每層先左邊再右邊。左邊 Z = 基準左 Z + 層數×單次車削量×tan(角度) - 刀片寬度，
-            右邊 Z = 基準右 Z - 層數×單次車削量×tan(角度) - 刀片寬度。左右兩邊皆扣刀寬避免過切。
-            外徑 X 逐刀減小，內徑 X 逐刀增大。到達目標直徑時僅輸出一刀終點 G92，不重複相同 X。
+            ACME 29° 分層進刀：每層先左後右，但<strong>同一層 X 切深相同</strong>（雙邊同時切深）。
+            左邊 Z = 基準左 Z + 層數×分層切深×tan(角度) - 刀寬；右邊 Z = 基準右 Z - 層數×分層切深×tan(角度) - 刀寬。
+            分層切深建議 = 刀寬 × tan(14.5°)。到達目標直徑時僅輸出一刀終點 G92。
           </p>
         </div>
       </section>
@@ -519,8 +524,13 @@
       return text.replace(/\.?0+$/u, '');
     }
 
-    function acmeReferenceBladeWidth(pitch, threadType) {
+    function acmeReferenceBladeWidth(pitch) {
       return ACME_FLAT_FACTOR * pitch;
+    }
+
+    function acmeLayerDepthFromBlade(toolWidth, angleDeg) {
+      const angleRad = angleDeg * Math.PI / 180;
+      return toolWidth * Math.tan(angleRad);
     }
 
     function getTargetType(threadType) {
@@ -535,26 +545,34 @@
       const initialHelp = document.getElementById('initialDiameterHelp');
       const hint = document.getElementById('targetTypeHint');
       const refText = document.getElementById('acmeRefBladeText');
+      const layerText = document.getElementById('acmeRefLayerText');
+      const pitch = Number(document.getElementById('pitch').value) || 0;
+      const refWidth = acmeReferenceBladeWidth(pitch);
+      const layerDepth = acmeLayerDepthFromBlade(refWidth, ACME_FLANK_ANGLE);
 
       if (isOuter) {
         targetHelp.textContent = '外徑 ACME 車牙完成後的目標直徑（牙底小徑）。';
         initialLabel.textContent = '材料加工起始外徑 (mm)';
         initialHelp.textContent = '第一刀 G92 的 X 起點，外徑為材料加工起始外徑。';
-        hint.innerHTML = '外徑 ACME 車牙：目標直徑為牙底（小徑），材料加工起始外徑需大於目標直徑。';
-        refText.textContent = `外徑牙刀標準刀片寬度 ≈ ${fmt(acmeReferenceBladeWidth(Number(document.getElementById('pitch').value || 0), 'outer'))} mm（0.3707 × 牙距）`;
+        hint.innerHTML = '外徑 ACME 分層進刀：每層左右同深，材料加工起始外徑需大於目標直徑。';
+        refText.textContent = `外徑牙刀標準刀片寬度 ≈ ${fmt(refWidth)} mm（0.3707 × 牙距）`;
       } else {
         targetHelp.textContent = '內徑 ACME 車牙完成後的目標直徑（牙頂大徑）。';
         initialLabel.textContent = '材料加工起始內徑 (mm)';
         initialHelp.textContent = '第一刀 G92 的 X 起點，內徑為材料加工起始內徑。';
-        hint.innerHTML = '內徑 ACME 車牙：目標直徑為牙頂（大徑），材料加工起始內徑需小於目標直徑。';
-        refText.textContent = `內徑牙刀標準刀片寬度 ≈ ${fmt(acmeReferenceBladeWidth(Number(document.getElementById('pitch').value || 0), 'inner'))} mm（0.3707 × 牙距）`;
+        hint.innerHTML = '內徑 ACME 分層進刀：每層左右同深，材料加工起始內徑需小於目標直徑。';
+        refText.textContent = `內徑牙刀標準刀片寬度 ≈ ${fmt(refWidth)} mm（0.3707 × 牙距）`;
       }
+
+      layerText.textContent = `建議分層切深 ≈ ${fmt(layerDepth)} mm（刀寬 × tan${ACME_FLANK_ANGLE}°）`;
     }
 
     function syncAcmeDefaults() {
       const pitch = Number(document.getElementById('pitch').value) || 0;
-      const threadType = form.threadType.value;
-      const refWidth = acmeReferenceBladeWidth(pitch, threadType);
+      const refWidth = acmeReferenceBladeWidth(pitch);
+      const angle = document.getElementById('useAcmeAngle').checked
+        ? ACME_FLANK_ANGLE
+        : Number(document.getElementById('cuttingAngle').value) || ACME_FLANK_ANGLE;
 
       if (document.getElementById('useAcmeAngle').checked) {
         document.getElementById('cuttingAngle').value = ACME_FLANK_ANGLE.toFixed(2);
@@ -562,6 +580,11 @@
 
       if (document.getElementById('useReferenceBlade').checked && pitch > 0) {
         document.getElementById('toolNoseWidth').value = refWidth.toFixed(4);
+      }
+
+      const toolWidth = Number(document.getElementById('toolNoseWidth').value) || refWidth;
+      if (document.getElementById('useAcmeLayerDepth').checked && toolWidth > 0) {
+        document.getElementById('cutAmount').value = acmeLayerDepthFromBlade(toolWidth, angle).toFixed(4);
       }
 
       updateThreadTypeUI();
@@ -596,7 +619,7 @@
       const safeX = Number(document.getElementById('safeX').value);
       const safeZ = Number(document.getElementById('safeZ').value);
       const toolNoseWidth = Number(document.getElementById('toolNoseWidth').value) || 0;
-      const referenceBladeWidth = acmeReferenceBladeWidth(pitch, threadType);
+      const referenceBladeWidth = acmeReferenceBladeWidth(pitch);
 
       return {
         threadType,
@@ -626,7 +649,7 @@
       const checks = [
         [p.targetDiameter > 0, '目標直徑必須大於 0。'],
         [p.initialDiameter > 0, '材料加工起始外(內)徑必須大於 0。'],
-        [p.cutAmount > 0, '單次車削量必須大於 0。'],
+        [p.cutAmount > 0, '分層切深必須大於 0。'],
         [p.pitch > 0, '牙距必須大於 0。'],
         [p.cuttingAngle > 0 && p.cuttingAngle < 90, '切削進刀角度需介於 0 到 90 度。'],
         [p.spindleSpeed > 0, '主軸轉速必須大於 0。'],
@@ -651,16 +674,16 @@
     function generateThreadingProgram(p) {
       const angleRad = p.cuttingAngle * Math.PI / 180;
       const tanA = Math.tan(angleRad);
-      const zStep = p.cutAmount * tanA;
-      const leftZ0 = p.cutStartZ - p.pitch / 2 + p.cutAmount * tanA;
-      const rightZ0 = p.cutStartZ + p.pitch / 2 - p.cutAmount * tanA;
+      const layerDepth = p.cutAmount;
+      const zStep = layerDepth * tanA;
+      const leftZ0 = p.cutStartZ - p.pitch / 2 + layerDepth * tanA;
+      const rightZ0 = p.cutStartZ + p.pitch / 2 - layerDepth * tanA;
       const toolW = p.toolNoseWidth || 0;
       const increasing = p.threadType === 'inner';
-      const depthPerCycle = 2 * p.cutAmount;
 
       const lines = [];
-      lines.push(`(ACME ${p.acmeIncludedAngle} DEG THREAD - ${p.threadType === 'outer' ? 'OD TO ROOT' : 'ID TO CREST'})`);
-      lines.push(`(PITCH ${fmtFeed(p.pitch)} MM  FLANK ANGLE ${fmt(p.cuttingAngle, 2)}  TOOL FLAT ${fmt(toolW)})`);
+      lines.push(`(ACME ${p.acmeIncludedAngle} DEG LAYER INFEED - ${p.threadType === 'outer' ? 'OD TO ROOT' : 'ID TO CREST'})`);
+      lines.push(`(PITCH ${fmtFeed(p.pitch)} MM  LAYER DEPTH ${fmt(layerDepth)}  TOOL FLAT ${fmt(toolW)}  BOTH SIDES SAME X)`);
       lines.push(`N2  G0  X${fmtCoord(p.safeX)}. Z${fmtCoord(p.safeZ)}.`);
       lines.push(`        T${p.toolNumber}`);
       lines.push(`    G97 S${Math.round(p.spindleSpeed)}`);
@@ -668,95 +691,55 @@
       lines.push('M8');
       lines.push(`    G00 X${fmtCoord(p.programStartX)}. Z${fmtCoord(p.programStartZ)}.`);
 
-      let depth = 0;
+      let layer = 0;
       let totalPasses = 0;
+      let currentX = p.initialDiameter;
       let finalX = p.initialDiameter;
       let leftFeedUsed = false;
       let rightFeedUsed = false;
 
       while (true) {
-        const leftX = increasing
-          ? p.initialDiameter + depth * depthPerCycle
-          : p.initialDiameter - depth * depthPerCycle;
-        const rightX = increasing
-          ? leftX + p.cutAmount
-          : leftX - p.cutAmount;
-
-        if (increasing && leftX > p.targetDiameter) break;
-        if (!increasing && leftX < p.targetDiameter) break;
-
-        const leftZ = leftZ0 + depth * zStep - toolW;
-        const rightZ = rightZ0 - depth * zStep - toolW;
+        const leftZ = leftZ0 + layer * zStep - toolW;
+        const rightZ = rightZ0 - layer * zStep - toolW;
         const leftFeed = !leftFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
         const rightFeed = !rightFeedUsed ? ` F${fmtFeed(p.pitch)}.` : '.';
 
-        if (!increasing) {
-          if (leftX <= p.targetDiameter) {
-            lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
-            lines.push(`    G00 Z${fmt(leftZ)}`);
-            totalPasses += 1;
-            leftFeedUsed = true;
-            finalX = leftX;
-            depth += 1;
-            break;
-          }
-
-          if (rightX <= p.targetDiameter) {
-            lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
-            lines.push(`    G00 Z${fmt(leftZ)}`);
-            totalPasses += 1;
-            leftFeedUsed = true;
-
-            lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
-            lines.push(`    G00 Z${fmt(rightZ)}`);
-            totalPasses += 1;
-            rightFeedUsed = true;
-            finalX = p.targetDiameter;
-            depth += 1;
-            break;
-          }
-        } else {
-          if (leftX >= p.targetDiameter) {
-            lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
-            lines.push(`    G00 Z${fmt(leftZ)}`);
-            totalPasses += 1;
-            leftFeedUsed = true;
-            finalX = p.targetDiameter;
-            depth += 1;
-            break;
-          }
-
-          if (rightX >= p.targetDiameter) {
-            lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
-            lines.push(`    G00 Z${fmt(leftZ)}`);
-            totalPasses += 1;
-            leftFeedUsed = true;
-
-            lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
-            lines.push(`    G00 Z${fmt(rightZ)}`);
-            totalPasses += 1;
-            rightFeedUsed = true;
-            finalX = p.targetDiameter;
-            depth += 1;
-            break;
-          }
+        if (!increasing && currentX <= p.targetDiameter) {
+          lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+          lines.push(`    G00 Z${fmt(leftZ)}`);
+          totalPasses += 1;
+          leftFeedUsed = true;
+          finalX = p.targetDiameter;
+          layer += 1;
+          break;
         }
 
-        lines.push(`    G92 X${fmt(leftX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+        if (increasing && currentX >= p.targetDiameter) {
+          lines.push(`    G92 X${fmt(p.targetDiameter)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
+          lines.push(`    G00 Z${fmt(leftZ)}`);
+          totalPasses += 1;
+          leftFeedUsed = true;
+          finalX = p.targetDiameter;
+          layer += 1;
+          break;
+        }
+
+        lines.push(`    G92 X${fmt(currentX)} Z${fmtCoord(p.threadEndZ)}${leftFeed}`);
         lines.push(`    G00 Z${fmt(leftZ)}`);
         totalPasses += 1;
         leftFeedUsed = true;
 
-        lines.push(`    G92 X${fmt(rightX)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
+        lines.push(`    G92 X${fmt(currentX)} Z${fmtCoord(p.threadEndZRight)}${rightFeed}`);
         lines.push(`    G00 Z${fmt(rightZ)}`);
         totalPasses += 1;
         rightFeedUsed = true;
-        finalX = rightX;
-        depth += 1;
+        finalX = currentX;
+        layer += 1;
+        currentX = increasing ? currentX + layerDepth : currentX - layerDepth;
       }
 
       if (totalPasses === 0) {
-        throw new Error('無法產生任何刀路，請檢查直徑與進刀量設定。');
+        throw new Error('無法產生任何刀路，請檢查直徑與分層切深設定。');
       }
 
       lines.push('        M09');
@@ -765,12 +748,13 @@
 
       return {
         code: lines.join('\n'),
-        depthCount: depth,
+        depthCount: layer,
         passCount: totalPasses,
         finalX,
         totalCut: Math.abs(finalX - p.initialDiameter),
         referenceBladeWidth: p.referenceBladeWidth,
-        toolNoseWidth: toolW
+        toolNoseWidth: toolW,
+        layerDepth
       };
     }
 
@@ -778,7 +762,7 @@
       document.getElementById('statDepths').textContent = String(result.depthCount);
       document.getElementById('statPasses').textContent = String(result.passCount);
       document.getElementById('statFinalX').textContent = fmt(result.finalX);
-      document.getElementById('statRefBlade').textContent = `${fmt(result.referenceBladeWidth)} mm`;
+      document.getElementById('statLayerDepth').textContent = `${fmt(result.layerDepth)} mm`;
       document.getElementById('statToolBlade').textContent = `${fmt(result.toolNoseWidth)} mm`;
       document.getElementById('statTotalCut').textContent = `${fmt(result.totalCut)} mm`;
     }
@@ -878,8 +862,10 @@
     });
 
     document.getElementById('pitch').addEventListener('input', syncAcmeDefaults);
+    document.getElementById('toolNoseWidth').addEventListener('input', syncAcmeDefaults);
     document.getElementById('useAcmeAngle').addEventListener('change', syncAcmeDefaults);
     document.getElementById('useReferenceBlade').addEventListener('change', syncAcmeDefaults);
+    document.getElementById('useAcmeLayerDepth').addEventListener('change', syncAcmeDefaults);
 
     document.getElementById('loadSample').addEventListener('click', loadSample);
     document.getElementById('copyOutput').addEventListener('click', copyOutput);
