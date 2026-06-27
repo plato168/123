@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>北海道旅遊推薦｜蔚藍夢幻北海道 5 日</title>
+  <style>
+    :root {
+      --bg: #0c1520;
+      --panel: #152030;
+      --panel-2: #1e3048;
+      --border: #2d4a6a;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #5eb3ff;
+      --accent-2: #7dd3fc;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --craft: #f0abfc;
+      --elec: #60a5fa;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(94, 179, 255, 0.14), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(125, 211, 252, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 20px 56px;
+    }
+
+    header { margin-bottom: 28px; }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle { color: var(--muted); max-width: 780px; }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      color: var(--accent-2);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0 28px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.12s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #0c2340;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+      color: var(--accent-2);
+    }
+
+    h3 {
+      margin: 18px 0 8px;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+    .day-card {
+      background: var(--panel-2);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .day-card:last-child { margin-bottom: 0; }
+
+    .day-title {
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .day-route { color: var(--muted); font-size: 0.92rem; margin-bottom: 10px; }
+
+    ul { margin: 8px 0; padding-left: 1.3rem; }
+    li { margin-bottom: 6px; }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .tag-craft { background: rgba(240, 171, 252, 0.18); color: var(--craft); }
+    .tag-elec { background: rgba(96, 165, 250, 0.18); color: var(--elec); }
+    .tag-food { background: rgba(251, 191, 36, 0.18); color: var(--warn); }
+    .tag-scenic { background: rgba(74, 222, 128, 0.15); color: var(--ok); }
+
+    .spot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .spot {
+      background: var(--panel-2);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .spot h4 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .spot p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .checklist-item:last-child { border-bottom: 0; }
+
+    .checklist-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .checklist-item label {
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .checklist-item.done label {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--panel-2);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 12px 0 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--ok));
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .tips {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 12px;
+    }
+
+    .tips strong { color: var(--warn); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 32px;
+    }
+
+    a { color: var(--accent-2); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>北海道旅遊推薦</h1>
+      <p class="subtitle">
+        蔚藍夢幻北海道 5 日行程整理，重點整理日本電器與手工藝品購物建議。
+        本頁可離線使用，勾選進度會自動儲存在瀏覽器。
+      </p>
+      <div class="meta-bar">
+        <span class="badge">出發：2026/8/14（四）</span>
+        <span class="badge">團號 SPK05260814A</span>
+        <span class="badge">VDR0000000522</span>
+        <span class="badge">5 日 4 夜</span>
+      </div>
+      <p style="margin-top:14px;font-size:0.9rem;">
+        <a href="日本旅遊常見問題.html" style="color:var(--accent-2);">→ 日本旅遊常見問題（付款、免稅、網路、禮貌等）</a>
+      </p>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="exportBtn">匯出進度 JSON</button>
+      <button class="btn-secondary" id="resetBtn">清除所有勾選</button>
+    </div>
+
+    <section>
+      <h2>行程總覽</h2>
+      <div class="day-card">
+        <div class="day-title">Day 1｜8/14（四）</div>
+        <div class="day-route">台北 → 新千歳機場 → 洞爺湖溫泉</div>
+        <ul>
+          <li><span class="tag tag-scenic">景點</span>洞爺湖溫泉區散策、湖畔風光</li>
+          <li><span class="tag tag-scenic">活動</span>洞爺湖長期煙火（約 20:45–21:05，依當日公告）</li>
+        </ul>
+      </div>
+      <div class="day-card">
+        <div class="day-title">Day 2｜8/15（五）</div>
+        <div class="day-route">積丹 → 小樽 → 小樽水族館 → 定山溪足湯</div>
+        <ul>
+          <li><span class="tag tag-scenic">景點</span>積丹半島海岸、神威岬（依天候）</li>
+          <li><span class="tag tag-craft">手工藝</span>小樽堺町通、北一硝子、小樽音樂盒堂</li>
+          <li><span class="tag tag-scenic">景點</span>小樽水族館、定山溪足湯體驗</li>
+        </ul>
+      </div>
+      <div class="day-card">
+        <div class="day-title">Day 3｜8/16（六）</div>
+        <div class="day-route">美瑛 → 富良野 → 札幌薄野</div>
+        <ul>
+          <li><span class="tag tag-scenic">景點</span>青池、白鬚瀑布、富田農場、四季彩之丘</li>
+          <li><span class="tag tag-craft">雜貨</span>富田農場／四季彩之丘伴手禮、農產加工品</li>
+          <li><span class="tag tag-elec">購物</span>薄野 COCONO SUSUKINO（新開複合商場，可順路逛）</li>
+        </ul>
+      </div>
+      <div class="day-card">
+        <div class="day-title">Day 4｜8/17（日）</div>
+        <div class="day-route">札幌 → 北海道神宮 → 免稅店 → 三井 OUTLET → 頭大佛 → 狸小路</div>
+        <ul>
+          <li><span class="tag tag-scenic">景點</span>北海道神宮、頭大佛</li>
+          <li><span class="tag tag-elec">電器</span>行程安排免稅店（團購時段，留意品項與價格）</li>
+          <li><span class="tag tag-craft">購物</span>三井 OUTLET 札幌北廣島、狸小路商店街自由時間</li>
+        </ul>
+      </div>
+      <div class="day-card">
+        <div class="day-title">Day 5｜8/18（一）</div>
+        <div class="day-route">新千歳機場 → 台北</div>
+        <ul>
+          <li><span class="tag tag-elec">補貨</span>新千歳機場免稅／伴手禮（Royce、白色戀人、LeTAO 等）</li>
+          <li><span class="tag tag-food">美食</span>機場內海鮮丼、拉麵道（時間允許再排）</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>手工藝品推薦</h2>
+      <div class="spot-grid">
+        <div class="spot">
+          <h4>小樽北一硝子</h4>
+          <p>玻璃工藝老字號，可參觀製作過程、選購玻璃杯、飾品與燈具。三號館有咖啡廳，適合邊逛邊休息。</p>
+        </div>
+        <div class="spot">
+          <h4>小樽音樂盒堂</h4>
+          <p>日本最大音樂盒賣場之一，木質音樂盒、八音盒機芯、北海道限定款。本館與二館步行可達。</p>
+        </div>
+        <div class="spot">
+          <h4>堺町通商店街</h4>
+          <p>小樽運河旁歷史街區，硝子店、皮革、雜貨、甜點並列。建議預留 1.5–2 小時慢慢逛。</p>
+        </div>
+        <div class="spot">
+          <h4>富田農場／四季彩之丘</h4>
+          <p>薰衣草製品、果醬、羊毛製品、農村風雜貨。富良野地區伴手禮集中採買的好時機。</p>
+        </div>
+        <div class="spot">
+          <h4>狸小路商店街</h4>
+          <p>札幌最老牌商店街，藥妝、雜貨、北海道土產、部分手工小物。Day 4 自由時間可補貨。</p>
+        </div>
+        <div class="spot">
+          <h4>三井 OUTLET 札幌北廣島</h4>
+          <p>品牌 OUTLET 為主，可找服飾、生活雜貨。若重手工藝，優先時間仍建議留給小樽與狸小路。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>日本電器推薦</h2>
+      <div class="spot-grid">
+        <div class="spot">
+          <h4>Bic Camera 札幌店</h4>
+          <p>位於東急百貨 5–6F，品項齊全：相機、耳機、電鬍刀、吹風機、日本家電。持護照可享免稅，建議先比價台灣售價。</p>
+        </div>
+        <div class="spot">
+          <h4>Bic Camera Select 狸小路</h4>
+          <p>狸小路 5 丁目，營業至 23:00，適合 Day 4 晚上補逛。品項較精簡但交通方便。</p>
+        </div>
+        <div class="spot">
+          <h4>行程免稅店（Day 4）</h4>
+          <p>跟團安排的免稅店通常有相機、電器、健康家電。先列清單、查型號，避免衝動購買。</p>
+        </div>
+        <div class="spot">
+          <h4>新千歳機場（Day 5）</h4>
+          <p>最後補貨點：耳機、小電器、日本限定款。注意液態物品與手提行李限制。</p>
+        </div>
+      </div>
+
+      <h3>常見值得評估的品項</h3>
+      <ul>
+        <li>吹風機（Panasonic、Sharp 等日本版）</li>
+        <li>電動牙刷、沖牙機</li>
+        <li>耳機、降噪耳機（Sony、Audio-Technica）</li>
+        <li>電鬍刀、美容家電</li>
+        <li>相機鏡頭、底片機（若攝影愛好）</li>
+      </ul>
+
+      <div class="tips">
+        <strong>購物提醒：</strong>
+        日本電器有時為 100V、插頭與台灣不同，需變壓器或確認是否為國際版。
+        免稅需護照正本、同一店與同一日滿一定金額。大型行李請預留空間，或考慮最後一天機場取貨。
+      </div>
+    </section>
+
+    <section>
+      <h2>行前準備清單</h2>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <p class="progress-text" id="progressText">已完成 0 / 0 項</p>
+      <div id="checklist"></div>
+    </section>
+
+    <section>
+      <h2>實用資訊</h2>
+      <ul>
+        <li><strong>氣候：</strong>8 月北海道白天約 22–28°C，早晚較涼，建議薄外套＋防曬。</li>
+        <li><strong>交通：</strong>跟團巴士為主；自由時間在札幌可搭地鐵（狸小路附近為大通／薄野站）。</li>
+        <li><strong>支付：</strong>現金仍普遍，但大店與便利商店多可刷卡；建議備少量日幣。</li>
+        <li><strong>小樽：</strong>堺町通與運河人潮多，貴重物品與護照注意保管。</li>
+        <li><strong>參考行程：</strong>同系列「蔚藍夢幻北海道 5 日」團型，實際順序以 EZTRAVEL 出團通知為準。</li>
+      </ul>
+    </section>
+
+    <footer>
+      日本旅遊／北海道專案 · 離線可用 · 進度儲存於本機瀏覽器
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "hokkaido-travel-checklist-v1";
+
+    const items = [
+      { id: "passport", text: "護照效期確認（免稅必備）" },
+      { id: "sim", text: "SIM 卡／eSIM 或漫遊方案" },
+      { id: "yen", text: "兌換日幣（小店與自動販賣機）" },
+      { id: "adapter", text: "萬用轉接頭（日本 A 型兩扁腳）" },
+      { id: "jacket", text: "薄外套（北海道早晚溫差）" },
+      { id: "sunscreen", text: "防曬、墨鏡、帽子" },
+      { id: "medicine", text: "常備藥品、暈車藥" },
+      { id: "camera", text: "相機／行動電源（青池、富良野拍照）" },
+      { id: "list-craft", text: "列手工藝品購買清單（硝子、音樂盒）" },
+      { id: "list-elec", text: "列電器型號清單並比價台灣售價" },
+      { id: "taxfree", text: "確認免稅條件與行李空間" },
+      { id: "otaru-time", text: "預留小樽堺町通充足逛街時間" },
+      { id: "sapporo-bic", text: "查 Bic Camera 札幌／狸小路營業時間" },
+      { id: "fireworks", text: "確認洞爺湖煙火當日時間" },
+      { id: "souvenir", text: "機場伴手禮預留預算（Royce、LeTAO 等）" }
+    ];
+
+    const checklistEl = document.getElementById("checklist");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function updateProgress(state) {
+      const done = items.filter(i => state[i.id]).length;
+      const total = items.length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      progressFill.style.width = pct + "%";
+      progressText.textContent = "已完成 " + done + " / " + total + " 項";
+    }
+
+    function render() {
+      const state = loadState();
+      checklistEl.innerHTML = "";
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "checklist-item" + (state[item.id] ? " done" : "");
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.id = item.id;
+        cb.checked = !!state[item.id];
+        cb.addEventListener("change", () => {
+          state[item.id] = cb.checked;
+          saveState(state);
+          row.classList.toggle("done", cb.checked);
+          updateProgress(state);
+        });
+        const label = document.createElement("label");
+        label.htmlFor = item.id;
+        label.textContent = item.text;
+        row.appendChild(cb);
+        row.appendChild(label);
+        checklistEl.appendChild(row);
+      });
+      updateProgress(state);
+    }
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const state = loadState();
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hokkaido-checklist-progress.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (confirm("確定要清除所有勾選進度嗎？")) {
+        localStorage.removeItem(STORAGE_KEY);
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

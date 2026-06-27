@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>北海道專案｜旅遊資料入口</title>
+  <style>
+    :root {
+      --bg: #0c1520;
+      --panel: #152030;
+      --panel-2: #1e3048;
+      --border: #2d4a6a;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #5eb3ff;
+      --accent-2: #7dd3fc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(94, 179, 255, 0.14), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+    h1 { margin: 0 0 8px; font-size: 1.6rem; }
+    p { color: var(--muted); line-height: 1.6; margin: 0 0 24px; }
+    .links { display: grid; gap: 12px; }
+    a {
+      display: block;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      color: var(--accent-2);
+      text-decoration: none;
+      transition: transform 0.12s ease, border-color 0.12s;
+    }
+    a:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+    a strong { display: block; color: var(--text); margin-bottom: 4px; }
+    a span { font-size: 0.9rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>北海道旅遊專案</h1>
+    <p>選擇要開啟的頁面。所有頁面均可離線使用。</p>
+    <div class="links">
+      <a href="北海道8月14日旅遊推薦.html">
+        <strong>北海道 8/14 旅遊推薦</strong>
+        <span>行程、購物、行前清單</span>
+      </a>
+      <a href="日本旅遊常見問題.html">
+        <strong>日本旅遊常見問題</strong>
+        <span>付款、免稅、網路、禮貌、安全等</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
