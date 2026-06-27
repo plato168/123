@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cursor 中文學習資源追蹤</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22d3ee;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header { margin-bottom: 24px; }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 820px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0 24px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.12s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #082f49;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .progress-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--ok));
+      transition: width 0.25s ease;
+    }
+
+    section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .resource-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .resource-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      align-items: start;
+    }
+
+    .resource-item:last-child { border-bottom: 0; }
+
+    .resource-item.done {
+      background: rgba(52, 211, 153, 0.06);
+    }
+
+    .resource-item.done .title {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .resource-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      accent-color: var(--ok);
+      cursor: pointer;
+    }
+
+    .title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .title a {
+      color: #e0f2fe;
+      text-decoration: none;
+    }
+
+    .title a:hover { text-decoration: underline; }
+
+    .desc {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .tag.official { border-color: rgba(56, 189, 248, 0.35); color: #bae6fd; }
+    .tag.community { border-color: rgba(251, 191, 36, 0.35); color: #fde68a; }
+    .tag.video { border-color: rgba(244, 114, 182, 0.35); color: #fbcfe8; }
+
+    .path-list {
+      margin: 0;
+      padding: 16px 18px 18px 36px;
+      line-height: 1.8;
+      color: #cbd5e1;
+    }
+
+    .path-list a { color: #7dd3fc; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.02);
+      font-weight: 600;
+    }
+
+    td code {
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+
+    .note {
+      margin: 0;
+      padding: 14px 18px 18px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .offline-badge {
+      display: inline-flex;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      background: rgba(52, 211, 153, 0.12);
+      color: #bbf7d0;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 640px) {
+      .resource-item { grid-template-columns: auto 1fr; }
+      th, td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Cursor 中文學習資源追蹤</h1>
+      <p class="subtitle">
+        整理 Cursor 官方與社群中文學習資源，可勾選已完成項目，進度會自動儲存在本機瀏覽器，方便後續追蹤。
+      </p>
+      <div class="offline-badge">本機離線可用 · 進度自動儲存 · 露營專案資料夾</div>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><div class="label">總資源數</div><div class="value" id="statTotal">0</div></div>
+      <div class="stat"><div class="label">已完成</div><div class="value" id="statDone">0</div></div>
+      <div class="stat"><div class="label">完成率</div><div class="value" id="statPercent">0%</div></div>
+      <div class="stat"><div class="label">最後更新</div><div class="value" id="statUpdated" style="font-size:0.95rem;">-</div></div>
+    </div>
+
+    <div class="progress-wrap">
+      <strong>整體學習進度</strong>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-secondary" id="expandAll" type="button">全部展開說明</button>
+      <button class="btn-secondary" id="clearAll" type="button">清除全部勾選</button>
+      <button class="btn-primary" id="exportProgress" type="button">匯出進度 JSON</button>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>建議學習路徑</h2>
+        <p>建議由官方入門開始，再進入 Agent、Rules、MCP 與實戰工作流。</p>
+      </div>
+      <ol class="path-list" id="learningPath">
+        <li data-id="path-1"><label><input type="checkbox"> 安裝 Cursor → <a href="https://cursor.com/cn" target="_blank" rel="noopener">cursor.com/cn</a></label></li>
+        <li data-id="path-2"><label><input type="checkbox"> 第一個專案 → <a href="https://cursor.com/zh-Hant/help/getting-started/first-project" target="_blank" rel="noopener">官方 Help Center</a></label></li>
+        <li data-id="path-3"><label><input type="checkbox"> 了解 Tab / Chat / Agent 差異</label></li>
+        <li data-id="path-4"><label><input type="checkbox"> Agent 協作 → <a href="https://cursor.com/cn/learn/working-with-agents" target="_blank" rel="noopener">Learn 課程</a></label></li>
+        <li data-id="path-5"><label><input type="checkbox"> Rules 與 MCP → <a href="https://cursor.com/cn/learn/customizing-agents" target="_blank" rel="noopener">自訂 Agent</a></label></li>
+        <li data-id="path-6"><label><input type="checkbox"> 綜合實戰 → <a href="https://cursor.com/cn/learn/putting-it-together" target="_blank" rel="noopener">Putting It Together</a></label></li>
+        <li data-id="path-7"><label><input type="checkbox"> Agent 最佳實踐 → <a href="https://cursor.com/cn/blog/agent-best-practices" target="_blank" rel="noopener">官方 Blog</a></label></li>
+      </ol>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>一、官方中文資源</h2>
+        <p>優先閱讀官方文件與 Learn 課程，內容最準確。</p>
+      </div>
+      <ul class="resource-list" data-group="official"></ul>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>二、官方 Learn 課程（简体）</h2>
+        <p>結構化課程，建議按順序學習。</p>
+      </div>
+      <ul class="resource-list" data-group="learn"></ul>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>三、社群中文教學</h2>
+        <p>繁體與简体社群資源，補充實戰工作流。</p>
+      </div>
+      <ul class="resource-list" data-group="community"></ul>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>四、核心功能速查</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>功能</th><th>快捷鍵</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tab 補全</td><td><code>Tab</code></td><td>自動完成程式碼</td></tr>
+          <tr><td>行內編輯</td><td><code>Ctrl+K</code></td><td>選取程式碼後用自然語言修改</td></tr>
+          <tr><td>Chat</td><td><code>Ctrl+L</code></td><td>針對專案提問</td></tr>
+          <tr><td>Agent</td><td><code>Ctrl+I</code></td><td>跨檔案自動開發</td></tr>
+          <tr><td>Plan Mode</td><td><code>Shift+Tab</code></td><td>先規劃再執行</td></tr>
+        </tbody>
+      </table>
+      <p class="note">
+        介面中文：安裝 Chinese (Simplified) Language Pack，再執行 Configure Display Language 選 zh-cn。
+        AI 中文回覆：在 Cursor Settings → Rules → User Rules 加入「Always respond in Traditional Chinese (繁體中文).」
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'cursor-zh-learning-progress-v1';
+
+    const RESOURCES = {
+      official: [
+        { id: 'off-1', title: 'Cursor 官網（简体）', url: 'https://cursor.com/cn', desc: '產品介紹、Agent、模型、下載入口', tag: 'official', lang: '简体' },
+        { id: 'off-2', title: '官方文件（简体）', url: 'https://cursor.com/cn/docs', desc: 'Agent、Rules、MCP、Skills、CLI、SDK', tag: 'official', lang: '简体' },
+        { id: 'off-3', title: '官方文件（繁體）', url: 'https://cursor.com/zh-Hant/docs', desc: '繁體中文官方文件', tag: 'official', lang: '繁體' },
+        { id: 'off-4', title: '更新日誌（简体）', url: 'https://cursor.com/cn/changelog', desc: '版本更新紀錄（最新版可能先出英文）', tag: 'official', lang: '简体' },
+        { id: 'off-5', title: '第一個專案（繁體）', url: 'https://cursor.com/zh-Hant/help/getting-started/first-project', desc: '開啟資料夾、啟動 Agent、審查 diff', tag: 'official', lang: '繁體' },
+        { id: 'off-6', title: 'Agent 模式（繁體）', url: 'https://cursor.com/zh-Hant/help/ai-features/agent', desc: 'Agent / Ask / Plan / Debug 模式說明', tag: 'official', lang: '繁體' },
+        { id: 'off-7', title: 'Agent 下指令（繁體）', url: 'https://cursor.com/zh-Hant/docs/agent/prompting', desc: '@ 引用、圖片、語音、切換模型', tag: 'official', lang: '繁體' },
+        { id: 'off-8', title: 'MCP 文件（简体）', url: 'https://cursor.com/cn/docs/mcp', desc: 'MCP 協議、設定、OAuth、Marketplace', tag: 'official', lang: '简体' },
+        { id: 'off-9', title: 'CLI 文件（简体）', url: 'https://cursor.com/cn/docs/cli/overview', desc: 'CLI 互動模式、Plan/Ask、Cloud Agent', tag: 'official', lang: '简体' },
+        { id: 'off-10', title: 'Agent 最佳實踐 Blog', url: 'https://cursor.com/cn/blog/agent-best-practices', desc: 'Rules、Skills、MCP、驗證工作流', tag: 'official', lang: '简体' },
+        { id: 'off-11', title: '官方論壇', url: 'https://forum.cursor.com/', desc: 'Announcements、Guides、Support（英文介面）', tag: 'official', lang: 'English' }
+      ],
+      learn: [
+        { id: 'learn-1', title: '與 Agent 協作', url: 'https://cursor.com/cn/learn/working-with-agents', desc: '提示詞、上下文、任務管理', tag: 'official', lang: '简体' },
+        { id: 'learn-2', title: '理解程式碼庫', url: 'https://cursor.com/cn/learn/understanding-your-codebase', desc: 'grep、語意搜索、索引、Explore 子代理', tag: 'official', lang: '简体' },
+        { id: 'learn-3', title: '工具呼叫與 MCP', url: 'https://cursor.com/cn/learn/tool-calling', desc: '工具呼叫基礎與 MCP 入門', tag: 'official', lang: '简体' },
+        { id: 'learn-4', title: '自訂 Agent', url: 'https://cursor.com/cn/learn/customizing-agents', desc: 'Rules、Skills、MCP 配置', tag: 'official', lang: '简体' },
+        { id: 'learn-5', title: '綜合實戰', url: 'https://cursor.com/cn/learn/putting-it-together', desc: 'Plan Mode、Debug、寫 Rules、Cloud Agents', tag: 'official', lang: '简体' }
+      ],
+      community: [
+        { id: 'com-1', title: 'Indexia 2026 完整教學', url: 'https://indexiahq.com/cursor-complete-tutorial-2026/', desc: '中文設定、Agent、Rules、MCP、AI Coding 工作流', tag: 'community', lang: '繁體' },
+        { id: 'com-2', title: 'AI Workflow 官方中文版', url: 'https://aiworkflowtutorials.com/zh-Hant/docs/cursor/official', desc: '依官方文件重組的中文查詢手冊', tag: 'community', lang: '繁體' },
+        { id: 'com-3', title: 'AI Workflow Cursor 教學', url: 'https://aiworkflowtutorials.com/zh-Hant/docs/cursor', desc: '原理篇 + 官方功能兩條主線', tag: 'community', lang: '繁體' },
+        { id: 'com-4', title: 'ExplainThis 入門', url: 'https://www.explainthis.io/zh-hant/ai/cursor-guide/1-1-intro-and-setup', desc: '安裝、設定、MCP 系列', tag: 'community', lang: '繁體' },
+        { id: 'com-5', title: 'YouTube 工程師下班有約', url: 'https://www.youtube.com/watch?v=kVniOF36GEk', desc: '入門到實戰、Rules、非純開發場景', tag: 'video', lang: '繁體' },
+        { id: 'com-6', title: 'Cursor 101', url: 'https://cursor101.com/zh', desc: 'Tab、Cmd+K、Chat、Composer、Rules 系列', tag: 'community', lang: '简体' },
+        { id: 'com-7', title: 'JoinLearn 2026 圖解教程', url: 'https://www.joinlearn.com/blog/cursor-complete-tutorial', desc: '安裝到 Agent 全流程圖解', tag: 'community', lang: '简体' },
+        { id: 'com-8', title: 'Bilibili 零基礎全套', url: 'https://www.bilibili.com/video/BV1ffmqBWErp/', desc: '安裝、界面、Rules、實戰專案', tag: 'video', lang: '简体' },
+        { id: 'com-9', title: 'Bilibili 入門教學', url: 'https://www.bilibili.com/video/BV1HEABzvEdo/', desc: '安裝、配置、專案初始化', tag: 'video', lang: '简体' },
+        { id: 'com-10', title: 'Cursor 中文設定指南', url: 'https://www.cursor-ide.com/blog/cursor-chinese-setup-guide', desc: '界面漢化 + AI 中文回覆 + Rules 配置', tag: 'community', lang: '简体' }
+      ]
+    };
+
+    function loadProgress() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      } catch {
+        return {};
+      }
+    }
+
+    function saveProgress(data) {
+      data.updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      updateStats(data);
+    }
+
+    function renderResources() {
+      Object.entries(RESOURCES).forEach(([group, items]) => {
+        const list = document.querySelector(`[data-group="${group}"]`);
+        list.innerHTML = items.map(item => `
+          <li class="resource-item" data-id="${item.id}">
+            <input type="checkbox" id="${item.id}" aria-label="標記完成：${item.title}">
+            <div>
+              <div class="title"><a href="${item.url}" target="_blank" rel="noopener">${item.title}</a></div>
+              <div class="desc">${item.desc}</div>
+              <div class="tag-row">
+                <span class="tag ${item.tag}">${item.tag === 'official' ? '官方' : item.tag === 'video' ? '影片' : '社群'}</span>
+                <span class="tag">${item.lang}</span>
+              </div>
+            </div>
+          </li>
+        `).join('');
+      });
+    }
+
+    function applyProgress(progress) {
+      document.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+        const li = box.closest('[data-id]');
+        const id = li ? li.dataset.id : box.id;
+        const checked = !!progress[id];
+        box.checked = checked;
+        if (li) li.classList.toggle('done', checked);
+      });
+      updateStats(progress);
+    }
+
+    function updateStats(progress) {
+      const boxes = [...document.querySelectorAll('input[type="checkbox"]')];
+      const done = boxes.filter(b => b.checked).length;
+      const total = boxes.length;
+      const percent = total ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById('statTotal').textContent = String(total);
+      document.getElementById('statDone').textContent = String(done);
+      document.getElementById('statPercent').textContent = `${percent}%`;
+      document.getElementById('progressFill').style.width = `${percent}%`;
+      document.getElementById('statUpdated').textContent = progress.updatedAt
+        ? new Date(progress.updatedAt).toLocaleString('zh-TW')
+        : '尚未儲存';
+    }
+
+    function bindEvents() {
+      document.body.addEventListener('change', (event) => {
+        if (event.target.type !== 'checkbox') return;
+        const progress = loadProgress();
+        const li = event.target.closest('[data-id]');
+        const id = li ? li.dataset.id : event.target.id;
+        progress[id] = event.target.checked;
+        if (li) li.classList.toggle('done', event.target.checked);
+        saveProgress(progress);
+      });
+
+      document.getElementById('clearAll').addEventListener('click', () => {
+        if (!confirm('確定要清除所有勾選進度嗎？')) return;
+        saveProgress({});
+        applyProgress({});
+      });
+
+      document.getElementById('exportProgress').addEventListener('click', () => {
+        const progress = loadProgress();
+        const blob = new Blob([JSON.stringify(progress, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'Cursor中文學習進度.json';
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('expandAll').addEventListener('click', () => {
+        document.querySelectorAll('.desc').forEach(el => {
+          el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        });
+      });
+    }
+
+    renderResources();
+    bindEvents();
+    applyProgress(loadProgress());
+  </script>
+</body>
+</html>
