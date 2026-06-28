@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運動營養健康飲食建議指南｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --purple: #a78bfa;
+      --warn: #fbbf24;
+      --pre: #5eb3ff;
+      --mid: #fbbf24;
+      --post: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52, 211, 153, 0.1), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.4rem, 2.4vw, 2rem); }
+    h2 { margin: 0 0 14px; font-size: 1.12rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 14px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 820px; }
+    .meta { font-size: 0.85rem; color: var(--muted); margin: 10px 0 16px; }
+    .related { font-size: 0.9rem; margin-bottom: 16px; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+
+    .guard {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+
+    .flow-card {
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid var(--border);
+    }
+    .flow-card.pre { border-top: 4px solid var(--pre); background: rgba(94, 179, 255, 0.06); }
+    .flow-card.mid { border-top: 4px solid var(--mid); background: rgba(251, 191, 36, 0.06); }
+    .flow-card.post { border-top: 4px solid var(--post); background: rgba(167, 139, 250, 0.06); }
+    .flow-card h4 { margin: 0 0 8px; font-size: 1.05rem; }
+    .flow-card.pre h4 { color: var(--pre); }
+    .flow-card.mid h4 { color: var(--warn); }
+    .flow-card.post h4 { color: var(--purple); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .age-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .age-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .age-card h4 { margin: 0 0 8px; color: var(--warn); }
+
+    .calc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      align-items: end;
+      margin: 12px 0;
+    }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea {
+      width: 100%;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 9px 11px;
+      font: inherit;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+
+    .result-box {
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .checklist li:last-child { border-bottom: 0; }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); width: auto; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    button {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .avoid { color: #f87171; font-size: 0.85rem; }
+    .good { color: var(--accent-2); font-size: 0.85rem; }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 5px; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>運動營養健康飲食建議指南</h1>
+      <p class="subtitle">
+        以「食物優先、預防勝於治療」為原則，提供運動前中後飲食、青少年選手、羽球比賽日與台灣日常飲食實用建議。
+        非醫療處方，特殊健康狀況請諮詢專業人員。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="運動前中後資源整合與全球化策略.html">前中後資源</a> ·
+        <a href="三位子女分齡運動規劃_9_11_13歲.html">分齡規劃</a> ·
+        <a href="羽球選手養成挑戰與協助指南.html">羽球指南</a>
+      </div>
+      <p class="meta">資料更新：<strong id="updatedDate">—</strong></p>
+    </header>
+
+    <div class="guard" id="disclaimerBox"></div>
+
+    <nav class="nav">
+      <a href="#phases">前中後飲食</a>
+      <a href="#age">分齡建議</a>
+      <a href="#taiwan">台灣外食</a>
+      <a href="#hydration">補水</a>
+      <a href="#badminton">羽球</a>
+      <a href="#supplements">補充品</a>
+      <a href="#compday">比賽日</a>
+      <a href="#diary">飲食日記</a>
+    </nav>
+
+    <section id="principles">
+      <h2>核心原則（與平台使命一致）</h2>
+      <ul>
+        <li><strong>食物優先：</strong>規律三餐＋適當點心，比瓶瓶罐罐補充劑更重要。</li>
+        <li><strong>運動是習慣，不是懲罰：</strong>不為「變瘦」而餓肚子訓練；青少年尤其需要足夠熱量與生長。</li>
+        <li><strong>賽前不試新：</strong>新食物、新補品留到平日，比賽只吃熟悉的。</li>
+        <li><strong>睡眠＞神秘補品：</strong>恢復的第一名是睡夠，其次才是飲食。</li>
+        <li><strong>標示透明：</strong>平台推廣健康飲食衛教，不誇大療效、不推銷替代醫療的產品。</li>
+      </ul>
+    </section>
+
+    <section id="phases">
+      <h2>運動前 · 中 · 後 飲食</h2>
+      <div class="flow" id="phaseCards"></div>
+    </section>
+
+    <section id="age">
+      <h2>青少年分齡建議（9・11・13 歲參考）</h2>
+      <div class="age-grid" id="ageGrid"></div>
+    </section>
+
+    <section id="taiwan">
+      <h2>台灣日常外食：較佳選擇</h2>
+      <table id="taiwanTable">
+        <thead><tr><th>場景</th><th>建議</th><th>避免</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="hydration">
+      <h2>補水估算（簡易參考）</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-top:0;" id="hydrationText"></p>
+      <div class="calc">
+        <div>
+          <label>體重（kg）</label>
+          <input type="number" id="weightKg" value="45" min="20" max="120">
+        </div>
+        <div>
+          <label>預計運動時間（小時）</label>
+          <input type="number" id="trainHours" value="2" min="0.5" max="8" step="0.5">
+        </div>
+        <div>
+          <label>強度</label>
+          <select id="intensity">
+            <option value="1">一般練習</option>
+            <option value="1.3">比賽日／大量出汗</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn-primary" id="calcWater" type="button">估算</button>
+        </div>
+      </div>
+      <div class="result-box" id="waterResult">輸入體重與時間後按「估算」。</div>
+    </section>
+
+    <section id="badminton">
+      <h2>羽球專項</h2>
+      <ul id="badmintonTips"></ul>
+    </section>
+
+    <section id="supplements">
+      <h2>補充品：什麼時候才需要？</h2>
+      <p id="suppStance" style="color:var(--muted);font-size:0.9rem;"></p>
+      <table id="suppTable">
+        <thead><tr><th>項目</th><th>適用時機</th><th>注意</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="compday">
+      <h2>比賽日飲食檢核</h2>
+      <ul class="checklist" id="compChecklist"></ul>
+      <div class="toolbar">
+        <button class="btn-primary" id="exportDiary">匯出日記＋檢核 JSON</button>
+        <button class="btn-secondary" id="resetCheck">清除檢核</button>
+      </div>
+    </section>
+
+    <section id="diary">
+      <h2>今日飲食日記（本機儲存）</h2>
+      <div class="calc">
+        <div style="grid-column:1/-1">
+          <label>運動前吃了什麼？</label>
+          <textarea id="dBefore" placeholder="例：7:00 飯糰＋茶葉蛋＋豆漿"></textarea>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>運動中補充</label>
+          <textarea id="dDuring" placeholder="例：每局間小口喝水"></textarea>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>運動後 30～60 分鐘</label>
+          <textarea id="dAfter" placeholder="例：鮮奶＋便當（雞胸）"></textarea>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>今日感受（能量、腸胃、睡眠）</label>
+          <textarea id="dFeel"></textarea>
+        </div>
+      </div>
+      <button class="btn-primary" id="saveDiary">儲存日記</button>
+    </section>
+
+    <footer>運動平台專案 · 運動營養衛教 · python3 更新運動營養指南.py --open</footer>
+  </div>
+
+  <!-- NUTRITION_DATA_BEGIN -->
+<script type="application/json" id="nutrition-data">
+{
+  "updated": "2026-06-28",
+  "disclaimer": "本資料為一般運動營養衛教，非個人化醫療或處方。過敏、疾病、用藥者請諮詢醫師或營養師。",
+  "phases": {
+    "before": {
+      "title": "運動前",
+      "timing": "訓練／比賽前 1～4 小時",
+      "goal": "提供穩定能量、避免空腹與腸胃不適",
+      "foods": [
+        "全穀主食＋少量蛋白：飯、麵、燕麥、全麥吐司",
+        "易消化蛋白：雞蛋、豆漿、優格、豆腐",
+        "低纖維蔬果：香蕉、蘋果、小番茄",
+        "充足水分，避免一次灌大量"
+      ],
+      "avoid": [
+        "高油炸物",
+        "大量高纖維（易腹脹）",
+        "陌生食物（賽前不試新）",
+        "含糖能量飲過量"
+      ],
+      "examples": [
+        {
+          "name": "賽前 3 小時餐",
+          "items": "雞肉飯＋燙青菜＋無糖豆漿"
+        },
+        {
+          "name": "賽前 1 小時點心",
+          "items": "香蕉 1 根＋白開水或稀釋運動飲"
+        },
+        {
+          "name": "早場比賽",
+          "items": "小飯糰＋茶葉蛋＋香蕉（提前 2 小時）"
+        }
+      ]
+    },
+    "during": {
+      "title": "運動中",
+      "timing": "訓練或比賽進行中",
+      "goal": "補水分與電解質；長時間才需補充醣類",
+      "foods": [
+        "白開水為主；大量出汗時可補電解質",
+        "超過 60～90 分鐘高強度：稀釋運動飲、能量膠或香蕉",
+        "羽球單場間歇：小口喝水，勿一次喝太猛"
+      ],
+      "avoid": [
+        "全糖手搖飲",
+        "比賽中首次嘗試補給品",
+        "固體大餐"
+      ],
+      "examples": [
+        {
+          "name": "羽球練習 2 小時",
+          "items": "每 20～30 分鐘小口喝水；無需額外補品"
+        },
+        {
+          "name": "全日賽（多場）",
+          "items": "場間：水＋香蕉或米餅；午餐清淡不油膩"
+        },
+        {
+          "name": "高溫戶外",
+          "items": "電解質飲料半稀釋＋增加休息"
+        }
+      ]
+    },
+    "after": {
+      "title": "運動後",
+      "timing": "結束後 30～60 分鐘內",
+      "goal": "修復、補充醣原與蛋白質，支持恢復",
+      "foods": [
+        "醣＋蛋白組合：牛奶、優格、雞胸、魚、蛋、豆類",
+        "全穀或根莖類主食",
+        "蔬菜與水果",
+        "持續補水至尿液淡黃"
+      ],
+      "avoid": [
+        "只喝蛋白粉不吃正餐",
+        "高油宵夜",
+        "以補品取代晚餐"
+      ],
+      "examples": [
+        {
+          "name": "訓練後 30 分鐘",
+          "items": "鮮奶＋全麥三明治或飯＋蛋"
+        },
+        {
+          "name": "比賽日傍晚",
+          "items": "便當（雞腿去皮）＋水果；避免炸物"
+        },
+        {
+          "name": "恢復日",
+          "items": "正常三餐＋充足睡眠優先於補充劑"
+        }
+      ]
+    }
+  },
+  "ageTips": [
+    {
+      "age": "9 歲",
+      "focus": "養成規律三餐、不挑食；運動是「加分」不是「挨餓」",
+      "protein": "每日約 1.0～1.2 g／kg 體重（一般活動量）",
+      "notes": "避免減重壓力；點心選優格、牛奶、水果；家長以身作則"
+    },
+    {
+      "age": "11 歲",
+      "focus": "課業＋訓練增加，總熱量需足夠",
+      "protein": "訓練日可略增；每餐有蛋白來源",
+      "notes": "段考週勿節食；準備訓練後簡餐；教導看成分表（糖、鈉）"
+    },
+    {
+      "age": "13 歲",
+      "focus": "青春期生長突增；鈣、鐵、蛋白質都重要",
+      "protein": "約 1.2～1.6 g／kg（依訓練量；競技者請營養師個別評估）",
+      "notes": "不自行減肥或吃不明補品；賽季注意補水與恢復；女生注意鐵質"
+    }
+  ],
+  "badminton": {
+    "title": "羽球專項提醒",
+    "tips": [
+      "單日多場比賽：場間以液體與易消化醣為主，避免油膩便當",
+      "連續兩日賽事：第一晚恢復餐＋睡眠比補充劑重要",
+      "青少年肩肘負荷高時，勿以減重傷害生長",
+      "補充品僅在「三餐不足」時由專業評估，非必需品"
+    ]
+  },
+  "taiwanQuick": [
+    {
+      "place": "早餐店",
+      "good": "飯糰＋蛋、全麥吐司＋豆漿、滷蛋＋小粥",
+      "avoid": "炸粿、超甜奶茶"
+    },
+    {
+      "place": "便當",
+      "good": "雞胸／滷雞腿去皮、飯量依訓練日調整、多青菜",
+      "avoid": "排骨炸物、全吃滷汁拌飯"
+    },
+    {
+      "place": "超商",
+      "good": "無糖茶、鮮乳、優格、茶葉蛋、香蕉、飯糧",
+      "avoid": "大瓶含糖飲、只買零食當正餐"
+    },
+    {
+      "place": "手搖飲",
+      "good": "無糖茶＋少量鮮奶（非訓練中大量飲用）",
+      "avoid": "全糖、加料當能量來源"
+    }
+  ],
+  "hydration": {
+    "baseline": "非運動日：依口渴補水，尿液淡黃為參考",
+    "training": "運動前 2 小時 400～600 ml；運動中每 15～20 分鐘 150～250 ml",
+    "weigh": "大量出汗者可量體重前後差，每少 1 kg 約補 1000～1500 ml（含電解質）"
+  },
+  "supplements": {
+    "stance": "食物優先；補充劑非必需品",
+    "common": [
+      {
+        "name": "乳清蛋白",
+        "when": "無法在 30～60 分鐘內吃到正餐時之「便利選項」",
+        "caution": "非取代三餐；注意乳糖不耐"
+      },
+      {
+        "name": "運動飲",
+        "when": "超過 1 小時高強度或大量出汗",
+        "caution": "可稀釋；日常勿當水喝"
+      },
+      {
+        "name": "BCAA／肌酸等",
+        "when": "僅競技選手在運動營養師指導下",
+        "caution": "青少年不建議自行使用"
+      }
+    ]
+  }
+}
+</script>
+<!-- NUTRITION_DATA_END -->
+
+  <script>
+    const DATA = JSON.parse(document.getElementById('nutrition-data').textContent);
+    const CHECK_KEY = 'sport-nutrition-comp-check-v1';
+    const DIARY_KEY = 'sport-nutrition-diary-v1';
+
+    const COMP_ITEMS = [
+      { id: 'c1', text: '賽前 3 小時有吃熟悉的主食＋蛋白' },
+      { id: 'c2', text: '賽前 1 小時只補輕點心（如需）' },
+      { id: 'c3', text: '自備水壺；場間小口補水' },
+      { id: 'c4', text: '午餐不選過油便當；保留下午體力' },
+      { id: 'c5', text: '未在比賽日首次嘗試新補品或新食物' },
+      { id: 'c6', text: '賽後 30～60 分鐘有醣＋蛋白' },
+      { id: 'c7', text: '今日無以「減重」為由節食' }
+    ];
+
+    function renderPhases() {
+      const order = ['before', 'during', 'after'];
+      const cls = { before: 'pre', during: 'mid', after: 'post' };
+      document.getElementById('phaseCards').innerHTML = order.map(key => {
+        const p = DATA.phases[key];
+        const ex = p.examples.map(e => `<li><strong>${e.name}：</strong>${e.items}</li>`).join('');
+        return `<div class="flow-card ${cls[key]}">
+          <h4>${p.title}</h4>
+          <p style="font-size:0.85rem;color:var(--muted)">${p.timing} · ${p.goal}</p>
+          <p class="good"><strong>可選：</strong></p><ul>${p.foods.map(f => `<li>${f}</li>`).join('')}</ul>
+          <p class="avoid"><strong>避免：</strong>${p.avoid.join('、')}</p>
+          <p><strong>範例</strong></p><ul>${ex}</ul>
+        </div>`;
+      }).join('');
+    }
+
+    function renderAge() {
+      document.getElementById('ageGrid').innerHTML = DATA.ageTips.map(a => `
+        <div class="age-card">
+          <h4>${a.age}</h4>
+          <p><strong>重點：</strong>${a.focus}</p>
+          <p><strong>蛋白質：</strong>${a.protein}</p>
+          <p style="font-size:0.86rem;color:var(--muted)">${a.notes}</p>
+        </div>`).join('');
+    }
+
+    function renderTaiwan() {
+      const tb = document.querySelector('#taiwanTable tbody');
+      tb.innerHTML = DATA.taiwanQuick.map(r => `
+        <tr><td>${r.place}</td><td class="good">${r.good}</td><td class="avoid">${r.avoid}</td></tr>`).join('');
+    }
+
+    function renderHydrationText() {
+      const h = DATA.hydration;
+      document.getElementById('hydrationText').innerHTML =
+        `<strong>基準：</strong>${h.baseline}<br><strong>訓練：</strong>${h.training}<br><strong>大量出汗：</strong>${h.weigh}`;
+    }
+
+    function renderBadminton() {
+      document.getElementById('badmintonTips').innerHTML =
+        DATA.badminton.tips.map(t => `<li>${t}</li>`).join('');
+    }
+
+    function renderSupp() {
+      document.getElementById('suppStance').textContent = DATA.supplements.stance;
+      document.querySelector('#suppTable tbody').innerHTML = DATA.supplements.common.map(s =>
+        `<tr><td>${s.name}</td><td>${s.when}</td><td>${s.caution}</td></tr>`).join('');
+    }
+
+    function calcWater() {
+      const w = +document.getElementById('weightKg').value || 45;
+      const h = +document.getElementById('trainHours').value || 2;
+      const mult = +document.getElementById('intensity').value || 1;
+      const base = Math.round(w * 35);
+      const during = Math.round(h * 600 * mult);
+      const pre = Math.round(Math.min(600, w * 8));
+      document.getElementById('waterResult').innerHTML =
+        `<strong>估算（僅供參考）：</strong><br>
+        非運動日基礎約 <strong>${base} ml</strong>／日（依氣候調整）<br>
+        運動前 2 小時建議約 <strong>${pre} ml</strong><br>
+        運動中約 <strong>${during} ml</strong>（分次小口）<br>
+        <span style="color:var(--muted)">尿液淡黃、不口渴為簡易指標；大量出汗請補電解質。</span>`;
+    }
+
+    function renderChecklist() {
+      const state = JSON.parse(localStorage.getItem(CHECK_KEY) || '{}');
+      const root = document.getElementById('compChecklist');
+      root.innerHTML = '';
+      COMP_ITEMS.forEach(item => {
+        const li = document.createElement('li');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!state[item.id];
+        cb.addEventListener('change', () => {
+          state[item.id] = cb.checked;
+          localStorage.setItem(CHECK_KEY, JSON.stringify(state));
+        });
+        const span = document.createElement('span');
+        span.textContent = item.text;
+        li.appendChild(cb);
+        li.appendChild(span);
+        root.appendChild(li);
+      });
+    }
+
+    function loadDiary() {
+      try {
+        const d = JSON.parse(localStorage.getItem(DIARY_KEY) || '{}');
+        ['dBefore', 'dDuring', 'dAfter', 'dFeel'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && d[id]) el.value = d[id];
+        });
+      } catch {}
+    }
+
+    function saveDiary() {
+      const d = {};
+      ['dBefore', 'dDuring', 'dAfter', 'dFeel'].forEach(id => {
+        d[id] = document.getElementById(id).value;
+      });
+      localStorage.setItem(DIARY_KEY, JSON.stringify(d));
+      alert('日記已儲存');
+    }
+
+    function exportAll() {
+      const blob = new Blob([JSON.stringify({
+        checklist: JSON.parse(localStorage.getItem(CHECK_KEY) || '{}'),
+        diary: JSON.parse(localStorage.getItem(DIARY_KEY) || '{}'),
+        exported: new Date().toISOString()
+      }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sport-nutrition-diary.json';
+      a.click();
+    }
+
+    document.getElementById('disclaimerBox').innerHTML =
+      `<strong>免責聲明：</strong>${DATA.disclaimer}`;
+    document.getElementById('updatedDate').textContent = DATA.updated || '—';
+
+    renderPhases();
+    renderAge();
+    renderTaiwan();
+    renderHydrationText();
+    renderBadminton();
+    renderSupp();
+    renderChecklist();
+    loadDiary();
+
+    document.getElementById('calcWater').addEventListener('click', calcWater);
+    document.getElementById('saveDiary').addEventListener('click', saveDiary);
+    document.getElementById('exportDiary').addEventListener('click', exportAll);
+    document.getElementById('resetCheck').addEventListener('click', () => {
+      if (confirm('清除比賽日檢核？')) {
+        localStorage.removeItem(CHECK_KEY);
+        renderChecklist();
+      }
+    });
+    calcWater();
+  </script>
+</body>
+</html>

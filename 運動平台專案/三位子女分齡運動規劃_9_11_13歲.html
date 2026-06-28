@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三位子女分齡運動規劃（9・11・13 歲）｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+      --purple: #a78bfa;
+      --warn: #fbbf24;
+      --age9: #5eb3ff;
+      --age11: #a78bfa;
+      --age13: #34d399;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(94, 179, 255, 0.08), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(52, 211, 153, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.4rem, 2.4vw, 1.95rem); line-height: 1.35; }
+    h2 { margin: 0 0 14px; font-size: 1.12rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 14px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 820px; }
+    .related { margin: 14px 0 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+
+    .age-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .age-tabs button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .age-tabs button.active { font-weight: 700; color: #064e3b; }
+    .age-tabs button[data-age="9"].active { background: var(--age9); border-color: var(--age9); }
+    .age-tabs button[data-age="11"].active { background: var(--age11); border-color: var(--age11); color: #1e1b4b; }
+    .age-tabs button[data-age="13"].active { background: var(--age13); border-color: var(--age13); }
+    .age-tabs button[data-age="all"].active { background: var(--warm); border-color: var(--warm); color: #422006; }
+
+    .age-panel { display: none; }
+    .age-panel.active { display: block; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .badge-9 { background: rgba(94, 179, 255, 0.2); color: var(--age9); }
+    .badge-11 { background: rgba(167, 139, 250, 0.2); color: var(--age11); }
+    .badge-13 { background: rgba(52, 211, 153, 0.2); color: var(--age13); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+
+    .child-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .child-card.age9 { border-top: 3px solid var(--age9); }
+    .child-card.age11 { border-top: 3px solid var(--age11); }
+    .child-card.age13 { border-top: 3px solid var(--age13); }
+    .child-card h4 { margin: 0 0 10px; font-size: 1rem; }
+
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field textarea { min-height: 56px; resize: vertical; }
+
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .checklist li:last-child { border-bottom: 0; }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); }
+
+    .highlight {
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
+
+    .warn-box {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.88rem;
+    }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    button.action {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 640px) { .week-grid { grid-template-columns: repeat(4, 1fr); } }
+    .week-grid label {
+      display: block; text-align: center;
+      color: var(--muted); margin-bottom: 4px;
+    }
+    .week-grid input { text-align: center; padding: 6px 4px; font-size: 0.75rem; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>三位子女分齡運動規劃（9・11・13 歲）</h1>
+      <p class="subtitle">
+        依長期運動員發展（LTAD）與台灣學制，為 9 歲（國小中年級）、11 歲（國小高年級）、13 歲（國中）提供
+        家長可操作的規劃框架。重點：<strong>健康與樂趣優先</strong>，競技是選項而非唯一目標。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="家庭起點與下一代使命.html">家庭使命</a> ·
+        <a href="賽事資訊與選手發展模組.html">選手發展模組</a> ·
+        <a href="運動前中後資源整合與全球化策略.html">前中後資源</a>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <a href="#compare">三齡對照</a>
+      <a href="#principles">規劃原則</a>
+      <a href="#by-age">分齡指南</a>
+      <a href="#planner">個人規劃表</a>
+      <a href="#parent">家長任務</a>
+      <a href="#quarter">季檢核</a>
+    </nav>
+
+    <section id="compare">
+      <h2>三齡快速對照（你現在的位置）</h2>
+      <table>
+        <tr>
+          <th>項目</th>
+          <th><span class="badge badge-9">9 歲</span></th>
+          <th><span class="badge badge-11">11 歲</span></th>
+          <th><span class="badge badge-13">13 歲</span></th>
+        </tr>
+        <tr>
+          <td>典型學制</td>
+          <td>國小三～四年</td>
+          <td>國小五～六年</td>
+          <td>國中一～二年</td>
+        </tr>
+        <tr>
+          <td>發展階段</td>
+          <td>基礎動作 · 多項嘗試 · 玩中學</td>
+          <td>技術學習 · 可開始輕度週期化</td>
+          <td>訓練適應 · 青春期生長 · 專項取捨</td>
+        </tr>
+        <tr>
+          <td>每週運動量參考</td>
+          <td>3～5 次 · 每次 45～60 分 · 以技術與遊戲為主</td>
+          <td>4～6 次 · 含 1 次體能 · 總量約 6～8 小時</td>
+          <td>5～6 次 · 需安排恢復 · 總量約 8～10 小時（依項目調整）</td>
+        </tr>
+        <tr>
+          <td>專項化建議</td>
+          <td><strong>不宜過早</strong>；可 1 主項 + 1 副項</td>
+          <td>主項可明確，仍保留跨項活動</td>
+          <td>可專項深化，但需監測生長與傷病</td>
+        </tr>
+        <tr>
+          <td>競賽頻率</td>
+          <td>低 · 以體驗賽、社團賽為主</td>
+          <td>中 · 選 2～4 場目標賽</td>
+          <td>中 · 賽季化 · 避免全年無休</td>
+        </tr>
+        <tr>
+          <td>課業／睡眠</td>
+          <td>睡眠 9～10 小時 · 作業與運動並列</td>
+          <td>升學壓力上升 · 週末集中補課業</td>
+          <td>國中課業重 · <strong>睡眠 ≥8 小時</strong> · 與教練溝通課表</td>
+        </tr>
+        <tr>
+          <td>家長角色</td>
+          <td>陪伴、觀察興趣、建立習慣</td>
+          <td>協調時間、記錄成長、不代勞責任</td>
+          <td>傾聽、支持決策、協助資源但不施壓</td>
+        </tr>
+      </table>
+      <div class="highlight">
+        <strong>三個孩子年齡剛好形成「梯次」：</strong>
+        9 歲可探索、11 歲可深化、13 歲可思考專項與升學——
+        同一家庭不必三套標準，但<strong>每人一份計畫</strong>，避免互相比較名次。
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2>規劃五大原則（比項目更重要）</h2>
+      <ol>
+        <li><strong>先問「還喜歡嗎？」</strong>——興趣是 9～13 歲最寶貴的燃料；厭倦時先減量，不要硬撐。</li>
+        <li><strong>技術由教練、節奏由身體</strong>——家長負責時間與資源，不替代教練改動作，不自行加課。</li>
+        <li><strong>睡眠與營養優先於加練</strong>——青春期（尤其 13 歲）生長突增，恢復不足比練太少更危險。</li>
+        <li><strong>一主項 + 一副項</strong>——直到 13 歲仍建議保留跨項（如主項羽球 + 游泳或核心訓練），降低過度使用傷害。</li>
+        <li><strong>記錄「過程」不只「獎牌」</strong>——技術進步、態度、團隊合作，都是可寫進履歷與家庭回憶的資產。</li>
+      </ol>
+    </section>
+
+    <section id="by-age">
+      <h2>分齡指南</h2>
+      <div class="age-tabs" id="ageTabs">
+        <button class="active" data-age="all">全部</button>
+        <button data-age="9">9 歲</button>
+        <button data-age="11">11 歲</button>
+        <button data-age="13">13 歲</button>
+      </div>
+
+      <div class="age-panel active" data-panel="all">
+        <p style="color:var(--muted);font-size:0.9rem;">選擇上方年齡標籤，查看該階段詳細建議。</p>
+      </div>
+
+      <div class="age-panel" data-panel="9">
+        <h3><span class="badge badge-9">9 歲</span> 啟蒙與基礎期</h3>
+        <p><strong>這一年最適合做的事：</strong></p>
+        <ul>
+          <li>確認 1 項最感興趣的主運動，另保留 1 項「玩性高」的副活動（游泳、攀岩、直排輪等）。</li>
+          <li>每週固定 2～3 個時段，讓孩子<strong>自己準備裝備、記得時間</strong>——建立自主，不是逼成績。</li>
+          <li>參加 1～2 場低壓力體驗賽或社團展示，重點是「完賽／上台」的成就感。</li>
+          <li>基礎體能：跑跳、平衡、核心，以遊戲方式，不做成人重量訓練。</li>
+        </ul>
+        <p><strong>避免：</strong>一週超過 6 天排滿、跨縣市密集比賽、因輸贏否定孩子。</p>
+        <p><strong>可與孩子討論的問題：</strong>「哪一項最開心？」「想跟誰一起練？」「下個月想挑戰什麼小目標？」</p>
+      </div>
+
+      <div class="age-panel" data-panel="11">
+        <h3><span class="badge badge-11">11 歲</span> 學習與深化期</h3>
+        <p><strong>這一年最適合做的事：</strong></p>
+        <ul>
+          <li>與教練訂<strong>年度技術目標</strong>（3～5 個具體小項，例如發球穩定度、體能測驗進步）。</li>
+          <li>開始簡單<strong>訓練日記</strong>：每週 3 行——今天練什麼、感受、睡夠嗎。</li>
+          <li>選 2～4 場「目標賽」，其餘以練習賽或社團賽為主，賽前 1 週減量。</li>
+          <li>高年級課業變重：與教練溝通<strong>段考週減課</strong>，固定週末 1 段作業時間。</li>
+          <li>可加入輕度阻力訓練（彈力帶、自重），需教練或體適能師指導。</li>
+        </ul>
+        <p><strong>避免：</strong>因升學預習完全停運動；與 13 歲哥哥／姐姐比成績。</p>
+        <p><strong>可討論：</strong>「你想把這項運動練到什麼程度？」「若時間不夠，優先保留什麼？」</p>
+      </div>
+
+      <div class="age-panel" data-panel="13">
+        <h3><span class="badge badge-13">13 歲</span> 適應與抉擇期</h3>
+        <p><strong>這一年最適合做的事：</strong></p>
+        <ul>
+          <li>與教練、家長三方開一次<strong>年度座談</strong>：目標（競技／校隊／健康）、每週上限、受傷史。</li>
+          <li>建立<strong>賽季週期</strong>：準備期 → 賽季 → 恢復期（至少 2～4 週減量／交叉訓練）。</li>
+          <li>青春期生長：注意膝、踝、腰；異常痠痛超過 3 天應休息並評估，不硬撐比賽。</li>
+          <li>國中學業：列出<strong>固定課表</strong>（運動／作業／睡眠），必要時與學校溝通社團或代表隊。</li>
+          <li>開始接觸<strong>第二專長想像</strong>：教練、裁判、運動媒體、防護——競技不是唯一出路。</li>
+        </ul>
+        <p><strong>避免：</strong>為了排名增加 30% 以上訓練量；在社群上與他人比較；忽略心理壓力與同儕關係。</p>
+        <p><strong>可討論：</strong>「三年後你希望運動在你生活中扮演什麼角色？」「需要我怎麼支持，而不是怎麼推？」</p>
+      </div>
+
+      <div class="warn-box" style="margin-top:16px;">
+        <strong>⚠ 就醫／暫停訓練紅線（任何年齡）：</strong>
+        夜間痛醒、單側腫脹、發燒中訓練、頭部撞擊後、被醫師囑咐休息——一律以專業判斷為準，教練與家長一致配合。
+      </div>
+    </section>
+
+    <section id="planner">
+      <h2>個人規劃表（可填寫 · 本機儲存）</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-top:0;">
+        請依實際項目填寫；每季檢視一次，不必追求完美。
+      </p>
+
+      <div class="grid-3">
+        <div class="child-card age9">
+          <h4><span class="badge badge-9">9 歲</span> 子女 A</h4>
+          <div class="field"><label>主要運動項目</label><input type="text" id="c9_sport" placeholder="例：乒乓球、游泳"></div>
+          <div class="field"><label>副項／交叉訓練</label><input type="text" id="c9_sub" placeholder="例：週六游泳"></div>
+          <div class="field"><label>教練／單位</label><input type="text" id="c9_coach"></div>
+          <div class="field"><label>本季小目標（3 個月）</label><textarea id="c9_goal" placeholder="例：正手穩定、認識 2 位新朋友、準時到課 90%"></textarea></div>
+          <div class="field"><label>每週運動時段（簡記）</label>
+            <div class="week-grid">
+              <div><label>一</label><input type="text" id="c9_d1" placeholder="—"></div>
+              <div><label>二</label><input type="text" id="c9_d2"></div>
+              <div><label>三</label><input type="text" id="c9_d3"></div>
+              <div><label>四</label><input type="text" id="c9_d4"></div>
+              <div><label>五</label><input type="text" id="c9_d5"></div>
+              <div><label>六</label><input type="text" id="c9_d6"></div>
+              <div><label>日</label><input type="text" id="c9_d0"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="child-card age11">
+          <h4><span class="badge badge-11">11 歲</span> 子女 B</h4>
+          <div class="field"><label>主要運動項目</label><input type="text" id="c11_sport"></div>
+          <div class="field"><label>副項／交叉訓練</label><input type="text" id="c11_sub"></div>
+          <div class="field"><label>教練／單位</label><input type="text" id="c11_coach"></div>
+          <div class="field"><label>本季小目標</label><textarea id="c11_goal" placeholder="例：校隊選拔、體能測驗進步、段考週調課"></textarea></div>
+          <div class="field"><label>每週運動時段</label>
+            <div class="week-grid">
+              <div><label>一</label><input type="text" id="c11_d1"></div>
+              <div><label>二</label><input type="text" id="c11_d2"></div>
+              <div><label>三</label><input type="text" id="c11_d3"></div>
+              <div><label>四</label><input type="text" id="c11_d4"></div>
+              <div><label>五</label><input type="text" id="c11_d5"></div>
+              <div><label>六</label><input type="text" id="c11_d6"></div>
+              <div><label>日</label><input type="text" id="c11_d0"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="child-card age13">
+          <h4><span class="badge badge-13">13 歲</span> 子女 C</h4>
+          <div class="field"><label>主要運動項目</label><input type="text" id="c13_sport"></div>
+          <div class="field"><label>副項／交叉訓練</label><input type="text" id="c13_sub"></div>
+          <div class="field"><label>教練／單位</label><input type="text" id="c13_coach"></div>
+          <div class="field"><label>本季小目標</label><textarea id="c13_goal" placeholder="例：賽季前 8 週週期、代表隊、學業與睡眠平衡"></textarea></div>
+          <div class="field"><label>三年方向（競技／校隊／終身）</label>
+            <select id="c13_path">
+              <option value="">— 選擇 —</option>
+              <option value="compete">競技深化</option>
+              <option value="school">校隊／升學</option>
+              <option value="health">健康與終身運動</option>
+              <option value="undecided">尚未決定（正常）</option>
+            </select>
+          </div>
+          <div class="field"><label>每週運動時段</label>
+            <div class="week-grid">
+              <div><label>一</label><input type="text" id="c13_d1"></div>
+              <div><label>二</label><input type="text" id="c13_d2"></div>
+              <div><label>三</label><input type="text" id="c13_d3"></div>
+              <div><label>四</label><input type="text" id="c13_d4"></div>
+              <div><label>五</label><input type="text" id="c13_d5"></div>
+              <div><label>六</label><input type="text" id="c13_d6"></div>
+              <div><label>日</label><input type="text" id="c13_d0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="action btn-primary" id="savePlan">儲存規劃</button>
+        <button class="action btn-secondary" id="exportPlan">匯出 JSON</button>
+        <button class="action btn-secondary" id="clearPlan">清除</button>
+      </div>
+    </section>
+
+    <section id="parent">
+      <h2>家長年度任務清單</h2>
+      <ul class="checklist" id="parentChecklist"></ul>
+    </section>
+
+    <section id="quarter">
+      <h2>每季檢核（建議 1、4、7、10 月）</h2>
+      <ul class="checklist" id="quarterChecklist"></ul>
+      <div class="highlight">
+        <strong>與平台專案的連結：</strong>
+        你在家庭裡累積的規劃經驗（時間表、教練溝通、季檢核），正是將來平台要幫助其他家長解決的問題——
+        可先記錄「什麼有效、什麼沒效」，作為產品共創的第一手資料。
+      </div>
+    </section>
+
+    <footer>運動平台專案 · 三位子女分齡規劃 · 非醫療建議 · 專項請諮詢教練與醫師 · 離線可用</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'children-sports-plan-9-11-13-v1';
+    const PARENT_KEY = 'children-sports-parent-check-v1';
+    const QUARTER_KEY = 'children-sports-quarter-check-v1';
+
+    const PLAN_IDS = [
+      'c9_sport','c9_sub','c9_coach','c9_goal','c9_d0','c9_d1','c9_d2','c9_d3','c9_d4','c9_d5','c9_d6',
+      'c11_sport','c11_sub','c11_coach','c11_goal','c11_d0','c11_d1','c11_d2','c11_d3','c11_d4','c11_d5','c11_d6',
+      'c13_sport','c13_sub','c13_coach','c13_goal','c13_path','c13_d0','c13_d1','c13_d2','c13_d3','c13_d4','c13_d5','c13_d6'
+    ];
+
+    const PARENT_ITEMS = [
+      { id: 'p1', text: '與三位孩子各自有一段「只聊運動感受」的對話（不評分、不比較）' },
+      { id: 'p2', text: '取得三位教練聯絡方式，並至少各溝通一次年度期望' },
+      { id: 'p3', text: '檢查運動保險／活動保險是否足夠（尤其出賽、夏令營）' },
+      { id: 'p4', text: '建立家庭共用月曆：運動、段考、比賽、休息週' },
+      { id: 'p5', text: '準備基本營養與補水習慣（訓練前後），不盲目吃補充劑' },
+      { id: 'p6', text: '認識 1 位運動防護或物理治療資源（轉介用）' },
+      { id: 'p7', text: '與 13 歲孩子討論：運動在國中三年要佔多少比重' },
+      { id: 'p8', text: '與 9 歲孩子建立「自己收裝備、記時間」習慣' },
+      { id: 'p9', text: '避免在兄弟姊妹間公開比較名次或升級速度' },
+      { id: 'p10', text: '每季檢視：睡眠是否足夠、是否仍期待去練習' }
+    ];
+
+    const QUARTER_ITEMS = [
+      { id: 'q1', text: '三人本季目標是否仍合理？需否調降或調高？' },
+      { id: 'q2', text: '有無新傷痛或慢性痠痛？是否已處理？' },
+      { id: 'q3', text: '課業與運動衝突是否已與教練／學校協調？' },
+      { id: 'q4', text: '9 歲：是否仍享受？11 歲：技術目標達成幾項？13 歲：賽季／恢復期是否排定？' },
+      { id: 'q5', text: '裝備是否需要更新（鞋、護具）？' },
+      { id: 'q6', text: '記錄 1 則本季最棒的運動回憶（給孩子看）' }
+    ];
+
+    function loadJSON(key) {
+      try { return JSON.parse(localStorage.getItem(key)) || {}; }
+      catch { return {}; }
+    }
+    function saveJSON(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+    function loadPlan() {
+      const data = loadJSON(STORAGE_KEY);
+      PLAN_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && data[id] != null) el.value = data[id];
+      });
+    }
+
+    function savePlan() {
+      const data = {};
+      PLAN_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) data[id] = el.value;
+      });
+      saveJSON(STORAGE_KEY, data);
+      alert('規劃已儲存至本機');
+    }
+
+    function exportPlan() {
+      const data = loadJSON(STORAGE_KEY);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'children-sports-plan-9-11-13.json';
+      a.click();
+    }
+
+    function clearPlan() {
+      if (!confirm('清除所有規劃欄位？')) return;
+      PLAN_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function renderChecklist(rootId, items, storageKey) {
+      const root = document.getElementById(rootId);
+      const state = loadJSON(storageKey);
+      root.innerHTML = '';
+      items.forEach(item => {
+        const li = document.createElement('li');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!state[item.id];
+        cb.addEventListener('change', () => {
+          state[item.id] = cb.checked;
+          saveJSON(storageKey, state);
+        });
+        const span = document.createElement('span');
+        span.textContent = item.text;
+        li.appendChild(cb);
+        li.appendChild(span);
+        root.appendChild(li);
+      });
+    }
+
+    document.getElementById('ageTabs').addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      const age = e.target.dataset.age;
+      document.querySelectorAll('#ageTabs button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      document.querySelectorAll('.age-panel').forEach(p => {
+        p.classList.toggle('active', p.dataset.panel === age);
+      });
+    });
+
+    document.getElementById('savePlan').addEventListener('click', savePlan);
+    document.getElementById('exportPlan').addEventListener('click', exportPlan);
+    document.getElementById('clearPlan').addEventListener('click', clearPlan);
+
+    loadPlan();
+    renderChecklist('parentChecklist', PARENT_ITEMS, PARENT_KEY);
+    renderChecklist('quarterChecklist', QUARTER_ITEMS, QUARTER_KEY);
+  </script>
+</body>
+</html>

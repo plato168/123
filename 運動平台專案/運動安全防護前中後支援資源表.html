@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運動安全防護前中後支援資源表｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --purple: #a78bfa;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --pre: #5eb3ff;
+      --mid: #fbbf24;
+      --post: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(94, 179, 255, 0.1), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(248, 113, 113, 0.06), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.35rem, 2.4vw, 1.95rem); }
+    h2 { margin: 0 0 14px; font-size: 1.12rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 14px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 820px; }
+    .meta { font-size: 0.85rem; color: var(--muted); margin: 10px 0 16px; }
+    .related { font-size: 0.9rem; margin-bottom: 16px; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+
+    .guard {
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.28);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+
+    .flow-card {
+      border-radius: 14px;
+      padding: 18px;
+      border: 1px solid var(--border);
+    }
+    .flow-card.pre { border-top: 4px solid var(--pre); background: rgba(94, 179, 255, 0.06); }
+    .flow-card.mid { border-top: 4px solid var(--mid); background: rgba(251, 191, 36, 0.06); }
+    .flow-card.post { border-top: 4px solid var(--post); background: rgba(167, 139, 250, 0.06); }
+    .flow-card h4 { margin: 0 0 6px; font-size: 1.05rem; }
+    .flow-card.pre h4 { color: var(--pre); }
+    .flow-card.mid h4 { color: var(--warn); }
+    .flow-card.post h4 { color: var(--purple); }
+    .flow-card .goal { font-size: 0.88rem; color: var(--muted); margin: 0 0 10px; }
+
+    .phase-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .phase-tabs button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .phase-tabs button.active {
+      background: rgba(52, 211, 153, 0.15);
+      border-color: var(--accent);
+      color: var(--accent-2);
+      font-weight: 600;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--accent-2);
+    }
+    .tag-high { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+
+    .age-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .age-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .age-card h4 { margin: 0 0 8px; color: var(--warn); }
+
+    .red-list { list-style: none; padding: 0; margin: 0; }
+    .red-list li {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .red-list li:last-child { border-bottom: 0; }
+    .red-list strong { color: var(--danger); }
+
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .checklist li:last-child { border-bottom: 0; }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); width: auto; }
+    .check-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .check-tag.before { background: rgba(94, 179, 255, 0.15); color: var(--pre); }
+    .check-tag.during { background: rgba(251, 191, 36, 0.15); color: var(--warn); }
+    .check-tag.after { background: rgba(167, 139, 250, 0.15); color: var(--purple); }
+
+    .injury-form label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea {
+      width: 100%;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 9px 11px;
+      font: inherit;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    button {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 5px; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>運動安全防護前中後支援資源表</h1>
+      <p class="subtitle">
+        為選手、教練與家庭整理運動前・中・後的安全防護知識、行動與支援資源。
+        聚焦預防、現場應變與恢復復賽，與平台「前中後資源整合」策略一致。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="運動前中後資源整合與全球化策略.html">前中後資源</a> ·
+        <a href="運動營養健康飲食建議指南.html">運動營養</a> ·
+        <a href="羽球選手養成挑戰與協助指南.html">羽球指南</a> ·
+        <a href="三位子女分齡運動規劃_9_11_13歲.html">分齡規劃</a>
+      </div>
+      <p class="meta">資料更新：<strong id="updatedDate">—</strong></p>
+    </header>
+
+    <div class="guard" id="disclaimerBox"></div>
+
+    <nav class="nav">
+      <a href="#principles">核心原則</a>
+      <a href="#resources">前中後資源表</a>
+      <a href="#redflags">緊急警訊</a>
+      <a href="#age">分齡重點</a>
+      <a href="#badminton">羽球</a>
+      <a href="#referrals">轉介</a>
+      <a href="#checklist">安全檢核</a>
+      <a href="#injury">傷害紀錄</a>
+    </nav>
+
+    <section id="principles">
+      <h2>核心原則</h2>
+      <ul id="principlesList"></ul>
+    </section>
+
+    <section id="overview">
+      <h2>前 · 中 · 後 總覽</h2>
+      <div class="flow" id="phaseOverview"></div>
+    </section>
+
+    <section id="resources">
+      <h2>支援資源表（知識 × 行動 × 支援）</h2>
+      <div class="phase-tabs" id="phaseTabs">
+        <button type="button" class="active" data-phase="all">全部</button>
+        <button type="button" data-phase="before">運動前</button>
+        <button type="button" data-phase="during">運動中</button>
+        <button type="button" data-phase="after">運動後</button>
+      </div>
+      <div id="resourceTables"></div>
+    </section>
+
+    <section id="redflags">
+      <h2>緊急警訊與現場五步</h2>
+      <h3>立即就醫／119 警訊</h3>
+      <ul class="red-list" id="redFlagList"></ul>
+      <h3>現場應變五步（簡要）</h3>
+      <ol id="emergencySteps"></ol>
+    </section>
+
+    <section id="age">
+      <h2>青少年分齡安全重點（9・11・13 歲參考）</h2>
+      <div class="age-grid" id="ageGrid"></div>
+    </section>
+
+    <section id="badminton">
+      <h2 id="badmintonTitle">羽球專項</h2>
+      <ul id="badmintonList"></ul>
+    </section>
+
+    <section id="referrals">
+      <h2>專業轉介時機</h2>
+      <table>
+        <thead><tr><th>類型</th><th>適用時機</th><th>備註</th></tr></thead>
+        <tbody id="referralBody"></tbody>
+      </table>
+    </section>
+
+    <section id="checklist">
+      <h2>單次訓練／比賽安全檢核（本機儲存）</h2>
+      <ul class="checklist" id="safetyChecklist"></ul>
+      <div class="toolbar">
+        <button class="btn-primary" id="exportCheck" type="button">匯出檢核 JSON</button>
+        <button class="btn-secondary" id="resetCheck" type="button">清除檢核</button>
+      </div>
+    </section>
+
+    <section id="injury">
+      <h2>傷害紀錄（本機儲存）</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-top:0;">
+        供教練轉介、物理治療與家長追蹤；非正式病歷。
+      </p>
+      <div class="form-grid">
+        <div>
+          <label>日期</label>
+          <input type="date" id="injDate">
+        </div>
+        <div>
+          <label>部位</label>
+          <input type="text" id="injPart" placeholder="例：右肩、左踝">
+        </div>
+        <div>
+          <label>發生階段</label>
+          <select id="injPhase">
+            <option value="before">運動前</option>
+            <option value="during">運動中</option>
+            <option value="after">運動後</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>機制與症狀</label>
+          <textarea id="injDesc" placeholder="例：殺球後肩前側尖銳痛，抬手過 90 度加劇"></textarea>
+        </div>
+        <div style="grid-column:1/-1">
+          <label>已採取處置</label>
+          <textarea id="injAction" placeholder="例：冰敷 15 分、休息、已通知教練"></textarea>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn-primary" id="saveInjury" type="button">儲存紀錄</button>
+        <button class="btn-secondary" id="exportInjury" type="button">匯出全部紀錄</button>
+        <button class="btn-secondary" id="clearInjury" type="button">清除紀錄</button>
+      </div>
+      <div id="injuryLog" style="margin-top:14px;font-size:0.88rem;color:var(--muted);"></div>
+    </section>
+
+    <footer>運動平台專案 · 運動安全防護 · python3 更新運動安全防護資源表.py --open</footer>
+  </div>
+
+  <!-- SAFETY_DATA_BEGIN -->
+<script type="application/json" id="safety-data">
+{
+  "updated": "2026-06-28",
+  "disclaimer": "本表為一般運動安全與防護衛教，非醫療處方或緊急醫療指引。疑似重傷、意識改變、劇烈胸痛等請立即撥打 119 或就醫。",
+  "principles": [
+    "預防優先：安全計畫比事後補救更重要。",
+    "分級管理：依年齡、項目、強度調整防護密度。",
+    "專業分工：教練管技術與週期，防護／醫療管傷病評估。",
+    "透明紀錄：熱身、傷病、恢復天數可追蹤，避免帶傷硬撐。",
+    "環境與裝備：場地、天候、鞋具、護具是安全的基本條件。"
+  ],
+  "phases": {
+    "before": {
+      "title": "運動前",
+      "subtitle": "風險評估 · 準備 · 預防",
+      "goal": "確認身體狀態、環境與裝備就緒，降低可預防的傷害。",
+      "resources": [
+        {
+          "category": "健康自評",
+          "knowledge": "睡眠、發燒、頭暈、舊傷疼痛是否加劇；不適時應減量或休息。",
+          "action": "簡易問卷或教練口頭確認；連續疲勞 3 天以上建議調整課表。",
+          "support": "家長觀察、教練紀錄、平台問卷模板",
+          "priority": "高"
+        },
+        {
+          "category": "熱身與激活",
+          "knowledge": "動態熱身 10～15 分鐘：關節活動、慢跑、專項步法／球感。",
+          "action": "依項目設計熱身 SOP；禁止「上場直接開打」。",
+          "support": "教練教案、防護師示範影片、分齡熱身清單",
+          "priority": "高"
+        },
+        {
+          "category": "裝備與護具",
+          "knowledge": "鞋具防滑、球拍磅數／拍重適齡、護膝／肌貼依評估使用。",
+          "action": "賽前檢查穿線、鞋底、護具是否鬆脫或過期。",
+          "support": "用品店試穿活動、教練背書規格、平台裝備衛教",
+          "priority": "高"
+        },
+        {
+          "category": "環境與天候",
+          "knowledge": "地板濕滑、空調過冷、高溫高濕、空氣品質影響風險。",
+          "action": "戶外高溫改時段；室內確認通風與飲水；雷雨暫停。",
+          "support": "場館 SOP、中央氣象資訊、活動保險條款",
+          "priority": "中"
+        },
+        {
+          "category": "保險與緊急聯絡",
+          "knowledge": "公共意外險、緊急聯絡人、過敏／用藥資訊。",
+          "action": "活動前收集名單；現場張貼 119 與最近醫院。",
+          "support": "ESG 企業贊助保險、平台活動管理模組",
+          "priority": "高"
+        },
+        {
+          "category": "週期與負荷",
+          "knowledge": "段考週、大賽前、生長期應減量；避免帶傷加練。",
+          "action": "教練與家長三方確認本週上限；異常疼痛即停。",
+          "support": "訓練日誌、平台週期提醒",
+          "priority": "中"
+        }
+      ]
+    },
+    "during": {
+      "title": "運動中",
+      "subtitle": "監測 · 應變 · 現場安全",
+      "goal": "即時辨識風險、正確應對輕重傷與環境突發狀況。",
+      "resources": [
+        {
+          "category": "補水與熱傷害",
+          "knowledge": "口渴已略延遲；頭痛、噁心、皮膚燙乾為警訊。",
+          "action": "固定休息點補水；疑似熱衰竭：陰涼、鬆衣、小口補水、就醫。",
+          "support": "補給站、體溫監測、防護師現場",
+          "priority": "高"
+        },
+        {
+          "category": "急性傷害第一時間",
+          "knowledge": "PRICE：保護、休息、冰敷、壓迫、抬高；勿盲目復位。",
+          "action": "停止運動；評估能否承重；疑似骨折／脫臼勿硬移。",
+          "support": "現場冰袋、彈性繃帶、防護師初評",
+          "priority": "高"
+        },
+        {
+          "category": "頭部／頸部外傷",
+          "knowledge": "任何撞擊後頭痛、嘔吐、意識模糊＝疑似腦震盪。",
+          "action": "立即停止；禁止當日復賽；依醫囑漸進復賽。",
+          "support": "腦震盪通報流程、運動醫學轉介",
+          "priority": "高"
+        },
+        {
+          "category": "過度使用與疼痛管理",
+          "knowledge": "尖銳痛、腫脹、關節卡住不同於一般痠痛。",
+          "action": "技術性疼痛可調整；病理疼痛應退場評估。",
+          "support": "教練動作調整、物理治療轉介",
+          "priority": "中"
+        },
+        {
+          "category": "通訊與通報",
+          "knowledge": "誰負責通報、誰陪同就醫、誰通知家長。",
+          "action": "現場指定安全官；重大事件 24 小時內書面紀錄。",
+          "support": "活動 SOP、平台事件表單",
+          "priority": "中"
+        },
+        {
+          "category": "比賽日密度",
+          "knowledge": "連續對戰間恢復不足易累積傷害。",
+          "action": "賽間補水、簡易伸展、冰敷預防性使用（依防護建議）。",
+          "support": "賽程表、恢復區、營養補給",
+          "priority": "中"
+        }
+      ]
+    },
+    "after": {
+      "title": "運動後",
+      "subtitle": "恢復 · 評估 · 復賽",
+      "goal": "促進恢復、追蹤傷勢、安全回到訓練與比賽。",
+      "resources": [
+        {
+          "category": "收操與整理",
+          "knowledge": "靜態伸展 5～10 分鐘；心率漸降，非立刻靜坐吹冷氣。",
+          "action": "固定收操流程；大強度後可加輕度有氧 5 分鐘。",
+          "support": "教練帶操、防護伸展指引",
+          "priority": "高"
+        },
+        {
+          "category": "傷害紀錄",
+          "knowledge": "部位、時間、機制、腫脹程度、是否影響睡眠。",
+          "action": "24 小時內填寫；3 日未改善應就醫或物理治療。",
+          "support": "平台傷病模板、家長與教練共享",
+          "priority": "高"
+        },
+        {
+          "category": "物理治療／運動醫學轉介",
+          "knowledge": "反覆性傷害、超過 2 週未愈、影響日常功能。",
+          "action": "教練或防護師轉介；保留復健處方與復賽建議。",
+          "support": "合作診所、平台轉介網絡",
+          "priority": "高"
+        },
+        {
+          "category": "睡眠與營養恢復",
+          "knowledge": "睡眠是組織修復第一要素；運動後 30～60 分鐘補充碳水＋蛋白。",
+          "action": "比賽日避免熬夜；見運動營養指南。",
+          "support": "運動營養健康飲食建議指南.html",
+          "priority": "中"
+        },
+        {
+          "category": "漸進復賽（Return to Play）",
+          "knowledge": "依醫師／防護師分階段：休息→輕度活動→專項→全強度。",
+          "action": "禁止「不痛就全量」；每階段至少 24～48 小時觀察。",
+          "support": "協會通報、教練週期調整",
+          "priority": "高"
+        },
+        {
+          "category": "心理恢復",
+          "knowledge": "大賽落敗、受傷停賽可能引發挫折或焦慮。",
+          "action": "允許情緒；必要時運動心理諮商。",
+          "support": "輔導資源、家長傾聽、平台衛教",
+          "priority": "中"
+        }
+      ]
+    }
+  },
+  "redFlags": [
+    {
+      "sign": "意識不清、抽搐、無法喚醒",
+      "action": "立即 119，維持呼吸道，勿餵食"
+    },
+    {
+      "sign": "頸部劇痛、肢體麻木無力",
+      "action": "固定頭頸，勿任意移動，119"
+    },
+    {
+      "sign": "胸痛、呼吸困難、臉唇發紫",
+      "action": "停止一切活動，119"
+    },
+    {
+      "sign": "開放性骨折、明顯變形",
+      "action": "固定患部，119 或急診"
+    },
+    {
+      "sign": "高熱＋意識改變、皮膚乾燙",
+      "action": "疑似熱射病，立即降溫＋119"
+    }
+  ],
+  "emergencySteps": [
+    "確保現場安全（停止比賽、清出空間）",
+    "評估意識與呼吸（必要時 CPR／AED）",
+    "呼叫 119 並指定一人陪同",
+    "通知教練、家長與活動主辦",
+    "簡要紀錄時間、機制、處置，供後續醫療"
+  ],
+  "ageGroups": [
+    {
+      "age": "9 歲左右",
+      "focus": "趣味與基本動作；防護重「環境安全＋充足休息」",
+      "limits": "每週 3～4 次、單次 60 分內；不拼 adult 強度",
+      "parentRole": "觀察情緒與睡眠；不場邊過度指導"
+    },
+    {
+      "age": "11 歲左右",
+      "focus": "穩定度與協調；開始建立熱身／收操習慣",
+      "limits": "週期化入門；段考週主動減量",
+      "parentRole": "協調課業與比賽；記錄輕微不適"
+    },
+    {
+      "age": "13 歲左右",
+      "focus": "專項週期、升學壓力下的負荷管理",
+      "limits": "監測生長期關節；排名賽需恢復天數",
+      "parentRole": "升學與賽程三方溝通；支持專業轉介"
+    }
+  ],
+  "badminton": {
+    "title": "羽球專項安全重點",
+    "items": [
+      "肩肘：磅數保守、殺球量依週期；異常疼痛停拍",
+      "足踝：防滑鞋、地板水漬立即處理",
+      "比賽日：連續兩日賽事需賽間恢復與補水",
+      "暑熱：室內空調與戶外遠征皆需補水計畫"
+    ]
+  },
+  "referrals": [
+    {
+      "type": "運動防護／體能",
+      "when": "活動現場、週期設計、動作篩檢",
+      "note": "非診斷，異常轉醫療"
+    },
+    {
+      "type": "物理治療",
+      "when": "反覆痠痛、超過 2 週、復健",
+      "note": "需合格治療師"
+    },
+    {
+      "type": "運動醫學／骨科",
+      "when": "急性重傷、影像檢查、復賽簽核",
+      "note": "依醫囑漸進"
+    },
+    {
+      "type": "運動心理",
+      "when": "比賽焦慮、受傷後信心低落",
+      "note": "與教練、家長合作"
+    }
+  ],
+  "checklist": [
+    {
+      "id": "s1",
+      "phase": "before",
+      "text": "今日身體自評完成（睡眠、發燒、舊傷）"
+    },
+    {
+      "id": "s2",
+      "phase": "before",
+      "text": "熱身 10 分鐘以上（含專項激活）"
+    },
+    {
+      "id": "s3",
+      "phase": "before",
+      "text": "鞋具／護具／裝備檢查完成"
+    },
+    {
+      "id": "s4",
+      "phase": "before",
+      "text": "緊急聯絡人與保險資訊可取得"
+    },
+    {
+      "id": "s5",
+      "phase": "during",
+      "text": "補水計畫執行（非等到口渴）"
+    },
+    {
+      "id": "s6",
+      "phase": "during",
+      "text": "現場知道誰是安全通報窗口"
+    },
+    {
+      "id": "s7",
+      "phase": "during",
+      "text": "異常疼痛已停止該項動作"
+    },
+    {
+      "id": "s8",
+      "phase": "after",
+      "text": "收操與整理完成"
+    },
+    {
+      "id": "s9",
+      "phase": "after",
+      "text": "有傷害則 24 小時內紀錄"
+    },
+    {
+      "id": "s10",
+      "phase": "after",
+      "text": "本週恢復睡眠達標（依年齡 9～10 小時）"
+    }
+  ]
+}
+</script>
+  <!-- SAFETY_DATA_END -->
+
+  <script>
+    const DATA = JSON.parse(document.getElementById('safety-data').textContent);
+    const CHECK_KEY = 'sport-safety-checklist-v1';
+    const INJURY_KEY = 'sport-safety-injury-log-v1';
+    const PHASE_LABEL = { before: '運動前', during: '運動中', after: '運動後' };
+    const PHASE_CLASS = { before: 'pre', during: 'mid', after: 'post' };
+
+    document.getElementById('updatedDate').textContent = DATA.updated || '—';
+    document.getElementById('disclaimerBox').textContent = DATA.disclaimer || '';
+
+    document.getElementById('principlesList').innerHTML =
+      (DATA.principles || []).map(p => `<li>${p}</li>`).join('');
+
+    document.getElementById('phaseOverview').innerHTML = ['before', 'during', 'after'].map(key => {
+      const ph = DATA.phases[key];
+      if (!ph) return '';
+      return `<div class="flow-card ${PHASE_CLASS[key]}">
+        <h4>${ph.title}</h4>
+        <p class="goal">${ph.subtitle || ''} — ${ph.goal || ''}</p>
+        <p style="margin:0;font-size:0.85rem;color:var(--muted);">${(ph.resources || []).length} 項支援資源</p>
+      </div>`;
+    }).join('');
+
+    function renderResourceTable(phaseKey) {
+      const ph = DATA.phases[phaseKey];
+      if (!ph) return '';
+      const rows = (ph.resources || []).map(r => `
+        <tr>
+          <td><strong>${r.category}</strong><br><span class="tag ${r.priority === '高' ? 'tag-high' : ''}">${r.priority || ''}優先</span></td>
+          <td>${r.knowledge}</td>
+          <td>${r.action}</td>
+          <td>${r.support}</td>
+        </tr>`).join('');
+      return `<h3>${ph.title} — ${ph.subtitle || ''}</h3>
+        <table>
+          <thead><tr><th>類別</th><th>知識重點</th><th>行動建議</th><th>支援資源</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    function renderAllResources(filter) {
+      const root = document.getElementById('resourceTables');
+      if (filter === 'all') {
+        root.innerHTML = ['before', 'during', 'after'].map(renderResourceTable).join('');
+      } else {
+        root.innerHTML = renderResourceTable(filter);
+      }
+    }
+
+    renderAllResources('all');
+
+    document.getElementById('phaseTabs').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-phase]');
+      if (!btn) return;
+      document.querySelectorAll('#phaseTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAllResources(btn.dataset.phase);
+    });
+
+    document.getElementById('redFlagList').innerHTML = (DATA.redFlags || []).map(r =>
+      `<li><strong>${r.sign}</strong> → ${r.action}</li>`).join('');
+
+    document.getElementById('emergencySteps').innerHTML =
+      (DATA.emergencySteps || []).map(s => `<li>${s}</li>`).join('');
+
+    document.getElementById('ageGrid').innerHTML = (DATA.ageGroups || []).map(a => `
+      <div class="age-card">
+        <h4>${a.age}</h4>
+        <p><strong>重點：</strong>${a.focus}</p>
+        <p><strong>負荷：</strong>${a.limits}</p>
+        <p><strong>家長：</strong>${a.parentRole}</p>
+      </div>`).join('');
+
+    if (DATA.badminton) {
+      document.getElementById('badmintonTitle').textContent = DATA.badminton.title;
+      document.getElementById('badmintonList').innerHTML =
+        (DATA.badminton.items || []).map(i => `<li>${i}</li>`).join('');
+    }
+
+    document.getElementById('referralBody').innerHTML = (DATA.referrals || []).map(r =>
+      `<tr><td>${r.type}</td><td>${r.when}</td><td>${r.note}</td></tr>`).join('');
+
+    function loadChecks() {
+      try { return JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveChecks(state) {
+      localStorage.setItem(CHECK_KEY, JSON.stringify(state));
+    }
+
+    function renderChecklist() {
+      const state = loadChecks();
+      const ul = document.getElementById('safetyChecklist');
+      ul.innerHTML = (DATA.checklist || []).map(c => `
+        <li>
+          <input type="checkbox" id="${c.id}" ${state[c.id] ? 'checked' : ''}>
+          <span class="check-tag ${c.phase}">${PHASE_LABEL[c.phase] || c.phase}</span>
+          <label for="${c.id}">${c.text}</label>
+        </li>`).join('');
+      ul.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const s = loadChecks();
+          s[inp.id] = inp.checked;
+          saveChecks(s);
+        });
+      });
+    }
+    renderChecklist();
+
+    document.getElementById('resetCheck').addEventListener('click', () => {
+      if (confirm('確定清除所有檢核勾選？')) {
+        localStorage.removeItem(CHECK_KEY);
+        renderChecklist();
+      }
+    });
+
+    document.getElementById('exportCheck').addEventListener('click', () => {
+      const state = loadChecks();
+      const blob = new Blob([JSON.stringify({ updated: DATA.updated, checks: state }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `運動安全檢核_${DATA.updated || 'export'}.json`;
+      a.click();
+    });
+
+    function loadInjuries() {
+      try { return JSON.parse(localStorage.getItem(INJURY_KEY)) || []; }
+      catch { return []; }
+    }
+    function saveInjuries(list) {
+      localStorage.setItem(INJURY_KEY, JSON.stringify(list));
+    }
+    function renderInjuryLog() {
+      const list = loadInjuries();
+      const el = document.getElementById('injuryLog');
+      if (!list.length) { el.textContent = '尚無紀錄。'; return; }
+      el.innerHTML = '<strong>最近紀錄：</strong><br>' + list.slice(-5).reverse().map(e =>
+        `[${e.date}] ${e.part}（${PHASE_LABEL[e.phase] || e.phase}）— ${e.desc}`).join('<br>');
+    }
+    renderInjuryLog();
+
+    document.getElementById('injDate').valueAsDate = new Date();
+
+    document.getElementById('saveInjury').addEventListener('click', () => {
+      const entry = {
+        date: document.getElementById('injDate').value,
+        part: document.getElementById('injPart').value.trim(),
+        phase: document.getElementById('injPhase').value,
+        desc: document.getElementById('injDesc').value.trim(),
+        action: document.getElementById('injAction').value.trim()
+      };
+      if (!entry.part || !entry.desc) {
+        alert('請至少填寫部位與症狀。');
+        return;
+      }
+      const list = loadInjuries();
+      list.push(entry);
+      saveInjuries(list);
+      document.getElementById('injPart').value = '';
+      document.getElementById('injDesc').value = '';
+      document.getElementById('injAction').value = '';
+      renderInjuryLog();
+    });
+
+    document.getElementById('exportInjury').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadInjuries(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `傷害紀錄_${DATA.updated || 'export'}.json`;
+      a.click();
+    });
+
+    document.getElementById('clearInjury').addEventListener('click', () => {
+      if (confirm('確定清除全部傷害紀錄？')) {
+        localStorage.removeItem(INJURY_KEY);
+        renderInjuryLog();
+      }
+    });
+  </script>
+</body>
+</html>

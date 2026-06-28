@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>品牌定位｜積極有效的運動行銷（非逐利出發）</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(252, 211, 77, 0.08), transparent 32%),
+        radial-gradient(circle at bottom left, rgba(52, 211, 153, 0.1), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    .wrap { max-width: 900px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 12px; font-size: clamp(1.5rem, 2.6vw, 2rem); line-height: 1.35; }
+    h2 { margin: 0 0 14px; font-size: 1.2rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 16px 0 8px; font-size: 1.05rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); font-size: 1.05rem; }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(94, 179, 255, 0.08));
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 18px;
+      padding: 28px 32px;
+      margin: 24px 0;
+      text-align: center;
+    }
+
+    .hero .quote {
+      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+      font-weight: 600;
+      color: var(--accent-2);
+      margin: 0 0 12px;
+    }
+
+    .hero p { margin: 0; color: var(--muted); max-width: 640px; margin-inline: auto; }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 26px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .related { margin-bottom: 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+    @media (max-width: 640px) { .vs { grid-template-columns: 1fr; } }
+
+    .vs-box {
+      border-radius: 12px; padding: 16px 18px;
+    }
+    .vs-no { background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.25); }
+    .vs-yes { background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); }
+    .vs-box h4 { margin: 0 0 10px; font-size: 0.95rem; }
+    .vs-no h4 { color: #f87171; }
+    .vs-yes h4 { color: var(--accent); }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .pill {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.88rem; color: var(--blue);
+    }
+
+    .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+    .steps li {
+      counter-increment: step;
+      padding: 14px 0 14px 48px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .steps li:last-child { border-bottom: 0; }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 14px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); color: #064e3b;
+      font-weight: 700; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .highlight {
+      background: rgba(252, 211, 77, 0.08);
+      border: 1px solid rgba(252, 211, 77, 0.25);
+      border-radius: 12px; padding: 16px 20px; margin-top: 14px;
+    }
+    .highlight strong { color: var(--warm); }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 8px; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 32px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>積極有效的運動行銷網站</h1>
+      <p class="subtitle">全面、正向、可信任——以推廣運動與健康為先，建立品牌知名度，而非以獲利為出發點。</p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="運動健康平台三年計畫檢核表.html">三年計畫</a>
+      </div>
+    </header>
+
+    <div class="hero">
+      <p class="quote">我們行銷的是「運動的好處」，不是「立刻掏錢買東西」。</p>
+      <p>
+        這是一個全面、有效、積極的作為：讓更多人認識規律運動對身心的實質幫助，
+        推廣預防勝於治療，減少過度依賴用藥的迷思——先贏得信任，再談永續經營。
+      </p>
+    </div>
+
+    <section id="why">
+      <h2>為什麼「非逐利出發」反而能建立知名度？</h2>
+      <p>台灣運動產業長期由小店、道館、社團組成，對「平台要抽成、要賣東西」天然警戒。若一開始就擺出商業平台姿態，容易遭遇排斥。</p>
+
+      <div class="vs">
+        <div class="vs-box vs-no">
+          <h4>❌ 容易引發排斥的做法</h4>
+          <ul style="margin:0;padding-left:1.2rem;font-size:0.92rem;">
+            <li>首頁全是商品與折扣</li>
+            <li>強迫教練／社團「搬家」到平台</li>
+            <li>誇大保健、藥品、速成減肥</li>
+            <li>只報比分、只炒明星八卦</li>
+            <li>未貢獻價值就要求付費／贊助</li>
+          </ul>
+        </div>
+        <div class="vs-box vs-yes">
+          <h4>✓ 積極有效、易於被接受的做法</h4>
+          <ul style="margin:0;padding-left:1.2rem;font-size:0.92rem;">
+            <li>免費健康與運動知識、賽事資訊</li>
+            <li>尊重既有 LINE 社團，只做加值</li>
+            <li>國手／教練分享「運動與人生」</li>
+            <li>社區體驗、親子、銀髮友善活動</li>
+            <li>透明標示贊助，使命寫在前面</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="highlight">
+        <strong>品牌知名度來自「被需要」：</strong>
+        當人們發現這個網站真的幫助自己或家人動起來、搞懂運動、找到靠譜資訊，
+        自然願意分享——這比買廣告更持久。
+      </div>
+    </section>
+
+    <section id="position">
+      <h2>對外定位（一句話版本）</h2>
+      <table>
+        <tr><th>對象</th><th>怎麼說</th></tr>
+        <tr><td>一般民眾</td><td>「幫你用最正確的方式開始運動、看懂賽事、照顧身體的運動健康網站。」</td></tr>
+        <tr><td>教練／社團</td><td>「不取代你，幫你曝光、辦活動、接企業健康與贊助資源的合作夥伴。」</td></tr>
+        <tr><td>企業 CSR</td><td>「可衡量社會影響的運動參與與健康促進平台。」</td></tr>
+        <tr><td>政府／運動部</td><td>「協助擴大運動人口、連結教練與社區的數位節點。」</td></tr>
+        <tr><td>媒體</td><td>「運動新聞、紀錄、選手故事與健康科普的正面內容來源。」</td></tr>
+      </table>
+
+      <p><strong>不要自稱：</strong>「運動電商」「最大賣場」「必買平台」。</p>
+      <p><strong>可以自稱：</strong>「運動健康與參與平台」「運動行銷與內容網站」「運動生活社群入口」。</p>
+    </section>
+
+    <section id="marketing">
+      <h2>「運動行銷網站」行銷什麼？</h2>
+      <p>行銷的不是商品，而是<strong>運動的價值</strong>：</p>
+      <div class="pill-row">
+        <span class="pill">規律運動的好處</span>
+        <span class="pill">預防勝於治療</span>
+        <span class="pill">適性入門</span>
+        <span class="pill">賽事與選手故事</span>
+        <span class="pill">教練專業</span>
+        <span class="pill">社區約練</span>
+        <span class="pill">運動前中後照護</span>
+        <span class="pill">職涯與傳承</span>
+      </div>
+
+      <h3>網站內容金字塔（由下而上建立信任）</h3>
+      <table>
+        <tr><th>層級</th><th>內容</th><th>目的</th><th>是否收費</th></tr>
+        <tr><td>基底</td><td>免費知識、新聞、比分、紀錄、健康科普</td><td>流量、SEO、信任</td><td>免費</td></tr>
+        <tr><td>互動</td><td>體驗活動、講座、社團約練、國手分享</td><td>參與、口碑</td><td>低價或免費</td></tr>
+        <tr><td>專業</td><td>教練課、訓練計畫、防護、復健轉介</td><td>價值兌現</td><td>合理收費</td></tr>
+        <tr><td>合作</td><td>企業 ESG、品牌體驗、賽事贊助</td><td>永續經營</td><td>B2B</td></tr>
+      </table>
+    </section>
+
+    <section id="launch">
+      <h2>降低排斥的啟動策略（前 12 個月）</h2>
+      <ol class="steps">
+        <li>
+          <strong>先給價值，再談合作</strong><br>
+          免費發布 2 個運動分館的入門指南、賽事報導、健康文章，不要求註冊即可閱讀大部分內容。
+        </li>
+        <li>
+          <strong>與社團「共辦」而非「收編」</strong><br>
+          活動海報並列社團與平台 Logo；報名便利、費用透明；主理人拿執行費。
+        </li>
+        <li>
+          <strong>教練是主角，平台是配角</strong><br>
+          教練照片、資歷、學員評價放最顯眼處；平台品牌低調、專業、可信。
+        </li>
+        <li>
+          <strong>國手與 KOL 講「運動與健康」</strong><br>
+          少炫富、少攀比；多講習慣、挫折、復出、轉職——貼近一般人。
+        </li>
+        <li>
+          <strong>企業以 ESG 夥伴身分進場</strong><br>
+          首年優先「無償支持健康活動」，而非硬銷產品；對外強調社會影響數據。
+        </li>
+        <li>
+          <strong>公開使命與贊助紅線</strong><br>
+          首頁可見：我們為什麼存在、我們不接什麼案——以透明度建立品牌。
+        </li>
+        <li>
+          <strong>用 impact 說話，不用 GMV 說話</strong><br>
+          對外 KPI：參與人次、規律運動比例、社區合作數——不是初期以銷售額為唯一指標。
+        </li>
+      </ol>
+    </section>
+
+    <section id="brand">
+      <h2>品牌知名度怎麼「積極」累積？</h2>
+      <table>
+        <tr><th>管道</th><th>做法</th><th>調性</th></tr>
+        <tr><td>內容 SEO</td><td>「如何開始跑步」「羽球入門」「運動與三高」</td><td>實用、專業、溫暖</td></tr>
+        <tr><td>賽事現場</td><td>自辦或協辦社區賽；現場健康衛教</td><td>參與感、非推銷</td></tr>
+        <tr><td>媒體合作</td><td>提供賽事數據、選手專訪、健康專欄</td><td>正面、建設性</td></tr>
+        <tr><td>企業健康</td><td>員工體驗日、講座 co-brand</td><td>專業、可報告</td></tr>
+        <tr><td>社群</td><td>短影片：教學片段、幕後、運動迷思破解</td><td>真實、不煽情</td></tr>
+        <tr><td>口碑</td><td>學員／社團長推薦計畫（非佣金導向，以曝光換合作）</td><td>互惠、尊重</td></tr>
+      </table>
+
+      <div class="highlight">
+        <strong>「積極」≠ 強推銷：</strong>
+        積極 = 主動舉辦活動、主動產出內容、主動連結教練與社區；
+        有效 = 可衡量的參與與健康影響；
+        全面 = 運動前中後、新聞到職涯，但分階段上線不貪多。
+      </div>
+    </section>
+
+    <section id="sustain">
+      <h2>非逐利出發，如何永續？</h2>
+      <p>「不以獲利為出發」≠「永遠不賺錢」。而是：</p>
+      <ul>
+        <li><strong>第 1 階段：</strong> 品牌與信任（免費內容、社區活動、ESG 無償贊助）</li>
+        <li><strong>第 2 階段：</strong> 專業服務（教練課、企業方案、賽事執行費）</li>
+        <li><strong>第 3 階段：</strong> 規模與影響（年度冠名、平台工具、跨區複製）</li>
+      </ul>
+      <p style="color:var(--muted);font-size:0.92rem;">
+        收入永遠服務使命：讓更多人運動、讓教練與社團活得下去、讓健康內容持續產出。
+        詳見 <a href="運動健康平台三年計畫檢核表.html" style="color:var(--blue);">三年計畫檢核表</a> 中的使命護欄與 ESG 收入占比目標。
+      </p>
+    </section>
+
+    <section id="manifesto">
+      <h2>品牌宣言（可放網站首頁）</h2>
+      <blockquote style="margin:0;padding:16px 20px;border-left:4px solid var(--accent);background:var(--panel-2);border-radius:0 12px 12px 0;font-size:1.02rem;">
+        我們相信：運動是預防疾病、提升生活品質最積極的力量之一。<br><br>
+        這個網站存在的理由，是幫助人們用<strong>正確、安全、適性</strong>的方式認識運動、參與運動、持續運動——
+        而不是催促你購買不必要的產品或替代專業醫療。<br><br>
+        我們與教練、社團、國手與負責任的夥伴一起，<br>
+        行銷<strong>運動本身的美好</strong>，建立一個更健康、更有活力的社會。
+      </blockquote>
+    </section>
+
+    <footer>運動平台專案 · 品牌定位 · 離線可用</footer>
+  </div>
+</body>
+</html>

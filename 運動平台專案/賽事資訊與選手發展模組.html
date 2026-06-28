@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>賽事資訊與選手發展｜新聞 · 紀錄 · 訓練 · 職涯</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --purple: #a78bfa;
+      --warn: #fbbf24;
+      --news: #f472b6;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(244, 114, 182, 0.08), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(94, 179, 255, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
+    h2 { margin: 0 0 14px; font-size: 1.2rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 16px 0 8px; font-size: 1.05rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 880px; }
+    .related { margin: 12px 0 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin: 16px 0;
+    }
+    .mod {
+      background: var(--panel-2); border-radius: 12px; padding: 16px;
+      border: 1px solid var(--border);
+    }
+    .mod h4 { margin: 0 0 8px; color: var(--news); font-size: 1rem; }
+
+    .flow-box {
+      background: var(--panel-2); border-radius: 12px; padding: 16px;
+      font-family: ui-monospace, monospace; font-size: 0.8rem;
+      overflow-x: auto; white-space: pre; color: var(--muted); line-height: 1.55;
+    }
+
+    .check-item {
+      display: grid; grid-template-columns: 24px 1fr; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .check-item:last-child { border-bottom: 0; }
+    .check-item.done .ctitle { text-decoration: line-through; color: var(--muted); }
+    .check-item input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--accent); }
+    .ctitle { font-weight: 700; margin-bottom: 4px; }
+    .cdetail { font-size: 0.9rem; color: var(--muted); }
+    .phase { font-size: 0.75rem; color: var(--purple); margin-bottom: 4px; }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 14px; font-size: 0.85rem; color: var(--blue); text-decoration: none;
+    }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+    button { border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer; font: inherit; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .guard {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px; padding: 14px 18px; margin-top: 12px; font-size: 0.92rem;
+    }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 6px; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>賽事資訊與選手發展模組</h1>
+      <p class="subtitle">
+        整合體育新聞、賽事報導、即時比分、世界／各項紀錄，並連結教練、防護、運動科學，
+        提供選手適性訓練計畫與職涯發展規劃。與平台使命一致：不只報導成績，更要支持運動員長期發展與全民運動參與。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="運動健康平台三年計畫檢核表.html">三年計畫</a> ·
+        <a href="運動前中後資源整合與全球化策略.html">前中後資源</a> ·
+        <a href="台灣選手養成挑戰與協助指南.html">選手養成協助</a>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <a href="#position">平台定位</a>
+      <a href="#media">新聞與賽事</a>
+      <a href="#records">紀錄資料</a>
+      <a href="#training">訓練計畫</a>
+      <a href="#career">職涯發展</a>
+      <a href="#data">資料來源</a>
+      <a href="#roadmap">上線節奏</a>
+      <a href="#checklist">檢核表</a>
+    </nav>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="exportBtn">匯出進度 JSON</button>
+      <button class="btn-secondary" id="resetBtn">清除勾選</button>
+    </div>
+
+    <section id="position">
+      <h2>在平台中的定位</h2>
+      <p>此模組是<strong>「資訊與數據層」＋「選手發展層」</strong>，與教練、社群、贊助、前中後資源串接：</p>
+      <div class="flow-box">體育新聞／賽事報導／比分／紀錄
+        ↓ 吸引關注、建立專業信任
+    一般民眾 · 業餘選手 · 青少年 · 職業／準職業選手
+        ↓
+    適性訓練計畫（教練＋運動科學＋防護）
+        ↓
+    職涯發展規劃（競技／教練／裁判／運動產業）
+        ↓
+    前中後資源（復健、營養、心理、升學、贊助）</div>
+      <table>
+        <tr><th>使用者</th><th>主要需求</th><th>平台提供</th></tr>
+        <tr><td>一般民眾</td><td>看賽事、懂規則、找運動入門</td><td>新聞、比分、紀錄故事、體驗課導流</td></tr>
+        <tr><td>業餘／校隊選手</td><td>標竿、訓練方向</td><td>紀錄對照、訓練模板、教練媒合</td></tr>
+        <tr><td>準職業／職業選手</td><td>週期化訓練、職涯決策</td><td>個人化計畫、防護、經紀／贊助資源轉介</td></tr>
+        <tr><td>教練／國手</td><td>數據、曝光、傳承</td><td>內容共創、選手培育、講座</td></tr>
+      </table>
+    </section>
+
+    <section id="media">
+      <h2>體育新聞與賽事報導</h2>
+      <div class="grid-4">
+        <div class="mod">
+          <h4>新聞聚合</h4>
+          <p style="font-size:0.9rem;color:var(--muted);margin:0;">
+            依運動分館整理：國內外賽事、選手動態、政策（運動部）、運動健康科普。標註來源與日期，區分「新聞」與「平台原創」。
+          </p>
+        </div>
+        <div class="mod">
+          <h4>賽事報導</h4>
+          <p style="font-size:0.9rem;color:var(--muted);margin:0;">
+            平台自辦或合作賽事之賽後報導、照片、數據圖表。可嵌入教練評論、技術解析（符合教育使命，非純娛樂八卦）。
+          </p>
+        </div>
+        <div class="mod">
+          <h4>即時比分</h4>
+          <p style="font-size:0.9rem;color:var(--muted);margin:0;">
+            球類、羽球、籃排等：局分、比分、賽程。初期可人工更新＋合作賽事 API；後期串接資料供應商或自建賽事系統。
+          </p>
+        </div>
+        <div class="mod">
+          <h4>賽程與提醒</h4>
+          <p style="font-size:0.9rem;color:var(--muted);margin:0;">
+            使用者訂閱項目／選手／隊伍，LINE 推播開賽提醒。導流至平台直播、現場購票或教練解說活動。
+          </p>
+        </div>
+      </div>
+
+      <h3>內容分級（避免失焦）</h3>
+      <table>
+        <tr><th>層級</th><th>內容</th><th>更新頻率</th></tr>
+        <tr><td>快訊</td><td>比分、破紀錄、退賽</td><td>賽事日即時</td></tr>
+        <tr><td>賽後</td><td>報導、數據、教練點評</td><td>24～48 小時內</td></tr>
+        <tr><td>專題</td><td>選手故事、訓練幕後、職涯路徑</td><td>週／雙週</td></tr>
+        <tr><td>百科</td><td>規則、紀錄說明、如何入門</td><td>常態維護</td></tr>
+      </table>
+    </section>
+
+    <section id="records">
+      <h2>世界紀錄與各項紀錄保持人</h2>
+      <p>依<strong>運動分館</strong>建立紀錄資料庫，服務「設目標、懂標竿、激勵參與」：</p>
+      <table>
+        <tr><th>紀錄類型</th><th>範例</th><th>平台用途</th></tr>
+        <tr><td>世界紀錄（WR）</td><td>田徑、游泳、舉重等</td><td>對照目標、科普、專題報導</td></tr>
+        <tr><td>亞洲／國家紀錄</td><td>各單項協會認證</td><td>台灣選手追蹤、亞洲策略</td></tr>
+        <tr><td>個人最佳（PB）</td><td>業餘選手自主登錄（可選）</td><td>訓練計畫成效追蹤</td></tr>
+        <tr><td>賽會紀錄</td><td>平台自辦賽、校際賽</td><td>歷屆榜單、青少年激勵</td></tr>
+        <tr><td>非奧項目</td><td>羽球排名、扯鈴、武道段位</td><td>各分館獨立欄位</td></tr>
+      </table>
+
+      <h3>紀錄頁建議欄位</h3>
+      <ul>
+        <li>項目名稱、性別組別、紀錄數值、保持人、創造日期、地點</li>
+        <li>資料來源（世界田聯、FINA、BWF、協會官網等）</li>
+        <li>最後更新日、是否已作廢／藥檢相關註記（若適用）</li>
+        <li>連結：該選手訓練專題、相關教練、入門指南</li>
+      </ul>
+      <div class="guard">
+        <strong>資料誠信：</strong>
+        紀錄以官方或協會來源為準；平台轉載需註明出處。破紀錄快訊需二次確認，避免錯誤資訊損害公信力。
+      </div>
+    </section>
+
+    <section id="training">
+      <h2>適性訓練計畫（選手導向）</h2>
+      <p>非取代教練，而是<strong>教練＋運動科學＋防護</strong>協作的數位工具與模板：</p>
+
+      <table>
+        <tr><th>對象</th><th>計畫內容</th><th>交付者</th></tr>
+        <tr>
+          <td>入門／一般</td>
+          <td>每週 2～3 次、30～45 分鐘入門課表；以健康與習慣為目標</td>
+          <td>認證教練</td>
+        </tr>
+        <tr>
+          <td>業餘選手</td>
+          <td>週期化：準備期、賽季、恢復期；含技術、體能、休息</td>
+          <td>教練＋防護</td>
+        </tr>
+        <tr>
+          <td>青少年</td>
+          <td>發展階段（LTAD）適性；避免過度訓練、專項過早</td>
+          <td>教練＋運動醫學顧問</td>
+        </tr>
+        <tr>
+          <td>準職業／職業</td>
+          <td>個人化週期、數據監測、傷病管理、賽程對應</td>
+          <td>教練團隊＋防護＋物理治療</td>
+        </tr>
+      </table>
+
+      <h3>訓練計畫模組功能</h3>
+      <ul>
+        <li><strong>目標設定</strong>：賽事、PB、體能指標、健康指標（非只看競賽）</li>
+        <li><strong>週課表</strong>：技術、體能、恢復、營養提醒（連結前中後資源）</li>
+        <li><strong>紀錄對照</strong>：距離世界／國家紀錄差距（激勵但需合理期待管理）</li>
+        <li><strong>傷痛紀錄</strong>：觸發物理治療轉介</li>
+        <li><strong>教練審核</strong>：計畫須教練確認後生效，避免 AI 或模板誤用</li>
+      </ul>
+    </section>
+
+    <section id="career">
+      <h2>運動員職涯發展規劃</h2>
+      <p>競技生涯有限，平台提供<strong>全生涯視角</strong>（對齊運動部人才與運動產業政策）：</p>
+
+      <table>
+        <tr><th>階段</th><th>年齡／狀態</th><th>規劃重點</th><th>平台資源</th></tr>
+        <tr><td>啟蒙</td><td>兒童～國中</td><td>多項嘗試、 FUN 、基礎動作</td><td>體驗營、社團、家長衛教</td></tr>
+        <tr><td>發展</td><td>高中～大學</td><td>專項深化、升學／課程平衡</td><td>教練、賽事、升學資訊</td></tr>
+        <tr><td>高峰</td><td>準職業～職業</td><td>賽事週期、贊助、心理、傷病</td><td>訓練計畫、經紀轉介、國手網絡</td></tr>
+        <tr><td>轉換</td><td>退役前 3～5 年</td><td>第二專長、教練證、評論、創業</td><td>職涯講座、教練培訓、平台內容工作</td></tr>
+        <tr><td>退役後</td><td>退役後</td><td>教練、防護、運動產業、創業</td><td>人才媒合、創業輔導、品牌合作</td></tr>
+      </table>
+
+      <h3>職涯工具箱</h3>
+      <ul>
+        <li><strong>技能盤點</strong>：技術、語言、媒體、教學能力</li>
+        <li><strong>職涯地圖</strong>：教練、裁判、運動管理、物理治療、運動記者、KOL</li>
+        <li><strong>mentor 配對</strong>：國手、資深教練、轉職成功選手</li>
+        <li><strong>升學／獎學金</strong>：體育績優、海外訓練資訊整理</li>
+        <li><strong>贊助與合約</strong>：基礎法律與財務衛教（進階轉介專業顧問）</li>
+      </ul>
+    </section>
+
+    <section id="data">
+      <h2>資料來源與合作（台灣 → 亞洲 → 全球）</h2>
+      <table>
+        <tr><th>資料類型</th><th>台灣</th><th>亞洲／全球</th></tr>
+        <tr><td>新聞</td><td>中央社、協會稿、平台原創、合作媒體</td><td>Reuters、協會國際稿、授權媒體</td></tr>
+        <tr><td>比分／賽程</td><td>自辦賽事系統、協會 API（若開放）</td><td>SportRadar 等（需授權費）</td></tr>
+        <tr><td>紀錄</td><td>各單項協會、運動部公開資料</td><td>World Athletics、FINA、BWF 等官網</td></tr>
+        <tr><td>排名</td><td>協會國內排名</td><td>國際總會排名</td></tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.9rem;">
+        <strong>第 1 年策略：</strong>以「平台自辦賽＋人工策展＋協會合作」為主，避免高價 API 與版權風險。
+        <strong>第 2～3 年：</strong>依流量與贊助收入，逐步購買數據授權或開發亞洲多語賽事資料。
+      </p>
+    </section>
+
+    <section id="roadmap">
+      <h2>模組上線節奏（與三年計畫對齊）</h2>
+      <table>
+        <tr><th>時程</th><th>媒體／數據</th><th>訓練／職涯</th><th>人力（增補）</th></tr>
+        <tr>
+          <td>第 1 年 H1</td>
+          <td>2 個分館新聞區、自辦賽報導</td>
+          <td>教練課表模板 v1</td>
+          <td>內容編輯 1、賽事數據志工</td>
+        </tr>
+        <tr>
+          <td>第 1 年 H2</td>
+          <td>比分即時（自辦賽）、紀錄頁 20 項</td>
+          <td>業餘選手 PB 登錄試行</td>
+          <td>+體育記者／編輯 1</td>
+        </tr>
+        <tr>
+          <td>第 2 年</td>
+          <td>新聞 APP 區、訂閱推播、協會 MOU</td>
+          <td>週期化計畫＋防護連動</td>
+          <td>數據工程 1、選手發展顧問 1</td>
+        </tr>
+        <tr>
+          <td>第 3 年</td>
+          <td>多語快訊、亞洲賽事資料</td>
+          <td>職涯 mentor 計畫、退役轉職講座</td>
+          <td>媒體組 3～5 人、選手服務 2 人</td>
+        </tr>
+      </table>
+
+      <h3>與其他模組的連結</h3>
+      <ul>
+        <li>新聞／破紀錄 → 導流體驗課、教練、社團</li>
+        <li>訓練計畫 → 運動前中後（防護、營養、復健）</li>
+        <li>職涯規劃 → 教練培訓、國手講座、企業贊助</li>
+        <li>賽事比分 → 平台自辦賽事贊助與轉播收入</li>
+      </ul>
+    </section>
+
+    <section id="checklist">
+      <h2>賽事資訊與選手發展 · 檢核表</h2>
+      <div id="checklist-root"></div>
+    </section>
+
+    <footer>運動平台專案 · 賽事資訊與選手發展 · 離線可用</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'sport-media-athlete-dev-v1';
+
+    const CHECKS = [
+      { phase: '第 1 年 Q1', id: 'm01', title: '定義各分館「新聞＋紀錄」欄位規格',
+        detail: '不同運動欄位不同（羽球排名 vs 田徑秒數 vs 武道段位）。先完成 2 個試點分館規格書。' },
+      { phase: '第 1 年 Q1', id: 'm02', title: '建立內容來源白名單與版權 SOP',
+        detail: '可轉載來源、需授權來源、平台原創流程。避免新聞侵權。' },
+      { phase: '第 1 年 Q2', id: 'm03', title: '上線自辦賽「賽後報導＋比分」模板',
+        detail: '每場賽事 24h 內發布：比分、名次、照片、數據摘要。' },
+      { phase: '第 1 年 Q2', id: 'm04', title: '完成 20 項「紀錄保持人」靜態資料頁（試點運動）',
+        detail: '標註來源與更新日。連結入門指南與相關教練。' },
+      { phase: '第 1 年 Q3', id: 'm05', title: '與 1 個單項協會洽談數據或新聞合作 MOU',
+        detail: '爭取賽程、成績、新聞稿授權或聯合發布。' },
+      { phase: '第 1 年 Q3', id: 'm06', title: '訓練計畫模板 v1（入門／業餘）上線',
+        detail: '須教練審核後生效。含熱身、主訓、恢復、營養提醒占位。' },
+      { phase: '第 1 年 Q4', id: 'm07', title: '選手 PB 自主登錄（可選）試點',
+        detail: '業餘選手記錄進步，對照國家紀錄時顯示合理差距與警示，避免過度攀比。' },
+      { phase: '第 1 年 Q4', id: 'm08', title: '首場「運動員職涯」講座（國手＋轉職選手）',
+        detail: '主題：競技以外的發展路徑。錄影沉澱知識庫。' },
+      { phase: '第 2 年 Q1', id: 'm09', title: 'LINE 賽程／比分訂閱推播',
+        detail: '僅限平台合作賽事與精選國際大賽，控制維護成本。' },
+      { phase: '第 2 年 Q2', id: 'm10', title: '週期化訓練模組（教練＋防護聯簽）',
+        detail: '賽期、恢復期自動提醒；傷痛觸發物理治療轉介。' },
+      { phase: '第 2 年 Q3', id: 'm11', title: 'Mentor 配對計畫：10 組選手－資深教練／國手',
+        detail: '季度 meetup，平台記錄時數供 ESG 與 impact 報告。' },
+      { phase: '第 2 年 Q4', id: 'm12', title: '評估體育數據 API 授權（預算與 ROI）',
+        detail: '流量與贊助達門檻後再購 SportRadar 等，或續用自辦＋協會數據。' },
+      { phase: '第 3 年', id: 'm13', title: '亞洲賽事新聞／紀錄多語專區（英＋繁中）',
+        detail: '服務亞洲拓展策略，至少覆蓋 2 個合作國家賽事。' },
+      { phase: '第 3 年', id: 'm14', title: '退役轉職人才庫（教練、評論、產業）',
+        detail: '對接平台教練認證、內容、企業健康方案崗位。' },
+      { phase: '第 3 年', id: 'm15', title: '發布《選手發展與服務 impact 年報》',
+        detail: '含：服務選手數、訓練計畫執行率、職涯講座、轉介復健數。' }
+    ];
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+    function render() {
+      const root = document.getElementById('checklist-root');
+      const state = loadState();
+      root.innerHTML = '';
+      CHECKS.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'check-item' + (state[c.id] ? ' done' : '');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!state[c.id];
+        cb.addEventListener('change', () => {
+          state[c.id] = cb.checked;
+          saveState(state);
+          row.classList.toggle('done', cb.checked);
+        });
+        const body = document.createElement('div');
+        body.innerHTML = `<div class="phase">${c.phase}</div><div class="ctitle">${c.title}</div><div class="cdetail">${c.detail}</div>`;
+        row.appendChild(cb);
+        row.appendChild(body);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadState(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sport-media-athlete-checklist.json';
+      a.click();
+    });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('清除所有勾選？')) { localStorage.removeItem(STORAGE_KEY); render(); }
+    });
+
+    render();
+  </script>
+</body>
+</html>
