@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運動健康平台｜三年計畫檢核表</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warn: #fbbf24;
+      --phase1: #5eb3ff;
+      --phase2: #a78bfa;
+      --phase3: #34d399;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52, 211, 153, 0.1), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(94, 179, 255, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
+    h2 { margin: 0 0 14px; font-size: 1.2rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 16px 0 8px; font-size: 1.05rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 860px; margin-bottom: 16px; }
+
+    .mission {
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin: 16px 0 24px;
+      font-size: 0.95rem;
+    }
+
+    .mission strong { color: var(--accent); }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 22px; }
+
+    button {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit; transition: transform 0.12s;
+    }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+    .nav a:hover { border-color: var(--accent); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px; margin-bottom: 22px;
+    }
+    .stat {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+    }
+    .stat .label { color: var(--muted); font-size: 0.8rem; }
+    .stat .value { font-size: 1.35rem; font-weight: 700; color: var(--accent-2); margin-top: 4px; }
+
+    section {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 12px 0;
+    }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .phase-head {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+    .phase-badge {
+      border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; font-weight: 700;
+    }
+    .y1 { background: rgba(94, 179, 255, 0.15); color: var(--phase1); }
+    .y2 { background: rgba(167, 139, 250, 0.15); color: var(--phase2); }
+    .y3 { background: rgba(52, 211, 153, 0.15); color: var(--phase3); }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .check-item:last-child { border-bottom: 0; }
+    .check-item.done .item-title { text-decoration: line-through; color: var(--muted); }
+
+    .check-item input { width: 20px; height: 20px; margin-top: 4px; accent-color: var(--accent); cursor: pointer; }
+
+    .item-title { font-weight: 700; margin-bottom: 6px; }
+    .item-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag {
+      font-size: 0.75rem; padding: 2px 8px; border-radius: 6px;
+      background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+    }
+    .tag-budget { color: var(--warn); border-color: rgba(251, 191, 36, 0.3); }
+    .tag-audience { color: var(--blue); border-color: rgba(94, 179, 255, 0.3); }
+
+    .item-detail {
+      background: var(--panel-2); border-radius: 10px;
+      padding: 12px 14px; font-size: 0.92rem; color: var(--muted);
+    }
+    .item-detail strong { color: var(--text); }
+
+    .progress-bar { height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; margin: 8px 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--accent)); transition: width 0.3s; }
+
+    .guard {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px; padding: 14px 18px; margin-top: 12px; font-size: 0.92rem;
+    }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 32px; }
+
+    @media (max-width: 640px) {
+      .check-item { grid-template-columns: 24px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>運動健康平台｜三年計畫檢核表</h1>
+      <p class="subtitle">
+        教練師資導向 · 多運動分館 · 社群／國手／KOL · 品牌贊助與 ESG · 使命：推廣規律運動、預防優於治療。
+        勾選進度自動儲存於本機瀏覽器，可離線使用。
+      </p>
+      <div class="mission">
+        <strong>核心使命：</strong>
+        讓更多人透過正確方式認識運動對身心的幫助，養成規律運動習慣，推廣「預防勝於治療」，
+        並以可持續的商業與贊助模式支持長期運作——<strong>收入是手段，健康影響是目的</strong>。
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="exportBtn">匯出進度 JSON</button>
+      <button class="btn-secondary" id="resetBtn">清除所有勾選</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="label">總檢核項</div><div class="value" id="statTotal">—</div></div>
+      <div class="stat"><div class="label">已完成</div><div class="value" id="statDone">—</div></div>
+      <div class="stat"><div class="label">完成率</div><div class="value" id="statPct">—</div></div>
+      <div class="stat"><div class="label">目前階段</div><div class="value" id="statPhase" style="font-size:1rem;">第 1 年</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <nav class="nav">
+      <a href="#overview">三年總覽</a>
+      <a href="#budget">預算表</a>
+      <a href="#audience">受眾目標</a>
+      <a href="#guardrails">使命護欄</a>
+      <a href="#y1">第 1 年</a>
+      <a href="#y2">第 2 年</a>
+      <a href="#y3">第 3 年</a>
+    </nav>
+
+    <section id="overview">
+      <h2>三年總覽與生態順序</h2>
+      <p>合作與建置順序（避免利益衝突、使命優先）：</p>
+      <ol>
+        <li><strong>國家運動／健康政策</strong> — 試點背書、場地、專案</li>
+        <li><strong>大型企業 ESG／保險／醫療</strong> — 無償或冠名贊助</li>
+        <li><strong>教練／道館／領隊</strong> — 日常交付</li>
+        <li><strong>場地業者</strong> — 課程與賽事落地</li>
+        <li><strong>國手／KOL／既有社群</strong> — 背書、流量、種子用戶</li>
+        <li><strong>運動用品店</strong> — 最後一哩服務與導購</li>
+      </ol>
+      <table>
+        <tr><th>年度</th><th>主題</th><th>現金預算（估）</th><th>累計參與人次</th><th>核心驗證</th></tr>
+        <tr>
+          <td><strong>第 1 年</strong></td>
+          <td>使命驗證 · MVP · 首場贊助活動</td>
+          <td>80～150 萬</td>
+          <td>800～1,500</td>
+          <td>有人持續運動、企業願意贊助第 2 場</td>
+        </tr>
+        <tr>
+          <td><strong>第 2 年</strong></td>
+          <td>多運動分館 · 贊助常態化</td>
+          <td>250～450 萬</td>
+          <td>6,000～12,000</td>
+          <td>40% 收入來自 ESG／健康／政府</td>
+        </tr>
+        <tr>
+          <td><strong>第 3 年</strong></td>
+          <td>城市運動健康節 · 跨縣市複製</td>
+          <td>500～900 萬</td>
+          <td>18,000～30,000</td>
+          <td>可發布年度健康影響報告</td>
+        </tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.88rem;">
+        預算含人力、保險、活動、平台維運；實物贊助（補給、場地、雲端）未完全計入現金，可抵減 20～40% 支出。
+      </p>
+    </section>
+
+    <section id="budget">
+      <h2>三年資金規模預算表</h2>
+      <h3>第 1 年（80～150 萬）— 精簡團隊 2～3 人</h3>
+      <table>
+        <tr><th>項目</th><th>月/年估計</th><th>說明</th></tr>
+        <tr><td>人力（兼職／專案）</td><td>40～70 萬/年</td><td>營運、活動 PM、商務各 0.5～1 FTE</td></tr>
+        <tr><td>平台 MVP</td><td>8～20 萬</td><td>LINE LIFF、報名、金流、簡易後台</td></tr>
+        <tr><td>活動執行（6～8 場）</td><td>18～35 萬</td><td>場地、保險、講師鐘點、文宣</td></tr>
+        <tr><td>行政／會計／法律</td><td>5～10 萬</td><td>協會掛靠、合約、收據</td></tr>
+        <tr><td>預備金</td><td>10～15 萬</td><td>緊急、超支</td></tr>
+        <tr><td><strong>收入目標</strong></td><td>40～100 萬</td><td>企業無償＋小額冠名＋課程抽成＋政府試點</td></tr>
+      </table>
+
+      <h3>第 2 年（250～450 萬）— 團隊 4～6 人</h3>
+      <table>
+        <tr><th>項目</th><th>年估計</th><th>說明</th></tr>
+        <tr><td>人力</td><td>120～200 萬</td><td>全職營運、商務、賽事 PM、內容</td></tr>
+        <tr><td>平台升級</td><td>25～45 萬</td><td>多運動分館、教練 SaaS、數據報表</td></tr>
+        <tr><td>活動／賽事（20+ 場）</td><td>60～120 萬</td><td>含 2～3 場中型賽事</td></tr>
+        <tr><td>行銷與內容</td><td>20～40 萬</td><td>KOL 合作、影片、健康系列</td></tr>
+        <tr><td>顧問（運動醫學／會計）</td><td>10～20 萬</td><td>內容審核、ESG 報告</td></tr>
+        <tr><td><strong>收入目標</strong></td><td>200～400 萬</td><td>贊助 40%＋課程 25%＋廣告行銷 20%＋政府 15%</td></tr>
+      </table>
+
+      <h3>第 3 年（500～900 萬）— 團隊 8～12 人</h3>
+      <table>
+        <tr><th>項目</th><th>年估計</th><th>說明</th></tr>
+        <tr><td>人力</td><td>250～450 萬</td><td>分運動項目負責人、區域營運</td></tr>
+        <tr><td>旗艦運動健康節</td><td>80～150 萬</td><td>跨項目、冠名、保險、執行</td></tr>
+        <tr><td>平台與數據</td><td>40～70 萬</td><td>Impact 報告、企業方案</td></tr>
+        <tr><td>活動／賽事常態</td><td>100～180 萬</td><td>系列賽、企業健康方案</td></tr>
+        <tr><td><strong>收入目標</strong></td><td>450～850 萬</td><td>年度冠名、企業 ESG、跨縣市專案</td></tr>
+      </table>
+    </section>
+
+    <section id="audience">
+      <h2>三年目標受眾與數量規劃</h2>
+      <table>
+        <tr><th>指標</th><th>第 1 年末</th><th>第 2 年末</th><th>第 3 年末</th></tr>
+        <tr><td>累計活動參與人次</td><td>800～1,500</td><td>6,000～12,000</td><td>18,000～30,000</td></tr>
+        <tr><td>註冊會員（平台/LINE）</td><td>300～600</td><td>2,500～5,000</td><td>8,000～15,000</td></tr>
+        <tr><td>合作教練／道館</td><td>15～25</td><td>50～80</td><td>120～200</td></tr>
+        <tr><td>合作社團／社群</td><td>5～8</td><td>20～35</td><td>50～80</td></tr>
+        <tr><td>運動項目分館</td><td>2</td><td>5～8</td><td>10～15</td></tr>
+        <tr><td>企業贊助夥伴（累計）</td><td>3～6</td><td>15～25</td><td>35～50</td></tr>
+        <tr><td>3 個月後仍規律運動（自填）</td><td>≥25%</td><td>≥30%</td><td>≥35%</td></tr>
+        <tr><td>企業 ESG／健康收入占比</td><td>≥30%</td><td>≥40%</td><td>≥45%</td></tr>
+      </table>
+      <h3>優先受眾（由近到遠）</h3>
+      <ul>
+        <li><strong>入門者</strong>：久未運動、想改善健康、怕受傷 — 體驗課、健康講座</li>
+        <li><strong>親子／青少年</strong>：武道、扯鈴、舞蹈、直排輪 — 習慣養成</li>
+        <li><strong>中階同好</strong>：已有運動習慣 — 約練、賽事、教練進修</li>
+        <li><strong>銀髮／慢病風險</strong>：與醫療、保險合作 — 適性運動方案</li>
+        <li><strong>企業員工</strong>：ESG 健康方案 — B2B 穩定收入</li>
+      </ul>
+    </section>
+
+    <section id="guardrails">
+      <h2>使命護欄與利益衝突管理</h2>
+      <ul>
+        <li>贊助須標示；教學內容與商業推廣分離</li>
+        <li>拒絕誇大療效保健、藥物替代運動之宣傳</li>
+        <li>國手／KOL 負責背書與流量，認證教練負責技術與安全</li>
+        <li>不強制社群搬家；平台負責付費活動、贊助、數據</li>
+        <li>健康相關內容需運動醫學或醫療顧問審核</li>
+      </ul>
+      <div class="guard">
+        <strong>無償贊助談法：</strong>
+        對企業用「ESG 社會參與／員工健康／可衡量 impact」，準備 one-pager、贊助菜單、活動後成果報告。
+      </div>
+    </section>
+
+    <section id="y1">
+      <div class="phase-head">
+        <span class="phase-badge y1">第 1 年</span>
+        <span>使命驗證 · 試點 2 運動 · MVP 上線</span>
+      </div>
+      <div id="checklist-y1"></div>
+    </section>
+
+    <section id="y2">
+      <div class="phase-head">
+        <span class="phase-badge y2">第 2 年</span>
+        <span>多運動擴張 · 贊助常態化 · 中型賽事</span>
+      </div>
+      <div id="checklist-y2"></div>
+    </section>
+
+    <section id="y3">
+      <div class="phase-head">
+        <span class="phase-badge y3">第 3 年</span>
+        <span>城市運動健康節 · 跨縣市 · 影響力報告</span>
+      </div>
+      <div id="checklist-y3"></div>
+    </section>
+
+    <footer>
+      運動平台專案 · 三年計畫檢核表 · 離線可用 · 進度儲存於本機
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'sport-health-platform-3y-checklist-v1';
+
+    const ITEMS = [
+      /* ===== 第 1 年 Q1 ===== */
+      { id: 'y1-q1-01', year: 1, quarter: 'Q1', title: '撰寫使命宣言與贊助紅線',
+        tags: ['策略', '法務'],
+        detail: '明確寫出：推廣規律運動、預防保健、不鼓吹過度用藥或誇大療效產品。列出「不接案」清單（如不明保健、博弈等）。此文件對外洽企業 CSR 與對內決策同等重要，可避免日後為了收入偏離初衷。' },
+      { id: 'y1-q1-02', year: 1, quarter: 'Q1', title: '選定試點城市與 2 個首發運動項目',
+        tags: ['策略'],
+        detail: '建議選你有教練／社群人脈的項目，例如：武道＋路跑、或舞蹈＋直排輪。不要一次 15 項。首發 2 項用於驗證 O2O 流程與贊助報告模板。' },
+      { id: 'y1-q1-03', year: 1, quarter: 'Q1', title: '確認法律載體（協會掛靠／社團／公司）',
+        tags: ['法務', '預算 3～8 萬'],
+        detail: '企業無償贊助與捐贈收據通常需對應合法受贈或合約主體。可與既有運動協會、社企或 NPO 合作，你方擔任執行單位。諮詢會計師 1 次，釐清發票、勞務、活動保險責任。' },
+      { id: 'y1-q1-04', year: 1, quarter: 'Q1', title: '撰寫企業 one-pager 與贊助方案菜單',
+        tags: ['商務'],
+        detail: '一頁紙含：使命、試點活動日期、需要的無償項目（保險、場地、補給、設計）、企業可獲 ESG 數據與 Logo 曝光。分支援／協力／冠名三階，即使第一階只值 1～3 萬也要寫清楚。' },
+      { id: 'y1-q1-05', year: 1, quarter: 'Q1', title: '招募種子教練 10 位、合作社團 3 個',
+        tags: ['受眾', '教練 10'],
+        detail: '教練優先於用品店。簽署合作備忘：體驗課分潤、內容審核、安全規範。社團主理人保留 LINE 群，平台負責報名、贊助、保險。目標 Q1 末有可上架的師資與第一場活動人力。' },
+      { id: 'y1-q1-06', year: 1, quarter: 'Q1', title: '洽談 1 位運動醫學或家醫顧問（兼職）',
+        tags: ['健康', '預算 0～3 萬'],
+        detail: '強化「預防勝於治療」公信力。顧問審核健康講座大纲、活動強度分級、免責與衛教文案，並可出席首場講座。對保險、金控 CSR _pitch 是重要加分。' },
+
+      /* ===== 第 1 年 Q2 ===== */
+      { id: 'y1-q2-01', year: 1, quarter: 'Q2', title: 'MVP 上線：教練頁、體驗課預約、LINE 入口',
+        tags: ['平台', '預算 8～15 萬'],
+        detail: '不必先做完整 App。LINE 官方帳＋ LIFF 或簡易 PWA 即可：教練介紹、時段、報名、付訂金。後台讓教練自行管理名額。重點是「第一場付費／登記體驗課」能跑通。' },
+      { id: 'y1-q2-02', year: 1, quarter: 'Q2', title: '寄出第一輪 5～10 封企業 CSR 提案',
+        tags: ['商務', '贊助'],
+        detail: '優先：保險、金控、運動品牌、科技雲端新創。標題強調「健康運動體驗日 · ESG 夥伴」。附上具體無償需求表（例如：公共意外險 1 場、50 份補給）。不要只寫「請支持我們」。' },
+      { id: 'y1-q2-03', year: 1, quarter: 'Q2', title: '舉辦首場小型體驗日（30～50 人）',
+        tags: ['活動', '受眾 50'],
+        detail: '即使尚無大贊助也可先辦：驗證流程、拍照、問卷（運動意願、健康自覺）。產出 2 頁 impact 摘要，作為談下一個贊助的 social proof。' },
+      { id: 'y1-q2-04', year: 1, quarter: 'Q2', title: '建立知識庫首批 5 篇（運動與健康）',
+        tags: ['內容'],
+        detail: '主題如：如何選適性運動、運動前後熱身、久站久坐者的入門、兒童與銀髮注意事項。由教練＋顧問共筆，建立平台不是「賣場」而是「健康促進」的基調。' },
+      { id: 'y1-q2-05', year: 1, quarter: 'Q2', title: '洽談運動部／地方政府試點或場地支持',
+        tags: ['政策'],
+        detail: '對接全民運動、社區運動、運動產業輔導。即使未核准補助，取得「申請中／對話中」也可寫入對企業簡報，增加可信度。' },
+
+      /* ===== 第 1 年 Q3 ===== */
+      { id: 'y1-q3-01', year: 1, quarter: 'Q3', title: '首場「企業協力」冠名體驗日（50～80 人）',
+        tags: ['活動', '贊助', '受眾 80'],
+        detail: '目標拿到至少 1 家企業無償或半無償：保險、補給、場地、設計任一。活動含 30 分鐘健康講座＋60 分鐘運動體驗。活動後 7 日內交付贊助成果報告（人次、照片、問卷）。' },
+      { id: 'y1-q3-02', year: 1, quarter: 'Q3', title: '邀請 1 位國手或前國手「運動與人生」分享（非競技宣傳）',
+        tags: ['國手', '內容'],
+        detail: '國手作旗幟層：季度 1 場即可。重點是「運動如何改變健康與生活」，對齊使命。可與企業冠名綁定，提高企業參與意願。' },
+      { id: 'y1-q3-03', year: 1, quarter: 'Q3', title: '與 1～2 位運動 KOL 試合作（單場）',
+        tags: ['KOL', '預算 3～8 萬'],
+        detail: 'KOL 負責宣傳與破圈，認證教練負責現場教學。合約明定分工，避免「會拍不會教」。追蹤：報名來源、現場轉正課率。' },
+      { id: 'y1-q3-04', year: 1, quarter: 'Q3', title: '累計 4～6 場體驗活動、教練 15 位',
+        tags: ['受眾 400+', '教練 15'],
+        detail: '開始追蹤核心 KPI：3 個月後仍每週運動 1 次以上（自填問卷）。若低於 20%，檢討活動是否偏一次性娛樂，需加強社群約練與後續課程。' },
+      { id: 'y1-q3-05', year: 1, quarter: 'Q3', title: '發布利益揭露與教練推薦規範 v1',
+        tags: ['法務', '使命'],
+        detail: '凡品牌贊助、教練帶貨、KOL 合作皆須標示。教練對不適合學員的產品有拒絕權。對外建立「可信任」形象，長遠比短期贊助費重要。' },
+
+      /* ===== 第 1 年 Q4 ===== */
+      { id: 'y1-q4-01', year: 1, quarter: 'Q4', title: '首場小型友誼賽或運動日（80～120 人）',
+        tags: ['賽事', '受眾 120'],
+        detail: '不必追求大規模。目的：測試賽事 SOP、保險、贊助背板、報名系統。可設親子組、入門組，降低競技門檻，符合健康使命。' },
+      { id: 'y1-q4-02', year: 1, quarter: 'Q4', title: '完成第 1 年 Impact 報告',
+        tags: ['商務'],
+        detail: '匯整：總參與人次、合作夥伴、問卷結果、案例故事 3 則。用於第 2 年談年度協力或冠名。報告視覺可給企業直接貼進 CSR。' },
+      { id: 'y1-q4-03', year: 1, quarter: 'Q4', title: '評估第 2 年要擴充的 2～3 個運動分館',
+        tags: ['策略'],
+        detail: '依第 1 年數據選：武道、路跑、舞蹈／扯鈴、直排輪、游泳等。每館需有項目負責人，避免只有名義沒有教練與活動。' },
+      { id: 'y1-q4-04', year: 1, quarter: 'Q4', title: '第 1 年財務結算：收入來源結構檢視',
+        tags: ['預算'],
+        detail: '目標：ESG／健康／政府相關收入 ≥30%。若過度依賴單一商業品牌且與使命衝突，第 2 年調整接案標準。' },
+
+      /* ===== 第 2 年 Q1 ===== */
+      { id: 'y2-q1-01', year: 2, quarter: 'Q1', title: '新增 2～3 個運動分館上線',
+        tags: ['平台', '分館 5'],
+        detail: '共用同一預約／活動引擎，各館啟用不同欄位（如武道段位、路跑距離）。每館至少 5 位教練、1 個合作社團。' },
+      { id: 'y2-q1-02', year: 2, quarter: 'Q1', title: '標準化 Sponsorship Deck（體驗日／賽事）',
+        tags: ['商務'],
+        detail: '將第 1 年成功方案製成簡報：冠名 15～25 萬、金牌 8～12 萬、銀牌 3～5 萬（依城市調整）。企業可「選菜」，降低 BD 時間。' },
+      { id: 'y2-q1-03', year: 2, quarter: 'Q1', title: '教練 SaaS 月費制上線（認證教練）',
+        tags: ['收入', '教練 50'],
+        detail: '免費夥伴仍可有基本頁；付費享優先排序、數據報表、金流。月費 1,500～3,000，以工具價值換取，而非強迫抽成商品。' },
+      { id: 'y2-q1-04', year: 2, quarter: 'Q1', title: '「運動與健康」系列講座（每月 1 場）',
+        tags: ['內容', '受眾 600+'],
+        detail: '國手＋醫師＋教練三方對談。可賣給企業作員工健康講座，一場 5～15 萬，同時產內容。' },
+
+      /* ===== 第 2 年 Q2 ===== */
+      { id: 'y2-q2-01', year: 2, quarter: 'Q2', title: '首場中型賽事或系列賽（150～250 人）',
+        tags: ['賽事', '受眾 250'],
+        detail: '爭取總冠名或分項冠名。賽事設入門組，並設健康檢查／熱身站（顧問把關）。詳細記錄贊助曝光與媒體素材。' },
+      { id: 'y2-q2-02', year: 2, quarter: 'Q2', title: '平台廣告版位上線（運動相關限定）',
+        tags: ['收入', '廣告'],
+        detail: '首頁、分館、活動頁之贊助版位。拒絕非運動、誇大療效廣告。月費制為主，並標示「贊助」。' },
+      { id: 'y2-q2-03', year: 2, quarter: 'Q2', title: '企業 B2B 健康方案試點（1～2 家）',
+        tags: ['商務', 'ESG'],
+        detail: ' package：季度 4 堂員工體驗課＋1 場健康講座＋ impact 報告。報價 15～40 萬/季，對齊 ESG 員工福祉指標。' },
+      { id: 'y2-q2-04', year: 2, quarter: 'Q2', title: '合作社團達 20 個、主理人分潤制度化',
+        tags: ['社群 20'],
+        detail: '透過平台報名之活動，主理人得執行費 10～15%。解決「社群怕被偷粉絲」之利益衝突，建立長期合作。' },
+
+      /* ===== 第 2 年 Q3 ===== */
+      { id: 'y2-q3-01', year: 2, quarter: 'Q3', title: '品牌體驗課常態化（每月 2～4 場）',
+        tags: ['行銷', '收入'],
+        detail: '品牌提供試用品＋贊助費，教練交付體驗，平台產數據報告。單場 8～20 萬。須符合使命護欄，不做「只賣不教」。' },
+      { id: 'y2-q3-02', year: 2, quarter: 'Q3', title: '累計參與人次突破 6,000',
+        tags: ['受眾 6000'],
+        detail: '若未達標，檢討是否活動過於分散。可集中資源在 2 個強項運動＋企業方案，而非盲目加項目。' },
+      { id: 'y2-q3-03', year: 2, quarter: 'Q3', title: '運動用品店試接入（5～10 家，導購分潤）',
+        tags: ['零售'],
+        detail: '教練推薦制接入穿線、試拍、租賃。小店不必早期付月費，以「教練推薦客流」換合作。避免早期與量販價格戰。' },
+      { id: 'y2-q3-04', year: 2, quarter: 'Q3', title: '第 2 年中期：顧問委員會（含醫療、教練、社企）',
+        tags: ['治理'],
+        detail: '季度審議接案是否違反使命、重大贊助是否適當。對外可稱「健康與運動倫理委員會」，提升公信力。' },
+
+      /* ===== 第 2 年 Q4 ===== */
+      { id: 'y2-q4-01', year: 2, quarter: 'Q4', title: '第 2 場中型賽事或跨項目運動日',
+        tags: ['賽事', '受眾 8000+'],
+        detail: '嘗試 2 個運動項目同台（如親子：扯鈴＋直排輪），作為第 3 年「運動健康節」預演。' },
+      { id: 'y2-q4-02', year: 2, quarter: 'Q4', title: '談判首份「年度協力夥伴」（60～150 萬）',
+        tags: ['商務', '贊助'],
+        detail: '用兩年數據打包：全年 N 場體驗、1 場賽事冠名、平台版位、員工健康方案折扣。優先保險、金控、運動品牌。' },
+      { id: 'y2-q4-03', year: 2, quarter: 'Q4', title: '第 2 年 Impact 報告＋財務結構檢視',
+        tags: ['預算'],
+        detail: '確認 ESG／健康收入 ≥40%。教練續用率 >70%。若達標，第 3 年可對外募集或申請更大政府專案。' },
+
+      /* ===== 第 3 年 Q1 ===== */
+      { id: 'y3-q1-01', year: 3, quarter: 'Q1', title: '運動分館達 10～12 個、教練 120+',
+        tags: ['分館 10', '教練 120'],
+        detail: '每館有明確項目負責人與年度活動計畫。未達活躍標準的分館暫停，避免空殼。' },
+      { id: 'y3-q1-02', year: 3, quarter: 'Q1', title: '籌備首屆「城市運動健康節」',
+        tags: ['旗艦', '預算 80～150 萬'],
+        detail: '跨項目、親子與入門為主。目標 500～1,000 現場人次。至少 1 家戰略冠名＋多家協力。與運動部／市政府 co-host 提高規格。' },
+      { id: 'y3-q1-03', year: 3, quarter: 'Q1', title: '教練培訓與社群領袖培訓（首期）',
+        tags: ['人才'],
+        detail: '將第 1～2 年方法論內化：健康溝通、安全規範、數位工具。呼應運動部人才培育，可申請補助。' },
+
+      /* ===== 第 3 年 Q2 ===== */
+      { id: 'y3-q2-01', year: 3, quarter: 'Q2', title: '首屆城市運動健康節執行',
+        tags: ['受眾 1000', '賽事'],
+        detail: '含：體驗區、健康講座、小型賽、企業 ESG 專區。完整 impact 數據、媒體稿、影片 3～5 支。' },
+      { id: 'y3-q2-02', year: 3, quarter: 'Q2', title: '第 2 或第 3 城市複製評估',
+        tags: ['擴張'],
+        detail: '複製條件：當地有項目負責人＋3 家以上夥伴＋1 個政府或企業窗口。不可僅靠總部遠端辦活動。' },
+      { id: 'y3-q2-03', year: 3, quarter: 'Q2', title: '累計會員 8,000+、參與 18,000+',
+        tags: ['受眾 18000'],
+        detail: '平台從「活動公司」轉型為「運動健康基礎設施」：常態課、約練、企業方案並行。' },
+
+      /* ===== 第 3 年 Q3 ===== */
+      { id: 'y3-q3-01', year: 3, quarter: 'Q3', title: '年度健康影響報告發布（對外）',
+        tags: ['Impact'],
+        detail: '含：服務人次、規律運動比例、合作夥伴、案例、財務透明度摘要。供企業續約、政府展延、媒體報導。' },
+      { id: 'y3-q3-02', year: 3, quarter: 'Q3', title: '運動部／國健署跨部會專案（若適用）',
+        tags: ['政策'],
+        detail: '以三年數據申請更大型：社區運動、預防保健、運動產業試點。使命與政策高度一致，成功率高於純商業提案。' },
+      { id: 'y3-q3-03', year: 3, quarter: 'Q3', title: '組織型態檢討（社企／基金會／公司）',
+        tags: ['治理'],
+        detail: '若使命收入已穩定，可評估設立基金會接受捐贈，或 B Corp 式治理，讓「非為逐利」寫進制度。' },
+
+      /* ===== 第 3 年 Q4 ===== */
+      { id: 'y3-q4-01', year: 3, quarter: 'Q4', title: '第 4 年策略：區域聯盟或加盟 SOP',
+        tags: ['策略'],
+        detail: '決定要「直營複製」或「輸出 SOP＋品牌授權」。輸出教練認證、贊助模板、平台白標，可能是下一階段收入。' },
+      { id: 'y3-q4-02', year: 3, quarter: 'Q4', title: '三年回顧：使命 vs 商業平衡審查',
+        tags: ['使命'],
+        detail: '審查是否曾接違反紅線案件、教練／社群是否仍信任平台、受眾健康指標是否提升。調整第 4 年護欄與董事／顧問組成。' },
+      { id: 'y3-q4-03', year: 3, quarter: 'Q4', title: '設定第 4～5 年財務自給率目標（≥70%）',
+        tags: ['預算'],
+        detail: '長期不应依賴單一政府或單一企業。收入組合：ESG／健康、賽事贊助、SaaS、課程、廣告、政府專案均衡。' }
+    ];
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function renderChecklist(containerId, items) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      let lastQ = '';
+      items.forEach(item => {
+        if (item.quarter !== lastQ) {
+          lastQ = item.quarter;
+          const qh = document.createElement('h3');
+          qh.textContent = item.quarter;
+          el.appendChild(qh);
+        }
+        const state = loadState();
+        const row = document.createElement('div');
+        row.className = 'check-item' + (state[item.id] ? ' done' : '');
+        row.dataset.id = item.id;
+
+        const tags = item.tags.map(t => {
+          const cls = t.includes('預算') || t.includes('收入') ? 'tag tag-budget'
+            : t.includes('受眾') || t.includes('教練') || t.includes('社群') ? 'tag tag-audience' : 'tag';
+          return `<span class="${cls}">${t}</span>`;
+        }).join('');
+
+        row.innerHTML = `
+          <input type="checkbox" id="${item.id}" ${state[item.id] ? 'checked' : ''}>
+          <div>
+            <div class="item-title">${item.title}</div>
+            <div class="item-meta">${tags}</div>
+            <div class="item-detail">${item.detail}</div>
+          </div>`;
+
+        const cb = row.querySelector('input');
+        cb.addEventListener('change', () => {
+          const s = loadState();
+          s[item.id] = cb.checked;
+          saveState(s);
+          row.classList.toggle('done', cb.checked);
+          updateStats();
+        });
+        el.appendChild(row);
+      });
+    }
+
+    function updateStats() {
+      const state = loadState();
+      const total = ITEMS.length;
+      const done = ITEMS.filter(i => state[i.id]).length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statDone').textContent = done;
+      document.getElementById('statPct').textContent = pct + '%';
+      document.getElementById('progressFill').style.width = pct + '%';
+
+      const y1 = ITEMS.filter(i => i.year === 1);
+      const y1done = y1.filter(i => state[i.id]).length;
+      let phase = '第 1 年';
+      if (y1done === y1.length) {
+        const y2 = ITEMS.filter(i => i.year === 2);
+        const y2done = y2.filter(i => state[i.id]).length;
+        phase = y2done === y2.length ? '第 3 年' : '第 2 年';
+      }
+      document.getElementById('statPhase').textContent = phase;
+    }
+
+    renderChecklist('checklist-y1', ITEMS.filter(i => i.year === 1));
+    renderChecklist('checklist-y2', ITEMS.filter(i => i.year === 2));
+    renderChecklist('checklist-y3', ITEMS.filter(i => i.year === 3));
+    updateStats();
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadState(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sport-platform-3y-progress.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('確定清除所有勾選進度？')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    });
+  </script>
+</body>
+</html>
