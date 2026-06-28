@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運動前中後資源整合｜產業脈絡與全球化策略</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --purple: #a78bfa;
+      --warn: #fbbf24;
+      --pre: #5eb3ff;
+      --mid: #fbbf24;
+      --post: #a78bfa;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52, 211, 153, 0.1), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
+    h2 { margin: 0 0 14px; font-size: 1.2rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 16px 0 8px; font-size: 1.05rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 880px; }
+    .related { margin: 12px 0 20px; }
+    .related a { color: var(--blue); font-size: 0.9rem; }
+
+    section {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px; margin: 16px 0;
+    }
+
+    .flow-card {
+      border-radius: 14px; padding: 18px; border: 1px solid var(--border);
+    }
+    .flow-card.pre { border-top: 4px solid var(--pre); background: rgba(94, 179, 255, 0.06); }
+    .flow-card.mid { border-top: 4px solid var(--mid); background: rgba(251, 191, 36, 0.06); }
+    .flow-card.post { border-top: 4px solid var(--post); background: rgba(167, 139, 250, 0.06); }
+
+    .flow-card h4 { margin: 0 0 10px; font-size: 1.05rem; }
+    .flow-card.pre h4 { color: var(--pre); }
+    .flow-card.mid h4 { color: var(--warn); }
+    .flow-card.post h4 { color: var(--purple); }
+
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .region {
+      background: var(--panel-2); border-radius: 12px; padding: 16px 18px;
+      border: 1px solid var(--border);
+    }
+    .region h4 { margin: 0 0 8px; color: var(--accent-2); }
+
+    .org-chart {
+      background: var(--panel-2); border-radius: 12px; padding: 16px;
+      font-family: ui-monospace, monospace; font-size: 0.82rem;
+      overflow-x: auto; white-space: pre; line-height: 1.5; color: var(--muted);
+    }
+
+    .check-item {
+      display: grid; grid-template-columns: 24px 1fr; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .check-item:last-child { border-bottom: 0; }
+    .check-item.done .ctitle { text-decoration: line-through; color: var(--muted); }
+    .check-item input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--accent); }
+    .ctitle { font-weight: 700; margin-bottom: 4px; }
+    .cdetail { font-size: 0.9rem; color: var(--muted); }
+
+    .guard {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px; padding: 14px 18px; margin-top: 12px; font-size: 0.92rem;
+    }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+    button {
+      border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 14px; font-size: 0.85rem; color: var(--blue); text-decoration: none;
+    }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 6px; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>運動前中後資源整合</h1>
+      <p class="subtitle">
+        將知識、防護、飲食、醫療、物理治療等產業脈絡，與教練平台、社群、贊助體系整合。
+        發展策略：台灣驗證 → 亞洲連結 → 全球化輸出。本頁可離線使用，檢核進度儲存於本機。
+      </p>
+      <div class="related">
+        <a href="index.html">← 運動平台專案入口</a> ·
+        <a href="運動健康平台三年計畫檢核表.html">三年計畫檢核表</a>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <a href="#lifecycle">前中後整合</a>
+      <a href="#industries">產業地圖</a>
+      <a href="#global">台灣→亞洲→全球</a>
+      <a href="#org">組織與人力</a>
+      <a href="#budget">人力預算</a>
+      <a href="#guard">健康倫理</a>
+      <a href="#checklist">整合檢核</a>
+    </nav>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="exportBtn">匯出進度 JSON</button>
+      <button class="btn-secondary" id="resetBtn">清除勾選</button>
+    </div>
+
+    <section id="lifecycle">
+      <h2>運動前 · 中 · 後：資源整合架構</h2>
+      <p>平台不只是「找教練」，而是覆蓋完整運動生命週期，各階段對接不同產業夥伴。</p>
+
+      <div class="flow">
+        <div class="flow-card pre">
+          <h4>運動前 Before</h4>
+          <ul>
+            <li><strong>知識與教育</strong>：入門觀念、適性評估、健康自評</li>
+            <li><strong>書籍／課程</strong>：運動科學、訓練方法、心理建設</li>
+            <li><strong>經驗分享</strong>：國手、教練、資深玩家、社群前輩</li>
+            <li><strong>裝備選擇</strong>：教練＋專業店導引（非比價電商）</li>
+            <li><strong>健康篩檢</strong>：健檢、運動醫學評估、慢病諮詢</li>
+          </ul>
+          <p style="font-size:0.88rem;color:var(--muted);margin:10px 0 0;">
+            平台角色：知識庫、講座、顧問媒合、企業 ESG 健康講習
+          </p>
+        </div>
+
+        <div class="flow-card mid">
+          <h4>運動中 During</h4>
+          <ul>
+            <li><strong>教練／道館</strong>：技術、陪練、課表</li>
+            <li><strong>運動防護</strong>：防護員、肌貼、護具、熱身流程</li>
+            <li><strong>場地與賽事</strong>：場館、路線、賽事執行</li>
+            <li><strong>即時安全</strong>：保險、緊急 SOP、天候／強度分級</li>
+            <li><strong>穿戴與數據</strong>：心率、配速、訓練紀錄（選配）</li>
+          </ul>
+          <p style="font-size:0.88rem;color:var(--muted);margin:10px 0 0;">
+            平台角色：預約、活動管理、防護人力媒合、贊助現場服務
+          </p>
+        </div>
+
+        <div class="flow-card post">
+          <h4>運動後 After</h4>
+          <ul>
+            <li><strong>飲食與營養</strong>：恢復餐、運動營養師諮詢</li>
+            <li><strong>物理治療／復健</strong>：痠痛、傷害評估、復健轉介</li>
+            <li><strong>醫藥保健</strong>：運動醫學、預防性衛教（非推銷用藥）</li>
+            <li><strong>補給</strong>：電解質、蛋白、恢復用品（標示「輔助」）</li>
+            <li><strong>休息與睡眠</strong>：恢復科學、過訓練預防</li>
+          </ul>
+          <p style="font-size:0.88rem;color:var(--muted);margin:10px 0 0;">
+            平台角色：轉介網絡、恢復課程、品牌體驗（受使命護欄約束）
+          </p>
+        </div>
+      </div>
+
+      <table>
+        <tr><th>階段</th><th>整合模組（平台功能）</th><th>主要合作產業</th></tr>
+        <tr>
+          <td>運動前</td>
+          <td>知識庫、書籍書單、講座、適性問卷、教練媒合</td>
+          <td>出版社、運動科學、健檢、保險、學校</td>
+        </tr>
+        <tr>
+          <td>運動中</td>
+          <td>課程預約、賽事、防護派遣、保險、現場贊助</td>
+          <td>教練、道館、防護、場館、品牌、醫療站</td>
+        </tr>
+        <tr>
+          <td>運動後</td>
+          <td>營養諮詢預約、物理治療轉介、恢復課、補給指南</td>
+          <td>營養師、物理治療所、運動醫學、機能補給</td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="industries">
+      <h2>產業脈絡地圖（可逐步接入）</h2>
+      <table>
+        <tr><th>產業類別</th><th>提供價值</th><th>接入優先序</th><th>變現／合作模式</th></tr>
+        <tr>
+          <td>教練／道館／領隊</td>
+          <td>核心交付</td>
+          <td>★★★ 第一批</td>
+          <td>課程抽成、SaaS 月費</td>
+        </tr>
+        <tr>
+          <td>運動防護／肌力體能</td>
+          <td>安全、專業信任</td>
+          <td>★★★ 第一批</td>
+          <td>活動派遣、諮詢預約</td>
+        </tr>
+        <tr>
+          <td>物理治療／復健</td>
+          <td>運動後轉介、傷害預防</td>
+          <td>★★★ 第一批</td>
+          <td>轉介、企業健康方案</td>
+        </tr>
+        <tr>
+          <td>運動醫學／診所</td>
+          <td>評估、衛教、預防</td>
+          <td>★★☆ 第二批</td>
+          <td>講座、篩檢活動冠名</td>
+        </tr>
+        <tr>
+          <td>營養／飲食</td>
+          <td>運動後恢復、體控</td>
+          <td>★★☆ 第二批</td>
+          <td>諮詢、內容贊助</td>
+        </tr>
+        <tr>
+          <td>機能補給／食品</td>
+          <td>補給站、試飲</td>
+          <td>★★☆ 第二批</td>
+          <td>活動贊助（標示輔助）</td>
+        </tr>
+        <tr>
+          <td>出版／知識內容</td>
+          <td>運動前教育</td>
+          <td>★★☆ 第二批</td>
+          <td>聯名書單、版稅分潤</td>
+        </tr>
+        <tr>
+          <td>醫藥保健</td>
+          <td>預防醫學、慢病衛教</td>
+          <td>★☆☆ 審慎接入</td>
+          <td>僅限衛教合作，拒絕處方推銷</td>
+        </tr>
+        <tr>
+          <td>運動用品／裝備</td>
+          <td>最後一哩</td>
+          <td>★☆☆ 第三批</td>
+          <td>教練推薦、體驗贊助</td>
+        </tr>
+        <tr>
+          <td>保險／金融</td>
+          <td>活動險、健康險、ESG</td>
+          <td>★★★ 第一批</td>
+          <td>無償保險、年度 ESG 方案</td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="global">
+      <h2>全球化策略：台灣 → 亞洲 → 全球</h2>
+      <div class="region-grid">
+        <div class="region">
+          <h4>Phase A · 台灣（第 1～2 年）</h4>
+          <ul>
+            <li>1～2 城市深度試點，2～5 運動分館</li>
+            <li>串接在地：教練、防護、物理治療、保險、出版社</li>
+            <li>建立「前中後」SOP 與資料模板（中英雙語雛形）</li>
+            <li>與運動部、國健署、地方政府試點合作</li>
+            <li><strong>目標：</strong>可複製的 impact 報告與贊助 package</li>
+          </ul>
+        </div>
+        <div class="region">
+          <h4>Phase B · 亞洲（第 2～4 年）</h4>
+          <ul>
+            <li>優先：日本、韓國、东南亚華語圈、香港</li>
+            <li>模式輸出：平台白標、教練認證、賽事 IP 授權</li>
+            <li>連結亞洲品牌贊助、跨國賽事、運動醫學交流</li>
+            <li>多語系：繁中、簡中、英、日（依市場）</li>
+            <li><strong>目標：</strong>3～5 個亞洲合作節點</li>
+          </ul>
+        </div>
+        <div class="region">
+          <h4>Phase C · 全球（第 4～6 年）</h4>
+          <ul>
+            <li>輸出「運動健康作業系統」：Know-how + 軟體 + 認證</li>
+            <li>參與國際運動健康、Exercise is Medicine 網絡</li>
+            <li>全球品牌長約贊助、線上內容訂閱</li>
+            <li>與國際出版、運動科學機構內容授權</li>
+            <li><strong>目標：</strong>使命型平台成為亞洲標竿，再拓全球華人與英文市場</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>各階段量化目標（參考）</h3>
+      <table>
+        <tr><th>階段</th><th>服務人次/年</th><th>合作專業夥伴</th><th>團隊規模</th><th>市場</th></tr>
+        <tr><td>台灣</td><td>6,000～12,000</td><td>150～250</td><td>15～35 人</td><td>北中南 1～3 城</td></tr>
+        <tr><td>亞洲</td><td>30,000～80,000</td><td>500～1,000</td><td>50～120 人</td><td>3～5 國節點</td></tr>
+        <tr><td>全球</td><td>100,000+</td><td>2,000+</td><td>120～250 人</td><td>多語系、多區域</td></tr>
+      </table>
+    </section>
+
+    <section id="org">
+      <h2>組織擴張：快速整合產業脈絡的人力架構</h2>
+      <p>
+        「大量雇用」的目標是<strong>縮短各產業串接時間</strong>，但應配合階段招聘，避免人事成本拖垮使命。
+        下列為<strong>台灣站達 30 人規模</strong>（約第 2 年）的參考架構：
+      </p>
+
+      <div class="org-chart">執行長 / 創辦人（使命與策略）
+├── 營運長 COO（活動、場地、賽事、SOP）
+│   ├── 活動／賽事 PM × 4
+│   ├── 場館與供應鏈協調 × 2
+│   └── 防護與現場安全協調 × 2
+├── 商務長 CBO（贊助、ESG、品牌、保險）
+│   ├── 企業贊助 BD × 3
+│   └── 政府／政策專案 × 2
+├── 內容與專業總監（運動前中後知識）
+│   ├── 運動醫學／物理治療顧問群（約聘）
+│   ├── 內容編輯 × 3
+│   ├── 影片／社群 × 3
+│   └── 出版／書籍合作 × 1
+├── 教練與社群總監
+│   ├── 運動分館項目負責人 × 5
+│   ├── 社群／合作社團經營 × 3
+│   └── 教練認證與培訓 × 2
+├── 產品與技術
+│   ├── 產品經理 × 2
+│   ├── 工程 × 3
+│   └── 數據／impact 分析 × 1
+└── 行政／人資／財務 × 3</div>
+
+      <h3>招聘節奏（與三年計畫對齊）</h3>
+      <table>
+        <tr><th>時點</th><th>團隊人數</th><th>重點招聘</th></tr>
+        <tr><td>第 1 年 Q1</td><td>3～5</td><td>營運、商務、內容（兼職可）</td></tr>
+        <tr><td>第 1 年 Q4</td><td>8～12</td><td>活動 PM、分館負責人、社群</td></tr>
+        <tr><td>第 2 年</td><td>20～35</td><td>BD、防護協調、物理治療商務、工程</td></tr>
+        <tr><td>第 3 年</td><td>35～50</td><td>亞洲拓展、多語內容、數據與顧問群</td></tr>
+        <tr><td>亞洲期</td><td>50～120</td><td>各國在地經理、賽事、商務</td></tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.9rem;">
+        每位「分館項目負責人」負責串接該運動的教練、防護、物理治療、補給與出版社，是產業整合的關鍵角色。
+      </p>
+    </section>
+
+    <section id="budget">
+      <h2>人力與拓展預算規模（台灣站，年）</h2>
+      <table>
+        <tr><th>團隊規模</th><th>人事成本（估）</th><th>適用階段</th><th>可覆蓋產業線</th></tr>
+        <tr><td>5 人</td><td>250～400 萬</td><td>試點第 1 年</td><td>2 運動、基礎前中後內容</td></tr>
+        <tr><td>15 人</td><td>900～1,400 萬</td><td>第 2 年</td><td>5～8 運動、防護+復健轉介</td></tr>
+        <tr><td>35 人</td><td>2,000～3,200 萬</td><td>第 3 年</td><td>10+ 運動、完整產業地圖</td></tr>
+        <tr><td>80 人（含亞洲）</td><td>5,000～8,000 萬</td><td>亞洲拓展期</td><td>跨國合作節點</td></tr>
+      </table>
+      <p>人事應由<strong>贊助、ESG、課程、政府專案</strong>支撐，而非過早靠醫藥或誇大保健廣告補貼。</p>
+    </section>
+
+    <section id="guard">
+      <h2>健康倫理與利益衝突（醫藥／補給特別注意）</h2>
+      <ul>
+        <li>平台使命是<strong>運動促進健康</strong>，醫藥與補給僅能作「輔助與衛教」，不得替代運動或鼓吹過度用藥。</li>
+        <li>物理治療、運動醫學內容須由<strong>合格專業人員</strong>審核或署名。</li>
+        <li>補給品牌贊助須標示「無法取代均衡飲食與規律運動」。</li>
+        <li>轉介物理治療／診所時揭露合作關係，避免不當導流。</li>
+        <li>書籍、知識內容標明作者資格與更新日期。</li>
+      </ul>
+      <div class="guard">
+        <strong>與「預防勝於治療」一致的合作：</strong>
+        保險公司（預防保健）、健檢中心（運動前篩檢）、運動醫學（評估後運動處方）、營養師（飲食支持）— 優先於直接藥品推廣。
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2>產業整合檢核表（建議順序）</h2>
+      <p style="color:var(--muted);font-size:0.9rem;">依序勾選，逐步把運動前中後資源接入平台。</p>
+      <div id="checklist-root"></div>
+    </section>
+
+    <footer>
+      運動平台專案 · 前中後資源整合 · 離線可用
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'sport-lifecycle-integration-v1';
+
+    const CHECKS = [
+      { id: 'c01', title: '建立「運動前中後」知識架構與標籤系統',
+        detail: '所有內容、夥伴、課程分類為 Before / During / After，方便用戶與品牌理解整合範圍。' },
+      { id: 'c02', title: '運動前：首批 20 篇知識內容＋10 本書籍書單',
+        detail: '含適性評估、熱身、裝備選擇、慢病運動注意。與教練、顧問共筆，標示審核者。' },
+      { id: 'c03', title: '簽署 3～5 位運動防護／體能師為合作夥伴',
+        detail: '可派遣至活動與賽事；建立現場安全 SOP 與裝備 checklist。' },
+      { id: 'c04', title: '簽署 5～10 家物理治療所／運動醫學診所轉介協議',
+        detail: '運動後痠痛、傷害諮詢轉介；揭露合作方式，避免過度醫療化。' },
+      { id: 'c05', title: '接入 2～3 位營養師或運動營養內容夥伴',
+        detail: '恢復飲食、賽前賽後補給衛教；不做極端減肥或代餐主推。' },
+      { id: 'c06', title: '保險公司活動公共意外險常態合作',
+        detail: '降低執行成本，同時對齊 ESG 與預防保健敘事。' },
+      { id: 'c07', title: '補給品牌以「活動贊助＋試飲」方式試合作 1～2 案',
+        detail: '現場補給站，必須標示贊助與「輔助」聲明；拒絕誇大效能。' },
+      { id: 'c08', title: '出版社或作者談 1 組聯名書單／講堂',
+        detail: '運動前知識深化；可為運動科學、心理、訓練法分類。' },
+      { id: 'c09', title: '平台「轉介與預約」模組上線（防護、物理治療、營養）',
+        detail: '用戶運動後可一鍵預約諮詢；教練可推薦但不得強制。' },
+      { id: 'c10', title: '建立醫藥保健合作審查委員會',
+        detail: '任何涉及保健、藥品、補充劑合作，須委員會過件；符合使命護欄。' },
+      { id: 'c11', title: '完成中英雙語「前中後」SOP 文件（供亞洲輸出）',
+        detail: '標準化活動安全、轉介、贊助標示，作為白標或加盟基礎。' },
+      { id: 'c12', title: '招聘首位「產業整合／分館負責人」',
+        detail: '專责串接單一運動項目之教練、防護、復健、補給、出版資源。' },
+      { id: 'c13', title: '第 2 運動分館複製前中後整合模板',
+        detail: '驗證模式可複製，不依赖創辦人個人關係。' },
+      { id: 'c14', title: '發布首份《運動前中後整合 impact 報告》',
+        detail: '含轉介數、活動安全事件、用戶自填健康感受；供企業與政府續約。' },
+      { id: 'c15', title: '評估亞洲首個合作節點（日／韓／星馬）',
+        detail: '找當地 1 個協會或品牌談 co-host 體驗日，測試跨國 SOP。' }
+    ];
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+    function render() {
+      const root = document.getElementById('checklist-root');
+      const state = loadState();
+      root.innerHTML = '';
+      CHECKS.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'check-item' + (state[c.id] ? ' done' : '');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!state[c.id];
+        cb.addEventListener('change', () => {
+          state[c.id] = cb.checked;
+          saveState(state);
+          row.classList.toggle('done', cb.checked);
+        });
+        const body = document.createElement('div');
+        body.innerHTML = `<div class="ctitle">${c.title}</div><div class="cdetail">${c.detail}</div>`;
+        row.appendChild(cb);
+        row.appendChild(body);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadState(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sport-lifecycle-integration.json';
+      a.click();
+    });
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('清除所有勾選？')) { localStorage.removeItem(STORAGE_KEY); render(); }
+    });
+
+    render();
+  </script>
+</body>
+</html>
