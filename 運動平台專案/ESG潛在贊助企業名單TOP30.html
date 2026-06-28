@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESG 潛在贊助企業 TOP 30｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warn: #fbbf24;
+      --a: #34d399;
+      --b: #5eb3ff;
+      --c: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(94, 179, 255, 0.1), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.4rem, 2.5vw, 2rem); }
+    h2 { margin: 0 0 14px; font-size: 1.15rem; color: var(--accent-2); }
+
+    .subtitle { color: var(--muted); max-width: 900px; }
+    .related { margin: 14px 0 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+    }
+
+    .disclaimer {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .filters button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.85rem;
+    }
+    .filters button.active { background: var(--accent); color: #064e3b; border-color: var(--accent); font-weight: 700; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); position: sticky; top: 0; }
+
+    .tier {
+      display: inline-block;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .tier-a { background: rgba(52, 211, 153, 0.2); color: var(--a); }
+    .tier-b { background: rgba(94, 179, 255, 0.2); color: var(--b); }
+    .tier-c { background: rgba(167, 139, 250, 0.2); color: var(--c); }
+
+    .cat { font-size: 0.78rem; color: var(--muted); }
+
+    a.corp-link { color: var(--blue); text-decoration: none; }
+    a.corp-link:hover { text-decoration: underline; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    button.action {
+      border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .table-wrap { overflow-x: auto; max-height: 70vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border); }
+
+    tr.contacted { opacity: 0.65; }
+    tr.contacted td:first-child + td { text-decoration: line-through; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+
+    ul { padding-left: 1.3rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>ESG 潛在贊助企業 TOP 30</h1>
+      <p class="subtitle">
+        依公開 ESG 評比、永續金融評鑑、運動企業認證、員工健康與體育贊助紀錄整理之<strong>建議開發名單</strong>，
+        供運動健康平台洽談 CSR／ESG 合作（含無償贊助、冠名、員工健康方案）。非官方排名，不保證合作意願。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="品牌定位與運動行銷策略.html">品牌定位</a> ·
+        <a href="運動健康平台三年計畫檢核表.html">三年計畫</a>
+      </div>
+    </header>
+
+    <div class="disclaimer">
+      <strong>使用說明：</strong>
+      優先聯絡窗口為「永續發展部／CSR／ESG 辦公室／企業社會責任」或「人資部員工協助／健康職場」。
+      對外話術請用「ESG 社會參與（S）· 員工健康 · 運動參與可衡量 impact」，而非商品銷售。
+      資料依據：金管會第三屆永續金融評鑑（2026）、2025《遠見》ESG 企業永續獎、運動部運動企業認證等公開資訊。
+    </div>
+
+    <section>
+      <h2>優先級說明</h2>
+      <ul>
+        <li><span class="tier tier-a">A</span> 最對口：健康／保險／運動企業認證／ESG 標竿，建議第一批提案</li>
+        <li><span class="tier tier-b">B</span> 高度相關：ESG 績優、員工健康、教育或社區推廣強</li>
+        <li><span class="tier tier-c">C</span> 具潛力：運動產業鏈、大型雇主健康、或區域／專項合作</li>
+      </ul>
+    </section>
+
+    <div class="toolbar">
+      <button class="action btn-primary" id="exportBtn">匯出聯絡進度 JSON</button>
+      <button class="action btn-secondary" id="resetBtn">清除聯絡勾選</button>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="active" data-cat="all">全部</button>
+      <button data-cat="金融保險">金融保險</button>
+      <button data-cat="運動產業">運動產業</button>
+      <button data-cat="科技製造">科技製造</button>
+      <button data-cat="零售消費">零售消費</button>
+      <button data-cat="電信">電信</button>
+      <button data-cat="其他">其他</button>
+    </div>
+
+    <section style="padding:0;overflow:hidden;">
+      <div class="table-wrap">
+        <table id="corp-table">
+          <thead>
+            <tr>
+              <th style="width:36px">聯絡</th>
+              <th style="width:28px">#</th>
+              <th>企業／集團</th>
+              <th style="width:52px">優先</th>
+              <th style="width:88px">類別</th>
+              <th>ESG／運動相關公開紀錄</th>
+              <th>建議合作形式</th>
+              <th>提案切入點</th>
+            </tr>
+          </thead>
+          <tbody id="corp-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>提案資源</h2>
+      <ul>
+        <li>運動部「運動企業認證」：<a class="corp-link" href="https://isports.sa.gov.tw/Apps/SEC/Index.aspx" target="_blank" rel="noopener">isports.sa.gov.tw</a></li>
+        <li>金管會永續金融評鑑資訊平台（第三屆前 25% 金融機構）</li>
+        <li>2025《遠見》ESG 企業永續獎得獎名單：<a class="corp-link" href="https://csr.gvm.com.tw/2025/winner.html" target="_blank" rel="noopener">csr.gvm.com.tw</a></li>
+        <li>運動產業發展條例：企業捐贈運動／全民運動賽事可享加成減除（詳見財會／法务）</li>
+      </ul>
+    </section>
+
+    <footer>運動平台專案 · 名單僅供 BD 參考 · 請以企業最新政策為準</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'esg-sponsor-top30-contact-v1';
+
+    const CORPS = [
+      { id: 1, tier: 'A', cat: '金融保險', name: '國泰金控（含國泰人壽、國泰世華、國泰產險）',
+        esg: '2025《遠見》ESG 金融首獎；TCSA 十大永續典範；第三屆永續金融評鑑前 25%；運動企業認證；社會共融／資安領袖獎',
+        form: '年度 ESG 健康運動節冠名、活動保險、員工體驗日、impact 共報',
+        pitch: '呼應「全齡零事故、員工健康、運動參與數據」；可 co-brand 社區運動與預防保健',
+        link: 'https://www.cathayholdings.com/' },
+      { id: 2, tier: 'A', cat: '金融保險', name: '富邦金控（含富邦人壽、富邦產險、台北富邦銀）',
+        esg: '2025《遠見》ESG 金融績優；第三屆永續金融評鑑前 25%；長期贊助體育（如富邦悍將等）',
+        form: '賽事冠名、基層運動、企業健康週、無償保險或補給',
+        pitch: '連結既有體育贊助敘事，加「全民運動＋可衡量參與人次」',
+        link: 'https://www.fubon.com/' },
+      { id: 3, tier: 'A', cat: '金融保險', name: '中國信託金控（含中信銀、中信文教基金會）',
+        esg: '2025《遠見》ESG 金融績優；第三屆永續金融評鑑銀行三連霸；教育推廣組首獎（圓夢工程）',
+        form: '青年運動、教育推廣、社區體驗、員工健康講座',
+        pitch: '對齊「教育推廣＋職涯」；運動作為青年健康與團隊力載體',
+        link: 'https://www.ctbcfinancial.com/' },
+      { id: 4, tier: 'A', cat: '金融保險', name: '玉山金控（含玉山銀行）',
+        esg: '2025《遠見》ESG 金融楷模；第三屆永續金融評鑑前 25%；職場共融績優',
+        form: '員工運動日、ESG 報告社會面案例、小型賽事協力',
+        pitch: '共融職場＋員工身心健康；提供可写入永續報告之參與數據',
+        link: 'https://www.esunfhc.com/' },
+      { id: 5, tier: 'A', cat: '金融保險', name: '南山人壽',
+        esg: '大型壽險；長期推動健康促進、保戶／員工健康活動；ESG 揭露完整',
+        form: '健康講座、社區走動、活動保險、預防医学衛教',
+        pitch: '「預防勝於治療」與平台使命一致；適合親子、銀髮體驗',
+        link: 'https://www.nanshanlife.com.tw/' },
+      { id: 6, tier: 'A', cat: '金融保險', name: '新光金控（含新光人壽）',
+        esg: '金融保險業 ESG 指標揭露；員工與保戶健康活動；社會參與方案',
+        form: '健康園地合作、講座、賽事協力夥伴',
+        pitch: '健康促進 KPI；可從北北基試點活動開始',
+        link: 'https://www.skfh.com.tw/' },
+      { id: 7, tier: 'B', cat: '金融保險', name: '第一金控（含第一銀行）',
+        esg: '第三屆永續金融評鑑前 25% 三連霸；公股金融 ESG 標竿',
+        form: '政府標案 co-host、社區運動、員工健康',
+        pitch: '可搭配運動部／地方政府試點，公股穩健形象',
+        link: 'https://www.firstholding.com.tw/' },
+      { id: 8, tier: 'B', cat: '金融保險', name: '台新金控（含台新銀行）',
+        esg: '永續金融與 ESG 報告；員工關懷與社會參與',
+        form: '員工體驗、校園或社區運動贊助',
+        pitch: '青年客群、數位原生活動報名與數據',
+        link: 'https://www.taishinholdings.com.tw/' },
+      { id: 9, tier: 'B', cat: '金融保險', name: '兆豐金控（含兆豐銀行）',
+        esg: '第三屆永續金融評鑑前 25%；公股 ESG；國際貿易金融',
+        form: '城市運動日、對外形象活動、員工健康',
+        pitch: '大型員工數；適合企業內部健康週＋對外 PR',
+        link: 'https://www.megaholdings.com/' },
+      { id: 10, tier: 'B', cat: '金融保險', name: '永豐金控（含永豐銀行）',
+        esg: '第三屆永續金融評鑑前 25%；數位金融與永續治理',
+        form: 'ESG 活動、員工運動社團支持',
+        pitch: '科技＋健康數據方案；中小型賽事冠名',
+        link: 'https://www.sinopac.com/' },
+      { id: 11, tier: 'A', cat: '科技製造', name: '台灣積體電路（台積電）',
+        esg: '2025《遠見》職場共融組首獎；全球 ESG 標竿；大型員工運動與 ERG',
+        form: '員工健康週、供應鏈健康活動、贊助青年運動教育',
+        pitch: '員工身心健康、共融；可提供參與與滿意度數據',
+        link: 'https://www.tsmc.com/' },
+      { id: 12, tier: 'B', cat: '科技製造', name: '鴻海（富士康）',
+        esg: '大型雇主；永續報告；員工規模大，健康職場受關注',
+        form: '員工運動季、廠區健康活動、贊助賽事',
+        pitch: '大量員工受惠；企業內部健康 KPI',
+        link: 'https://www.honhai.com/' },
+      { id: 13, tier: 'B', cat: '科技製造', name: '台塑企业（含台化、台塑生醫等）',
+        esg: '《遠見》報導：台化獲運動企業認證；廠區運動社團與健康推廣',
+        form: '職場運動、社區健康、廠區賽事',
+        pitch: '已有運動企業認證經驗；可擴及供應鏈員工',
+        link: 'https://www.fpcc.com.tw/' },
+      { id: 14, tier: 'B', cat: '零售消費', name: '統一企业（含统一超商 7-ELEVEN）',
+        esg: '2025《遠見》統一超 4 獎；教育推廣楷模；社區好鄰居方案',
+        form: '便利通路曝光、社區體驗、補給／試飲（需符合健康論述）',
+        pitch: '全台據點＋社區滲透；親子、便利健康補給',
+        link: 'https://www.uni-president.com.tw/' },
+      { id: 15, tier: 'B', cat: '零售消費', name: '全家便利商店（全家集團）',
+        esg: '2025《遠見》ESG 2 獎；社區與會員經營；企業永續報告',
+        form: '社區運動、會員活動、門市區域贊助',
+        pitch: '與「社區運動、好鄰居」敘事一致',
+        link: 'https://www.family.com.tw/' },
+      { id: 16, tier: 'B', cat: '零售消費', name: '佳格食品（桂格、多力等）',
+        esg: '2025《遠見》ESG 2 獎；健康食品形象；教育與公益',
+        form: '運動後營養衛教、試飲、健康講座（標示輔助非替代運動）',
+        pitch: '運動＋飲食教育；企業健康講座 co-brand',
+        link: 'https://www.skap.com.tw/' },
+      { id: 17, tier: 'B', cat: '電信', name: '中華電信',
+        esg: '2025《遠見》ESG 綜合績效榮譽榜（連續 3 年首獎級）；電信 ESG 標竿',
+        form: '5G／平台技術贊助、員工健康、偏鄉運動推廣',
+        pitch: '數位包容＋遠距偏鄉運動課程；可提供連線／簡訊資源',
+        link: 'https://www.cht.com.tw/' },
+      { id: 18, tier: 'B', cat: '電信', name: '台灣大哥大',
+        esg: 'ESG 永續報告；員工與社會參與；MYfone／媒體資源',
+        form: '活動直播、員工健康、校園運動',
+        pitch: '數位平台合作；運動賽事轉播或報名系統',
+        link: 'https://www.taiwanmobile.com/' },
+      { id: 19, tier: 'B', cat: '電信', name: '遠傳電信',
+        esg: 'ESG 治理；綠色電信；員工與社會方案',
+        form: '企業健康、環保路跑、社區活動',
+        pitch: 'Green 路跑＋碳抵換敘事；員工運動日',
+        link: 'https://www.fetnet.net/' },
+      { id: 20, tier: 'A', cat: '運動產業', name: '巨大集团（Giant 捷安特）',
+        esg: '全球自行车领导品牌；ESG 永續製造；深度连结骑行文化',
+        form: '骑行活动、试骑、赛事、教学合作',
+        pitch: '与平台「单车分馆」天然契合；骑游台湾叙事',
+        link: 'https://www.giantgroup-cycling.com/' },
+      { id: 21, tier: 'A', cat: '運動產業', name: '美利达（Merida）',
+        esg: '台湾自行车品牌；国际赛事赞助；运动推广',
+        form: '骑行体验、赛事、车队故事内容',
+        pitch: '基层骑行＋选手职涯内容；区域赛合作',
+        link: 'https://www.merida.com/' },
+      { id: 22, tier: 'C', cat: '運動產業', name: '宝成工业（Pou Chen）',
+        esg: '全球最大运动鞋制造之一；CSR 与劳工、环境披露',
+        form: '运动产业论坛、供应链健康、公益赛事',
+        pitch: '运动产业链 ESG；制造端员工健康',
+        link: 'https://www.pouchen.com/' },
+      { id: 23, tier: 'B', cat: '其他', name: '信义房屋（信义集团）',
+        esg: '2025《遠見》ESG 3 獎；社区参与；企业公民',
+        form: '社区运动、里民体验、健康讲座',
+        pitch: '社区渗透力强；「里邻运动」试点',
+        link: 'https://www.sinyi.com.tw/' },
+      { id: 24, tier: 'B', cat: '其他', name: '远东集团（远百、远百企管等）',
+        esg: '2025《遠見》集团 4 奖；远百／巨城社区方案',
+        form: '商场体验日、亲子运动、冠名活动',
+        pitch: '人流与 Family 客群；线下体验日',
+        link: 'https://www.feg.com.tw/' },
+      { id: 25, tier: 'C', cat: '其他', name: '冠德集团（根基营造、环球购物中心）',
+        esg: '2025《遠見》首奖级方案；商场与社区',
+        form: '社区运动、亲子体验、健康活动',
+        pitch: '商场中庭体验；北台湾据点',
+        link: 'https://www.kg-group.com/' },
+      { id: 26, tier: 'C', cat: '金融保險', name: '元大金融（含元大银行、元大证券）',
+        esg: '2025《遠見》ESG 金融楷模；第三屆永續金融評鑑前 25% 三連霸',
+        form: '青年运动、金融教育＋健康、赛事',
+        pitch: '青年族群；证券投教延伸运动健康',
+        link: 'https://www.yuanta.com/' },
+      { id: 27, tier: 'C', cat: '科技製造', name: '华硕集团（ASUS）',
+        esg: '科技业 ESG；全球品牌；员工运动与公益',
+        form: 'Wearable／健康科技体验、员工赛、校园电竞＋运动',
+        pitch: '运动科技、健康数据（需隐私合规）',
+        link: 'https://www.asus.com/tw/' },
+      { id: 28, tier: 'C', cat: '科技製造', name: '日月光投控',
+        esg: '制造业 ESG 指标；员工与社区；永续报告完整',
+        form: '员工健康周、厂乡活动、赞助',
+        pitch: '大量制造员工；南部据点活动',
+        link: 'https://www.aseglobal.com/' },
+      { id: 29, tier: 'C', cat: '其他', name: '长庚医疗体系（长庚纪念医院等）',
+        esg: '预防医学、社区健康、运动医学潜力；非典型 CSR 但高度对口',
+        form: '健康筛查、运动处方卫教、讲座（非推销药品）',
+        pitch: '「运动即medicine」；与平台使命高度一致',
+        link: 'https://www.cgmh.org.tw/' },
+      { id: 30, tier: 'C', cat: '其他', name: '台湾运动彩券（台彩／公益回馈）',
+        esg: '法定运动发展回馈；体育发展基金相关；属特殊性质',
+        form: '基层赛事、公益运动（需依法合规申请）',
+        pitch: '体育发展公益性质；需专业法规评估',
+        link: 'https://www.taiwansportslottery.com.tw/' }
+    ];
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+    let activeCat = 'all';
+
+    function render() {
+      const body = document.getElementById('corp-body');
+      const state = loadState();
+      body.innerHTML = '';
+      const list = activeCat === 'all' ? CORPS : CORPS.filter(c => c.cat === activeCat);
+      list.forEach(c => {
+        const tr = document.createElement('tr');
+        if (state[c.id]) tr.classList.add('contacted');
+        tr.innerHTML = `
+          <td><input type="checkbox" data-id="${c.id}" ${state[c.id] ? 'checked' : ''} title="已聯絡"></td>
+          <td>${c.id}</td>
+          <td><a class="corp-link" href="${c.link}" target="_blank" rel="noopener">${c.name}</a></td>
+          <td><span class="tier tier-${c.tier.toLowerCase()}">${c.tier}</span></td>
+          <td class="cat">${c.cat}</td>
+          <td>${c.esg}</td>
+          <td>${c.form}</td>
+          <td>${c.pitch}</td>`;
+        const cb = tr.querySelector('input');
+        cb.addEventListener('change', () => {
+          state[c.id] = cb.checked;
+          saveState(state);
+          tr.classList.toggle('contacted', cb.checked);
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    document.getElementById('filters').addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      document.querySelectorAll('#filters button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      activeCat = e.target.dataset.cat;
+      render();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadState(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'esg-sponsor-contact-progress.json';
+      a.click();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('清除所有聯絡勾選？')) {
+        localStorage.removeItem(STORAGE_KEY);
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
