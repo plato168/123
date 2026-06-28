@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>羽球選手養成挑戰與協助指南｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --shuttle: #fbbf24;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(251, 191, 36, 0.08), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: 1.35; }
+    h2 { margin: 0 0 14px; font-size: 1.15rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 14px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 860px; }
+    .related { margin: 14px 0 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(52, 211, 153, 0.08));
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      border-radius: 18px;
+      padding: 24px 28px;
+      margin: 20px 0;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .filters button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.84rem;
+    }
+    .filters button.active {
+      background: var(--shuttle);
+      color: #422006;
+      border-color: var(--shuttle);
+      font-weight: 700;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .challenge-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+    }
+    .challenge-card h4 {
+      margin: 0 0 8px;
+      font-size: 0.98rem;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 0.72rem;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+    .tag-money { background: rgba(251, 191, 36, 0.2); color: var(--warn); }
+    .tag-tech { background: rgba(94, 179, 255, 0.2); color: var(--blue); }
+    .tag-health { background: rgba(52, 211, 153, 0.2); color: var(--accent); }
+    .tag-comp { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+    .tag-system { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .tag-psy { background: rgba(244, 114, 182, 0.2); color: #f472b6; }
+
+    .help-box {
+      background: rgba(52, 211, 153, 0.06);
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 0.88rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .help-box strong { color: var(--accent-2); }
+
+    .path-flow {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      margin: 14px 0; font-size: 0.85rem;
+    }
+    .path-flow span {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+    }
+    .path-flow .arr { border: 0; background: none; color: var(--shuttle); }
+
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .checklist li:last-child { border-bottom: 0; }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    button.action {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .highlight {
+      background: rgba(252, 211, 77, 0.08);
+      border: 1px solid rgba(252, 211, 77, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+    }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>羽球選手養成挑戰與協助指南</h1>
+      <p class="subtitle">
+        羽球是台灣參與人口最多的運動項目之一，基層火熱、頂尖選手能見度高，
+        但從「愛打」到「能走下去」之間，仍充滿費用、傷病、賽事、升學與資訊斷層。
+        本頁聚焦<strong>羽球專項</strong>，說明你可以如何協助選手與家庭。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="台灣選手養成挑戰與協助指南.html">通用選手指南</a> ·
+        <a href="三位子女分齡運動規劃_9_11_13歲.html">分齡規劃</a> ·
+        <a href="運動前中後資源整合與全球化策略.html">前中後資源</a> ·
+        <a href="ESG潛在贊助企業名單TOP30.html">ESG 名單</a>
+      </div>
+    </header>
+
+    <div class="hero">
+      <p>
+        <strong style="color:var(--warm);">羽球協助三原則：</strong>
+        ① 技術與週期交給教練；② 家長管生活、情緒、升學時程，不兼當場邊教練；
+        ③ 平台與贊助補<strong>場地、保險、情報、基層賽事</strong>，不製造「不打排名賽就沒前途」的恐慌。
+      </p>
+    </div>
+
+    <nav class="nav">
+      <a href="#landscape">台灣羽球現況</a>
+      <a href="#pathway">養成路徑</a>
+      <a href="#challenges">專項挑戰</a>
+      <a href="#injury">傷病預防</a>
+      <a href="#cost">費用參考</a>
+      <a href="#help">協助方式</a>
+      <a href="#action">行動檢核</a>
+    </nav>
+
+    <section id="landscape">
+      <h2>台灣羽球生態：機會與斷層</h2>
+      <ul>
+        <li><strong>群眾基礎大</strong>：各縣市運動中心、學校、民間球館、社團多，入門門檻相對低。</li>
+        <li><strong>標竿效應</strong>：頂尖國際選手帶動關注，但易讓基層誤以為「只有拿冠軍才有價值」。</li>
+        <li><strong>競技體系</strong>：中華民國羽球協會（CTBA）辦理全國性賽事、排名與國家隊選拔；基層則分散在各區俱乐部、校隊。</li>
+        <li><strong>斷層常見於</strong>：區域強隊 ↔ 全國前段 ↔ 國家隊培訓之間的資源與情報落差。</li>
+        <li><strong>升學</strong>：體育績優、大專公開甄試名額競爭激烈，各校標準與項目需求每年不同。</li>
+      </ul>
+      <p style="color:var(--muted);font-size:0.88rem;">
+        官方參考：<a href="https://www.ctba.org.tw/" style="color:var(--blue)" target="_blank" rel="noopener">中華民國羽球協會 CTBA</a>、
+        <a href="https://www.sa.gov.tw/" style="color:var(--blue)" target="_blank" rel="noopener">運動部</a>、
+        BWF 青少年排名與賽程（國際級選手適用）。
+      </p>
+    </section>
+
+    <section id="pathway">
+      <h2>羽球養成路徑（簡化）</h2>
+      <div class="path-flow">
+        <span>啟蒙（6～9 歲）<br>多玩、基礎步法等</span>
+        <span class="arr">→</span>
+        <span>基礎（9～12 歲）<br>校隊／區隊、技術</span>
+        <span class="arr">→</span>
+        <span>發展（12～15 歲）<br>排名賽、專項取捨</span>
+        <span class="arr">→</span>
+        <span>深化（15～18 歲）<br>全國前段、升學</span>
+        <span class="arr">→</span>
+        <span>高峰／轉換<br>國家隊、大學、教練、終身</span>
+      </div>
+      <table>
+        <tr><th>年齡帶</th><th>訓練重點</th><th>賽事節奏</th><th>常見陷阱</th></tr>
+        <tr>
+          <td><strong>9 歲前後</strong></td>
+          <td>握拍、步法、協調；每週 3～4 次、每次 60 分內</td>
+          <td>社團賽、體驗賽</td>
+          <td>過早單打硬拼、拍線磅數過高</td>
+        </tr>
+        <tr>
+          <td><strong>11 歲前後</strong></td>
+          <td>穩定度、多拍能力、基本戰術；可加 1 次體能</td>
+          <td>區域賽、選 2～3 場目標賽</td>
+          <td>週末連續兩日比賽＋平日全課</td>
+        </tr>
+        <tr>
+          <td><strong>13 歲前後</strong></td>
+          <td>單雙打策略、週期化；監測生長期肩肘</td>
+          <td>全國少年賽、排名賽（依教練規劃）</td>
+          <td>為排名過度參賽、忽略國中課業與睡眠</td>
+        </tr>
+        <tr>
+          <td><strong>15～18 歲</strong></td>
+          <td>個人化週期、體能峰值、心理</td>
+          <td>全國錦標、選拔、升學關鍵年</td>
+          <td>升學與遠征二選一未提早規劃</td>
+        </tr>
+      </table>
+      <div class="highlight">
+        <strong>與你家三個孩子（9・11・13 歲）：</strong>
+        若皆打羽球，可共用交通與情報，但<strong>每人一份週期</strong>——
+        9 歲重樂趣、11 歲重穩定、13 歲重週期與升學情報，勿用同一套比賽密度。
+      </div>
+    </section>
+
+    <section id="challenges">
+      <h2>羽球專項挑戰 × 協助方式</h2>
+      <div class="filters" id="catFilters">
+        <button class="active" data-cat="all">全部</button>
+        <button data-cat="money">費用場地</button>
+        <button data-cat="tech">技術訓練</button>
+        <button data-cat="health">傷病</button>
+        <button data-cat="comp">賽事排名</button>
+        <button data-cat="system">升學制度</button>
+        <button data-cat="psy">心理</button>
+      </div>
+      <div id="challengeList"></div>
+    </section>
+
+    <section id="injury">
+      <h2>羽球常見傷病與預防</h2>
+      <table>
+        <tr><th>部位</th><th>常見原因</th><th>預防／協助</th></tr>
+        <tr>
+          <td>肩袖、旋轉肌</td>
+          <td>過度殺球、磅數過高、熱身不足</td>
+          <td>青少年磅數宜保守；教練評估；肩頸強化與收操；異常疼痛停拍</td>
+        </tr>
+        <tr>
+          <td>網球肘（外側肘）</td>
+          <td>反拍、腕力過度、球拍過重</td>
+          <td>調整握拍與拍重；物理治療；短期降量</td>
+        </tr>
+        <tr>
+          <td>膝、踝</td>
+          <td>步法急停、跳殺落地、場地滑</td>
+          <td>選防滑鞋；加強髖與核心；檢查球館地板與空調</td>
+        </tr>
+        <tr>
+          <td>腰、背</td>
+          <td>核心不足、動作代償</td>
+          <td>體能師指導；避免每日高強度對打</td>
+        </tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:0;">
+        平台可連結<a href="運動前中後資源整合與全球化策略.html" style="color:var(--blue)">運動後恢復、物理治療轉介</a>；
+        活動必保<strong>公共意外險</strong>，並教導熱身／收操為固定儀式。
+      </p>
+    </section>
+
+    <section id="cost">
+      <h2>家庭費用參考（粗估，因地區而異）</h2>
+      <table>
+        <tr><th>項目</th><th>月／次估計</th><th>協助方向</th></tr>
+        <tr><td>團班／私教</td><td>3,000～15,000+ 元／月</td><td>企業 ESG 偏鄉體驗營；獎學金式名額</td></tr>
+        <tr><td>場地費</td><td>400～800 元／小時（雙打場）</td><td>與球館共辦基層賽換時段；學校場地合作</td></tr>
+        <tr><td>球拍、穿線</td><td>穿線 300～600 元／次；拍 2,000～8,000+ 元</td><td>用品店試打活動；穿線贊助（教練把關規格）</td></tr>
+        <tr><td>比賽報名、交通</td><td>500～3,000 元／場＋交通</td><td>贊助「遠征交通＋保險」套餐</td></tr>
+        <tr><td>運動用品店</td><td>球鞋 2,000～4,000 元／雙</td><td>試穿活動；二手良品循環（平台媒合）</td></tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.88rem;">
+        協助弱勢選手時，<strong>交通與保險</strong>往往比贈高級球拍更實際。
+      </p>
+    </section>
+
+    <section id="help">
+      <h2>你可以怎麼協助羽球選手？</h2>
+      <table>
+        <tr><th>身份</th><th>羽球專項行動</th></tr>
+        <tr>
+          <td><strong>家長</strong></td>
+          <td>
+            記錄賽程與升學截止日；不場邊指導；協調穿線／拍規與教練一致；
+            段考週主動與教練溝通減量；允許「校隊＋社團」路徑並存。
+          </td>
+        </tr>
+        <tr>
+          <td><strong>平台</strong></td>
+          <td>
+            羽球分館：全國賽程、比分、協會排名摘要；穿線／場地情報；
+            基層排名賽報名整合；選手故事（經同意）；升學簡章整理。
+          </td>
+        </tr>
+        <tr>
+          <td><strong>教練／球館</strong></td>
+          <td>
+            公開週期原則；共辦 ESG 體驗營；提供試打與安全裝備檢查；
+            轉介防護；協助弱勢學員申請補助。
+          </td>
+        </tr>
+        <tr>
+          <td><strong>企業 ESG</strong></td>
+          <td>
+            贊助少年排名賽、偏鄉羽球營、公共意外險、交通費；
+            員工親子羽球日（健康使命，非推銷）。
+          </td>
+        </tr>
+        <tr>
+          <td><strong>學校</strong></td>
+          <td>
+            校隊與社團資源透明；輔導室提供體育績優時程；
+            段考週彈性配合全國賽（在規範內）。
+          </td>
+        </tr>
+      </table>
+
+      <h3>羽球選手職涯出口（不只國家隊）</h3>
+      <ul>
+        <li>大專／公開甄試校隊 → 大學教練、體育系</li>
+        <li>BWF／CTBA 教練證、民間俱乐部教練</li>
+        <li>穿線師、運動用品專業、球館管理</li>
+        <li>運動防護、物理治療（需正規學歷）</li>
+        <li>賽事裁判、體育行政、運動媒體</li>
+        <li>終身運動：社團、親子、企業聯誼賽</li>
+      </ul>
+    </section>
+
+    <section id="action">
+      <h2>羽球協助行動檢核（本機儲存）</h2>
+      <ul class="checklist" id="actionChecklist"></ul>
+      <div class="toolbar">
+        <button class="action btn-primary" id="exportAction">匯出 JSON</button>
+        <button class="action btn-secondary" id="resetAction">清除勾選</button>
+      </div>
+    </section>
+
+    <footer>運動平台專案 · 羽球專項 · 非教練／醫療建議 · 技術與週期請依教練與醫師 · 離線可用</footer>
+  </div>
+
+  <script>
+    const ACTION_KEY = 'badminton-support-action-v1';
+
+    const CHALLENGES = [
+      {
+        id: 1, cat: 'money',
+        tag: '費用場地', tagClass: 'tag-money',
+        title: '場地難訂、費用長期累積',
+        problem: '熱門時段難排；一週多練加上比賽，家庭支出可觀。',
+        help: '與球館共辦離峰體驗；ESG 贊助時段；平台顯示各區公開場地與費率；弱勢選手交通＋保險優先。'
+      },
+      {
+        id: 2, cat: 'money',
+        tag: '費用場地', tagClass: 'tag-money',
+        title: '裝備規格迷思（拍、線、鞋）',
+        problem: '家長盲目追求名拍、高磅；孩子技術未到位易傷害。',
+        help: '教練背書的試打／穿線日；平台衛教「磅數與年齡」；用品店以體驗換信任，非硬銷。'
+      },
+      {
+        id: 3, cat: 'tech',
+        tag: '技術訓練', tagClass: 'tag-tech',
+        title: '教練與訓練內容品質不一',
+        problem: '部分基層重對打輕基本功；動作錯誤長期難改正。',
+        help: '平台認證教練名單＋學員評價；推廣多球、步法訓練比例；教練社群共備教案。'
+      },
+      {
+        id: 4, cat: 'tech',
+        tag: '技術訓練', tagClass: 'tag-tech',
+        title: '單打／雙打路線未釐清',
+        problem: '體能與戰術不同；早定單打卻常打雙打（或相反）導致發展混亂。',
+        help: '11～13 歲與教練訂「主項」；仍保留另一項作交叉；平台提供單雙打不同課表模板。'
+      },
+      {
+        id: 5, cat: 'health',
+        tag: '傷病', tagClass: 'tag-health',
+        title: '青少年肩肘過度使用',
+        problem: '比賽密集、殺球過多、磅數過高，旋轉肌問題年輕化。',
+        help: '週期減量週；物理治療轉介；活動前肩頸激活；教練把關技術而非只拼勝負。'
+      },
+      {
+        id: 6, cat: 'health',
+        tag: '傷病', tagClass: 'tag-health',
+        title: '比賽日恢復不足',
+        problem: '連續兩日賽事、間隔短、補水與飲食隨便。',
+        help: '前中後資源：賽間補給衛教；大賽後恢復週；家長準備簡易餐與休息空間。'
+      },
+      {
+        id: 7, cat: 'comp',
+        tag: '賽事排名', tagClass: 'tag-comp',
+        title: '排名賽過密、選項過多',
+        problem: '全年無休比賽，技術與學業雙輸；為積分硬報不合適級別。',
+        help: '教練協助「賽事菜單」；平台賽程訂閱與提醒；倡議最少恢復天數。'
+      },
+      {
+        id: 8, cat: 'comp',
+        tag: '賽事排名', tagClass: 'tag-comp',
+        title: '基層與全國賽情報斷層',
+        problem: '不知 CTBA 賽程、報名截止、選拔規則；錯過關鍵場次。',
+        help: '羽球分館聚合官方賽程（標日期）；LINE 推播；與協會洽合作更新。'
+      },
+      {
+        id: 9, cat: 'system',
+        tag: '升學制度', tagClass: 'tag-system',
+        title: '體育績優名額少、標準高',
+        problem: '羽球強校競爭激烈；國中會考與全國賽時間衝突。',
+        help: '升學情報專區（依年度更新）；學長經驗分享；國二起追蹤目標校簡章。'
+      },
+      {
+        id: 10, cat: 'system',
+        tag: '升學制度', tagClass: 'tag-system',
+        title: '校隊與俱乐部雙軌不同步',
+        problem: '校隊練習與俱乐部週期衝突；教練要求不一致。',
+        help: '三方（家長、校隊、俱乐部）年度座談；以「主責教練」整合週期。'
+      },
+      {
+        id: 11, cat: 'psy',
+        tag: '心理', tagClass: 'tag-psy',
+        title: '21 分制連續心理壓力',
+        problem: '分數接近時焦虑；連輸後自我否定；家長場邊情緒影響。',
+        help: '運動心理衛教；家長場邊規則（不罵、不指導）；強調過程與技術目標。'
+      },
+      {
+        id: 12, cat: 'psy',
+        tag: '心理', tagClass: 'tag-psy',
+        title: '與兄姊／隊友比較',
+        problem: '同家庭或同隊排名比较；「輸給弟弟／學妹」的羞耻。',
+        help: '每人独立目标；教練私下回饋；平台報導多元成功（技術進步、運動精神）。'
+      }
+    ];
+
+    const ACTION_ITEMS = [
+      { id: 'b1', text: '訂閱／整理本季 CTBA 與區域羽球賽程表（含報名截止）' },
+      { id: 'b2', text: '與孩子教練確認：本季主項（單／雙）、每週上限、段考週減量' },
+      { id: 'b3', text: '檢查球拍磅數、拍重是否適合年齡（請教練確認）' },
+      { id: 'b4', text: '建立傷病紀錄：部位、日期、是否減量（供物理治療轉介）' },
+      { id: 'b5', text: '若有三子女：分别訂賽事密度，避免週末全家馬拉松比賽' },
+      { id: 'b6', text: '向 ESG 企業提案：少年羽球排名賽「交通＋保險」贊助' },
+      { id: 'b7', text: '與 1 家球館或學校洽談共辦基層體驗或排名賽' },
+      { id: 'b8', text: '整理 1 份羽球體育績優／公開甄試情報（標年份）' },
+      { id: 'b9', text: '平台羽球分館：上線賽程＋1 則選手／教練故事（經同意）' },
+      { id: 'b10', text: '季末問孩子：「還期待去打球嗎？」——調整下季計畫' }
+    ];
+
+    function renderChallenges(cat) {
+      const root = document.getElementById('challengeList');
+      root.innerHTML = '';
+      CHALLENGES.filter(c => cat === 'all' || c.cat === cat).forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'challenge-card';
+        div.innerHTML = `
+          <h4><span class="tag ${c.tagClass}">${c.tag}</span> ${c.id}. ${c.title}</h4>
+          <p style="margin:0 0 8px;font-size:0.88rem;color:var(--muted);"><strong style="color:var(--text);">挑戰：</strong>${c.problem}</p>
+          <div class="help-box"><strong>協助方式：</strong>${c.help}</div>`;
+        root.appendChild(div);
+      });
+    }
+
+    function loadAction() {
+      try { return JSON.parse(localStorage.getItem(ACTION_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function renderAction() {
+      const root = document.getElementById('actionChecklist');
+      const state = loadAction();
+      root.innerHTML = '';
+      ACTION_ITEMS.forEach(item => {
+        const li = document.createElement('li');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!state[item.id];
+        cb.addEventListener('change', () => {
+          state[item.id] = cb.checked;
+          localStorage.setItem(ACTION_KEY, JSON.stringify(state));
+        });
+        const span = document.createElement('span');
+        span.textContent = item.text;
+        li.appendChild(cb);
+        li.appendChild(span);
+        root.appendChild(li);
+      });
+    }
+
+    document.getElementById('catFilters').addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      document.querySelectorAll('#catFilters button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      renderChallenges(e.target.dataset.cat);
+    });
+
+    document.getElementById('exportAction').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadAction(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'badminton-support-action.json';
+      a.click();
+    });
+
+    document.getElementById('resetAction').addEventListener('click', () => {
+      if (confirm('清除勾選？')) {
+        localStorage.removeItem(ACTION_KEY);
+        renderAction();
+      }
+    });
+
+    renderChallenges('all');
+    renderAction();
+  </script>
+</body>
+</html>
