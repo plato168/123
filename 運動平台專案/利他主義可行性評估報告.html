@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>利他主義可行性評估報告｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --high: #34d399;
+      --mid: #fbbf24;
+      --low: #f87171;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(252, 211, 77, 0.07), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.08), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.45rem, 2.5vw, 2rem); line-height: 1.35; }
+    h2 { margin: 0 0 14px; font-size: 1.15rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 16px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 820px; }
+    .meta { color: var(--muted); font-size: 0.85rem; margin: 12px 0 20px; }
+    .related { margin-bottom: 18px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+
+    .verdict {
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(94, 179, 255, 0.08));
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: 18px;
+      padding: 28px 32px;
+      margin: 22px 0;
+      text-align: center;
+    }
+
+    .score-ring {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: conic-gradient(var(--accent) 0deg 234deg, var(--panel-2) 234deg 360deg);
+      position: relative;
+    }
+    .score-ring::after {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: var(--panel);
+    }
+    .score-num, .score-label {
+      position: relative; z-index: 1;
+    }
+    .score-num { font-size: 2.2rem; font-weight: 800; color: var(--accent-2); line-height: 1; }
+    .score-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+    .verdict-title {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      font-weight: 700;
+      color: var(--warm);
+      margin: 0 0 10px;
+    }
+    .verdict p { margin: 0; color: var(--muted); max-width: 680px; margin-inline: auto; }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+    .nav a:hover { border-color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .score-bar { margin: 10px 0 16px; }
+    .score-bar .label {
+      display: flex; justify-content: space-between;
+      font-size: 0.88rem; margin-bottom: 6px;
+    }
+    .score-bar .label span:last-child { font-weight: 700; color: var(--accent-2); }
+    .bar-track {
+      height: 10px; background: var(--panel-2);
+      border-radius: 999px; overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .pill {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 5px 12px; font-size: 0.82rem;
+    }
+    .pill-high { border-color: rgba(52, 211, 153, 0.4); color: var(--high); }
+    .pill-mid { border-color: rgba(251, 191, 36, 0.4); color: var(--mid); }
+    .pill-low { border-color: rgba(248, 113, 113, 0.4); color: var(--low); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .swot {
+      border-radius: 12px; padding: 16px 18px;
+    }
+    .swot-s { background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); }
+    .swot-w { background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.25); }
+    .swot-o { background: rgba(94, 179, 255, 0.08); border: 1px solid rgba(94, 179, 255, 0.25); }
+    .swot-t { background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.25); }
+    .swot h4 { margin: 0 0 10px; font-size: 0.95rem; }
+    .swot-s h4 { color: var(--high); }
+    .swot-w h4 { color: var(--low); }
+    .swot-o h4 { color: var(--blue); }
+    .swot-t h4 { color: var(--warn); }
+    .swot ul { margin: 0; padding-left: 1.2rem; font-size: 0.88rem; }
+
+    .gate {
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      background: var(--panel-2);
+      border-radius: 0 10px 10px 0;
+      margin: 12px 0;
+      font-size: 0.9rem;
+    }
+    .gate.fail { border-left-color: var(--danger); }
+    .gate.warn { border-left-color: var(--warn); }
+
+    .highlight {
+      background: rgba(252, 211, 77, 0.08);
+      border: 1px solid rgba(252, 211, 77, 0.25);
+      border-radius: 12px; padding: 14px 18px;
+      font-size: 0.9rem; margin-top: 14px;
+    }
+    .highlight strong { color: var(--warm); }
+
+    .disclaimer {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px; padding: 14px 18px;
+      font-size: 0.88rem; margin-bottom: 18px;
+    }
+
+    textarea {
+      width: 100%; min-height: 88px;
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      padding: 12px; font: inherit; resize: vertical;
+    }
+
+    button.action {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit; margin-top: 8px;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>利他主義可行性評估報告</h1>
+      <p class="subtitle">
+        針對「以推廣運動與健康為先、非逐利出發」之運動健康平台構想，
+        綜合今日所產出之品牌策略、三年計畫、資源整合、賽事模組與 ESG 贊助名單，
+        進行務實可行性分析。
+      </p>
+      <p class="meta">評估基準日：2026 年 6 月 26 日 · 評估視角：台灣試點 → 亞洲拓展 · 語言：繁體中文</p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="品牌定位與運動行銷策略.html">品牌定位</a> ·
+        <a href="運動健康平台三年計畫檢核表.html">三年計畫</a> ·
+        <a href="ESG潛在贊助企業名單TOP30.html">ESG 名單</a>
+      </div>
+    </header>
+
+    <div class="disclaimer">
+      <strong>評估說明：</strong>
+      本報告為策略性判斷，非財務或法律保證。分數代表「在現有規劃與台灣環境下，使命能否被實踐且組織能否存續」的相對機率，
+      滿分 100 分。利他主義出發<strong>不降低社會需求</strong>，但<strong>提高對資金結構、執行紀律與耐心</strong>的要求。
+    </div>
+
+    <div class="verdict">
+      <div class="score-ring">
+        <div class="score-num">65</div>
+        <div class="score-label">綜合可行性</div>
+      </div>
+      <p class="verdict-title">條件可行 — 值得試點，但須大幅收斂初期野心</p>
+      <p>
+        以利他主義為核心的運動健康平台，在台灣<strong>具備明確的社會價值與政策順風</strong>，
+        且「教練優先、ESG 贊助、先給價值再談合作」的設計，可有效降低產業排斥。
+        然而，<strong>完整願景（多運動分館、媒體數據、亞洲複製）同時推進的可行性偏低</strong>；
+        若聚焦第 1 年「2 項運動 × 6～8 場體驗活動 × 3 家贊助」，成功機率可提升至約 <strong>72～78 分</strong>。
+      </p>
+    </div>
+
+    <nav class="nav">
+      <a href="#summary">總評</a>
+      <a href="#dimensions">分項評分</a>
+      <a href="#swot">SWOT</a>
+      <a href="#timeline">分階段可行性</a>
+      <a href="#gates">續航關卡</a>
+      <a href="#risks">主要風險</a>
+      <a href="#recommend">建議</a>
+      <a href="#notes">備註</a>
+    </nav>
+
+    <section id="summary">
+      <h2>總評摘要（五句話）</h2>
+      <ol>
+        <li><strong>使命面：</strong>「預防勝於治療、推廣運動價值」與國健署、運動部方向一致，<em>利他敘事本身可信且必要</em>。</li>
+        <li><strong>商業面：</strong>純靠情懷無法存續；需以 ESG／保險／政府試點構成 ≥40% 使命相關收入，<em>此路徑可行但洽談週期長</em>（通常 6～18 個月）。</li>
+        <li><strong>生態面：</strong>教練、社團對平台警戒度高；你方「共辦不收編」策略<em>正確且為成敗關鍵</em>。</li>
+        <li><strong>執行面：</strong>第 1 年 80～150 萬預算、2～3 人團隊<em>合理</em>；若同時做 15 運動分館＋賽事 API＋選手職涯，<em>不可行</em>。</li>
+        <li><strong>結論：</strong>作為<strong>社會企業／NPO 執行單位＋數位節點</strong>的混合型態最可行；不宜初期定位為運動電商或純內容媒體。</li>
+      </ol>
+      <div class="pill-row">
+        <span class="pill pill-high">社會需求：高</span>
+        <span class="pill pill-high">策略方向：高</span>
+        <span class="pill pill-mid">資金取得：中</span>
+        <span class="pill pill-mid">執行複雜度：中偏高</span>
+        <span class="pill pill-mid">長期存續：中</span>
+        <span class="pill pill-low">一次做滿版圖：低</span>
+      </div>
+    </section>
+
+    <section id="dimensions">
+      <h2>分項可行性評分</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-top:0;">
+        各維度獨立評估，加權後得出綜合 65 分。點擊下方可展開理解依據。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>① 使命與社會需求契合度</span><span>82</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:82%;background:var(--high)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        台灣運動人口成長、久坐與慢病議題、企業 ESG 員工健康需求皆存在；利他定位有助差異化，非空中樓閣。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>② 品牌策略與降低排斥設計</span><span>78</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--high)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        「先給價值、教練是主角、透明贊助紅線」符合產業心理；若執行一致，教練／社團接受度可期待。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>③ ESG／企業贊助取得（第 1～2 年）</span><span>62</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--mid)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        TOP 30 名單方向正確；金融、保險、運動品牌最對口。但需合法受贈主體、impact 數據與案例，首年取得 3～6 家屬<strong>努力可及</strong>，非自動發生。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>④ 第 1 年試點（MVP＋活動）財務平衡</span><span>68</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--mid)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        支出 80～150 萬、收入目標 40～100 萬；若創辦人部分無薪＋實物贊助抵銷，第 1 年<strong>有機會接近打平</strong>，但仍需 6～12 個月現金緩衝。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>⑤ 教練／社團生態整合</span><span>70</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--high)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        市場分散、缺乏統一入口是痛點；平台若真能做到「幫你接 ESG 活動、不搶 LINE 群」，具整合價值。風險在於首波若被視為「又一個抽成的平台」。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>⑥ 賽事資訊／選手發展模組（完整版）</span><span>45</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--low)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        版權、API 授權費、人力策展成本高；與利他使命相關但<strong>非第 1 年必要</strong>。建議延後至第 2～3 年或只做自辦賽報導。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>⑦ 前中後資源整合（醫療／補給／出版）</span><span>58</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:58%;background:var(--mid)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        方向正確，但涉及利益衝突與法規（醫療廣告、保健宣稱）；需審查委員會與合作節制，擴張速度應慢於活動面。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>⑧ 三年後可持續營運（非依賴創辦人個人）</span><span>55</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--mid)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        若第 2 年未達 40% 使命相關收入、教練留存低、贊助不續約，第 3 年會被迫商業化或縮編。需提早設「停損／ pivot 」關卡。
+      </p>
+
+      <div class="score-bar">
+        <div class="label"><span>⑨ 台灣 → 亞洲拓展</span><span>40</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--low)"></div></div>
+      </div>
+      <p style="font-size:0.86rem;color:var(--muted);margin:-6px 0 14px;">
+        屬第 4 年以後議題；在台灣未驗證 SOP 與 impact 報告前，跨境複製可行性低。
+      </p>
+
+      <table>
+        <tr><th>加權維度</th><th>權重</th><th>得分</th><th>加權貢獻</th></tr>
+        <tr><td>使命＋策略設計</td><td>25%</td><td>80</td><td>20.0</td></tr>
+        <tr><td>第 1 年試點可執行</td><td>30%</td><td>70</td><td>21.0</td></tr>
+        <tr><td>資金與贊助</td><td>25%</td><td>62</td><td>15.5</td></tr>
+        <tr><td>長期存續</td><td>15%</td><td>55</td><td>8.25</td></tr>
+        <tr><td>全球化野心（折減）</td><td>5%</td><td>40</td><td>2.0</td></tr>
+        <tr><td><strong>綜合（四捨五入）</strong></td><td>100%</td><td>—</td><td><strong>65</strong></td></tr>
+      </table>
+    </section>
+
+    <section id="swot">
+      <h2>SWOT 分析</h2>
+      <div class="grid-2">
+        <div class="swot swot-s">
+          <h4>優勢 Strengths</h4>
+          <ul>
+            <li>利他使命清晰，易對接 ESG、政府、醫療保險敘事</li>
+            <li>教練優先、共辦不收編，符合台灣產業結構</li>
+            <li>已有分年計畫、護欄、ESG 名單等可執行文件</li>
+            <li>第 1 年預算克制，不必一開始就燒大錢做 App</li>
+            <li>運動部運動企業認證、永續金融評比等公開標竿可引用</li>
+          </ul>
+        </div>
+        <div class="swot swot-w">
+          <h4>劣勢 Weaknesses</h4>
+          <ul>
+            <li>利他定位難以吸引逐利資本，現金跑道依賴贊助節奏</li>
+            <li>新品牌無信任資產，需用活動與數據換取</li>
+            <li>創辦團隊若 &lt;3 人，商務＋活動＋內容難以並行</li>
+            <li>impact 衡量若流於形式，企業第 2 年不續約</li>
+            <li>模組過多（媒體、職涯、15 運動）分散注意力</li>
+          </ul>
+        </div>
+        <div class="swot swot-o">
+          <h4>機會 Opportunities</h4>
+          <ul>
+            <li>企業 ESG 報告需社會面（S）可量化案例</li>
+            <li>運動產業發展條例：捐贈賽事具稅務誘因（需法遵）</li>
+            <li>地方運動中心、學校、企業健康週缺執行單位</li>
+            <li>巨大、美利達等運動企業與平台天然契合</li>
+            <li>銀髮、親子、企業員工為高付費意願 B2B 客群</li>
+          </ul>
+        </div>
+        <div class="swot swot-t">
+          <h4>威脅 Threats</h4>
+          <ul>
+            <li>既有健身、運動 App、KOL 帶課競爭注意力</li>
+            <li>教練若曾遇不良平台，會一次否定新進者</li>
+            <li>經濟下行時企業 CSR 預算最先被砍</li>
+            <li>健康／醫療內容涉法，一則失言即傷公信力</li>
+            <li>過度依賴單一大金主或單一運動項目</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="timeline">
+      <h2>分階段可行性（若依計畫執行）</h2>
+      <table>
+        <tr><th>階段</th><th>可行性</th><th>關鍵假設</th><th>若失敗最可能原因</th></tr>
+        <tr>
+          <td><strong>第 1 年</strong><br>使命驗證 · 2 運動 · 6～8 場活動</td>
+          <td><span class="pill pill-high">72～78%</span></td>
+          <td>創辦人全職或等同投入；至少 1 家 ESG 無償贊助；10 位種子教練</td>
+          <td>只寫計畫不辦活動；教練招募不足；無 impact 報告</td>
+        </tr>
+        <tr>
+          <td><strong>第 2 年</strong><br>5～8 分館 · 贊助常態化</td>
+          <td><span class="pill pill-mid">58～65%</span></td>
+          <td>第 1 年有 3+ 企業願續約；40% 收入來自使命相關；團隊 4～6 人</td>
+          <td>贊助斷層；擴張過快；教練 SaaS 無人付費</td>
+        </tr>
+        <tr>
+          <td><strong>第 3 年</strong><br>城市運動健康節 · 跨縣市</td>
+          <td><span class="pill pill-mid">50～58%</span></td>
+          <td>年度冠名 1 家；累計 18,000+ 參與人次；可發布影響力年報</td>
+          <td>旗艦活動超支；政府標案未中；人力斷層</td>
+        </tr>
+        <tr>
+          <td><strong>完整願景一次到位</strong><br>（15 運動＋媒體 API＋亞洲）</td>
+          <td><span class="pill pill-low">25～35%</span></td>
+          <td>不建議作為起點</td>
+          <td>資源分散、樣本不足、品牌尚未建立</td>
+        </tr>
+      </table>
+      <div class="highlight">
+        <strong>利他主義的悖論：</strong>
+        越堅持「非逐利」，越需要<strong>把商業做成「使命的燃料」而非目的</strong>——
+        ESG 贊助、課程抽成、政府專案都是手段；若拒絕所有收入設計，可行性會從 65 分跌至 30 分以下。
+      </div>
+    </section>
+
+    <section id="gates">
+      <h2>續航關卡（Go / Pivot / Stop）</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-top:0;">
+        建議每季對照；未達標不必然放棄，但須調整範圍或資金來源。
+      </p>
+
+      <div class="gate">
+        <strong>第 1 年 Q2 關卡</strong><br>
+        MVP 上線、完成 ≥2 場體驗活動、≥5 位教練上架。<br>
+        <em>未達 → 暫停新模組，專注活動與教練關係。</em>
+      </div>
+      <div class="gate">
+        <strong>第 1 年 Q4 關卡</strong><br>
+        累計參與 ≥800 人次、≥3 家企業贊助（含 1 家願談第 2 年）、3 個月規律運動自填 ≥25%。<br>
+        <em>未達 → 檢討運動項目選擇與 ESG 提案材料，不進第 2 年擴編。</em>
+      </div>
+      <div class="gate warn">
+        <strong>第 2 年 Q2 關卡</strong><br>
+        使命相關收入 ≥35%、合作社團 ≥15、至少 1 份企業可對外使用的 impact 報告。<br>
+        <em>未達 → 縮減分館數，延後賽事／媒體模組。</em>
+      </div>
+      <div class="gate fail">
+        <strong>停損紅線（任一發生即全面檢討）</strong><br>
+        連續兩季現金流為負且無新贊助；重大安全或健康宣稱爭議；核心教練集體退出。
+      </div>
+    </section>
+
+    <section id="risks">
+      <h2>前五大風險與因應</h2>
+      <table>
+        <tr><th>風險</th><th>機率</th><th>影響</th><th>因應</th></tr>
+        <tr>
+          <td>ESG 洽談比預期慢 12 個月</td>
+          <td>高</td>
+          <td>高</td>
+          <td>先辦小活動產生案例；掛靠協會／社企受贈；同步申請政府試點</td>
+        </tr>
+        <tr>
+          <td>教練／社團不信任平台</td>
+          <td>中偏高</td>
+          <td>高</td>
+          <td>首年只共辦、分潤透明、海報並列 Logo；找 2～3 位意見領袖教練背書</td>
+        </tr>
+        <tr>
+          <td>範圍蔓延（功能做太多）</td>
+          <td>高</td>
+          <td>中高</td>
+          <td>第 1 年只做：報名＋2 運動＋活動＋ESG 報告；其餘寫在 roadmap 不開發</td>
+        </tr>
+        <tr>
+          <td>impact 數據不可信</td>
+          <td>中</td>
+          <td>高</td>
+          <td>固定問卷、第三方顧問審核摘要、公開方法論</td>
+        </tr>
+        <tr>
+          <td>創辦人 burnout</td>
+          <td>中偏高</td>
+          <td>高</td>
+          <td>第 1 年即找兼職活動 PM；商務與內容不可同一人長期兼任</td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="recommend">
+      <h2>綜合建議（提高可行性的六件事）</h2>
+      <ol>
+        <li><strong>法律主體先定：</strong>釐清 NPO／社企／公司＋協會合作，讓 ESG 贊助能開收據、活動能保險。</li>
+        <li><strong>收斂第 1 年：</strong>只選 2 個運動（建議：路跑或單車＋一項入門友善如羽球／扯鈴），做深不做廣。</li>
+        <li><strong>ESG 名單 A 級先攻 5 家：</strong>國泰、富邦、中信、巨大、美利達——準備一頁提案＋具體無償需求表。</li>
+        <li><strong>用「可報告的數據」換贊助：</strong>參與人次、3 個月規律運動比例、企業員工滿意度，比華麗網站更重要。</li>
+        <li><strong>媒體／選手模組延後：</strong>第 1 年只做自辦賽報導＋教練課表模板，不碰高價 API。</li>
+        <li><strong>每季寫一頁「使命對帳」：</strong>收入來源是否 ≥30% 與健康／ESG 相關？有無違反護欄的案型？</li>
+      </ol>
+
+      <h3>與今日產出文件的一致性檢查</h3>
+      <table>
+        <tr><th>文件</th><th>對可行性的貢獻</th><th>需注意</th></tr>
+        <tr><td>品牌定位與運動行銷策略</td><td>高 — 降低排斥的理論基礎完整</td><td>需落地為對外教練話術與首頁文案</td></tr>
+        <tr><td>三年計畫檢核表</td><td>高 — 預算與節奏合理</td><td>檢核項過多，第 1 年可只追 15 項核心</td></tr>
+        <tr><td>前中後資源整合</td><td>中 — 中長期護城河</td><td>第 1 年僅做知識庫 5 篇＋1 家物理治療轉介即可</td></tr>
+        <tr><td>賽事與選手模組</td><td>中低（短期）— 願景清晰</td><td>不宜與試點同期上線</td></tr>
+        <tr><td>ESG TOP 30 名單</td><td>高 — 商務開發起點</td><td>名單≠意願，需 3～6 個月培育</td></tr>
+      </table>
+
+      <div class="highlight">
+        <strong>最終判斷：</strong>
+        以利他主義為初衷的運動健康平台，在台灣<strong>值得做、也做得成「小而美」的試點</strong>，
+        綜合可行性約 <strong>65/100（條件可行）</strong>。
+        若願意接受「前 18 個月是證明使命，不是證明獲利」，
+        並嚴守收斂範圍，試點成功率可視為 <strong>72～78/100</strong>。
+        若堅持短期內同時實現大平台、多運動、媒體中心與亞洲布局，可行性降至 <strong>30/100 以下</strong>，不建議。
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>你的備註（本機儲存）</h2>
+      <textarea id="userNotes" placeholder="記錄你的判斷、需補強的資源、或下一個決策點…"></textarea>
+      <button class="action btn-primary" id="saveNotes">儲存備註</button>
+      <button class="action btn-secondary" id="clearNotes">清除</button>
+    </section>
+
+    <footer>運動平台專案 · 利他主義可行性評估 · 2026-06-26 · 離線可用</footer>
+  </div>
+
+  <script>
+    const NOTES_KEY = 'altruism-feasibility-notes-v1';
+    const ta = document.getElementById('userNotes');
+    try { ta.value = localStorage.getItem(NOTES_KEY) || ''; } catch {}
+    document.getElementById('saveNotes').addEventListener('click', () => {
+      localStorage.setItem(NOTES_KEY, ta.value);
+      alert('已儲存至本機');
+    });
+    document.getElementById('clearNotes').addEventListener('click', () => {
+      if (confirm('清除備註？')) {
+        ta.value = '';
+        localStorage.removeItem(NOTES_KEY);
+      }
+    });
+  </script>
+</body>
+</html>
