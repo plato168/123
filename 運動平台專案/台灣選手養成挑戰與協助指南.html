@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣選手養成挑戰與協助指南｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --pink: #f472b6;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(244, 114, 182, 0.07), transparent 32%),
+        radial-gradient(circle at bottom, rgba(52, 211, 153, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: 1.35; }
+    h2 { margin: 0 0 14px; font-size: 1.15rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 14px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 860px; }
+    .related { margin: 14px 0 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(244, 114, 182, 0.1), rgba(52, 211, 153, 0.08));
+      border: 1px solid rgba(244, 114, 182, 0.25);
+      border-radius: 18px;
+      padding: 24px 28px;
+      margin: 20px 0;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .filters button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.84rem;
+    }
+    .filters button.active {
+      background: var(--accent);
+      color: #064e3b;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .challenge-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+    }
+    .challenge-card.hidden { display: none; }
+    .challenge-card h4 {
+      margin: 0 0 8px;
+      font-size: 0.98rem;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 0.72rem;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+    .tag-money { background: rgba(251, 191, 36, 0.2); color: var(--warn); }
+    .tag-edu { background: rgba(94, 179, 255, 0.2); color: var(--blue); }
+    .tag-health { background: rgba(52, 211, 153, 0.2); color: var(--accent); }
+    .tag-career { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+    .tag-system { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .tag-psy { background: rgba(244, 114, 182, 0.2); color: var(--pink); }
+
+    .help-box {
+      background: rgba(52, 211, 153, 0.06);
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 0.88rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .help-box strong { color: var(--accent-2); }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .role-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .role-card h4 { margin: 0 0 8px; color: var(--warm); font-size: 0.95rem; }
+    .role-card ul { margin: 0; padding-left: 1.2rem; font-size: 0.86rem; color: var(--muted); }
+
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .checklist li:last-child { border-bottom: 0; }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    button.action {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    .highlight {
+      background: rgba(252, 211, 77, 0.08);
+      border: 1px solid rgba(252, 211, 77, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+    }
+    .highlight strong { color: var(--warm); }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>台灣選手養成挑戰與協助指南</h1>
+      <p class="subtitle">
+        台灣運動員從基層到高峰，常同時面對經費、升學、傷病、資訊斷層與職涯不確定。
+        本頁整理<strong>常見挑戰</strong>與<strong>你可以怎麼協助</strong>——作為家長、平台創辦人或社會夥伴，而不只是旁觀者。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="賽事資訊與選手發展模組.html">選手發展模組</a> ·
+        <a href="三位子女分齡運動規劃_9_11_13歲.html">分齡規劃</a> ·
+        <a href="運動前中後資源整合與全球化策略.html">前中後資源</a> ·
+        <a href="ESG潛在贊助企業名單TOP30.html">ESG 名單</a>
+      </div>
+    </header>
+
+    <div class="hero">
+      <p>
+        <strong style="color:var(--accent-2);">協助選手的核心原則：</strong>
+        不取代教練、不剝削選手故事、不製造「不上場就沒價值」的壓力。
+        提供<strong>資源、資訊、連結、可選擇的出路</strong>——讓他們在運動裡長大，而不是被運動消耗。
+      </p>
+    </div>
+
+    <nav class="nav">
+      <a href="#landscape">台灣現況</a>
+      <a href="#challenges">十大挑戰</a>
+      <a href="#roles">你的角色</a>
+      <a href="#platform">平台能做的事</a>
+      <a href="#resources">政策與資源</a>
+      <a href="#action">行動檢核</a>
+    </nav>
+
+    <section id="landscape">
+      <h2>台灣選手養成：為什麼特別難？</h2>
+      <p>與歐美或部分亞洲強國相比，台灣常見結構性限制包括：</p>
+      <ul>
+        <li><strong>資源高度集中</strong>：奧運／亞運主流項目較易取得補助，基層與非奧項目資源不足。</li>
+        <li><strong>升學制度銜接</strong>：體育績優、原住民、身心障礙運動等管道存在，但資訊分散、各校標準不一。</li>
+        <li><strong>教練與防護人力不足</strong>：許多基層依志工或兼職，運動科學、心理支持更稀缺。</li>
+        <li><strong>產業鏈未完整</strong>：退役後教練、管理、運動科學、媒體等出路需自行摸索。</li>
+        <li><strong>城鄉與家庭差距</strong>：交通、場地、裝備、私人教練費用，直接影響「誰能練下去」。</li>
+      </ul>
+      <div class="highlight">
+        <strong>你的平台定位：</strong>
+        不是再疊一層商業中介，而是<strong>把分散的資源串起來</strong>——教練、防護、升學資訊、企業 ESG、賽事機會，讓基層選手少走彎路。
+      </div>
+    </section>
+
+    <section id="challenges">
+      <h2>十大挑戰 × 具體協助方式</h2>
+      <div class="filters" id="catFilters">
+        <button class="active" data-cat="all">全部</button>
+        <button data-cat="money">經費資源</button>
+        <button data-cat="edu">升學課業</button>
+        <button data-cat="health">傷病防護</button>
+        <button data-cat="career">職涯出路</button>
+        <button data-cat="system">制度資訊</button>
+        <button data-cat="psy">心理壓力</button>
+      </div>
+      <div id="challengeList"></div>
+    </section>
+
+    <section id="roles">
+      <h2>依你的身份，可以怎麼做？</h2>
+      <div class="role-grid">
+        <div class="role-card">
+          <h4>作為家長</h4>
+          <ul>
+            <li>保障睡眠、營養與情緒，不將自己的焦慮轉嫁成加練</li>
+            <li>協助記錄傷病、保險、賽程，但不代勞與教練的技術溝通</li>
+            <li>主動了解升學管道與截止日，避免高三才發現來不及</li>
+            <li>允許孩子探索「競技以外」的運動價值</li>
+          </ul>
+        </div>
+        <div class="role-card">
+          <h4>作為平台／創辦人</h4>
+          <ul>
+            <li>建立升學、獎學金、補助資訊庫（標註來源與日期）</li>
+            <li>媒合 ESG 贊助至基層賽事、裝備、交通費</li>
+            <li>提供訓練模板、傷病紀錄、教練審核機制</li>
+            <li>報導選手故事時著重歷程，非僅名次</li>
+          </ul>
+        </div>
+        <div class="role-card">
+          <h4>作為教練／社團夥伴</h4>
+          <ul>
+            <li>與平台共辦活動，保留社團自主與分潤透明</li>
+            <li>分享適性訓練知識，避免過早專項化</li>
+            <li>轉介防護、物理治療，不硬撐傷勢上場</li>
+            <li>參與選手職涯座談（含退役路徑）</li>
+          </ul>
+        </div>
+        <div class="role-card">
+          <h4>作為企業／贊助方</h4>
+          <ul>
+            <li>贊助交通、保險、營養、偏鄉訓練營——比只冠名更實用</li>
+            <li>接受可衡量的社會影響報告（參與人次、持續運動比例）</li>
+            <li>提供員工志工、場地、而非只要求 logo 曝光</li>
+            <li>長約 2～3 年，減少選手「年年找錢」的不確定</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="platform">
+      <h2>平台功能如何對應選手需求</h2>
+      <table>
+        <tr><th>選手痛點</th><th>對應模組／行動</th><th>優先級（建議）</th></tr>
+        <tr>
+          <td>不知道下一場賽事、升學截止日</td>
+          <td>賽事資訊、行事曆訂閱、升學情報專區</td>
+          <td>第 1 年</td>
+        </tr>
+        <tr>
+          <td>訓練缺乏週期、傷後不知怎麼調整</td>
+          <td>教練審核課表、前中後資源、防護轉介</td>
+          <td>第 1～2 年</td>
+        </tr>
+        <tr>
+          <td>經費不足（交通、裝備、遠征）</td>
+          <td>ESG 贊助、企業健康方案轉入基層補助</td>
+          <td>第 1 年（試點）</td>
+        </tr>
+        <tr>
+          <td>非奧項目能見度低</td>
+          <td>分運動分館報導、自辦賽、紀錄榜</td>
+          <td>第 1～2 年</td>
+        </tr>
+        <tr>
+          <td>退役後不知能做什麼</td>
+          <td>職涯地圖、mentor、教練培訓、國手分享</td>
+          <td>第 2～3 年</td>
+        </tr>
+        <tr>
+          <td>心理壓力、比較、身份認同</td>
+          <td>運動心理衛教、同儕支持活動（非治療替代）</td>
+          <td>第 2 年起</td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="resources">
+      <h2>台灣政策與資源方向（需自行查最新版）</h2>
+      <table>
+        <tr><th>類型</th><th>方向</th><th>備註</th></tr>
+        <tr>
+          <td>優秀運動員補助</td>
+          <td>運動部各級選手培訓、獎勵、出國</td>
+          <td>依項目、級別、成績而定；申請流程向所屬單項協會詢問</td>
+        </tr>
+        <tr>
+          <td>升學管道</td>
+          <td>體育績優、原住民、身心障礙運動、運動專班</td>
+          <td>各校簡章每年不同；建議國二／高一起追蹤</td>
+        </tr>
+        <tr>
+          <td>企業捐贈誘因</td>
+          <td>運動產業發展條例相關捐贈減除</td>
+          <td>需合法受贈主體；詳見財會／法務</td>
+        </tr>
+        <tr>
+          <td>場地與政策</td>
+          <td>運動中心、學校開放、地方政府運動局</td>
+          <td>可洽地方試點、共辦基層賽</td>
+        </tr>
+        <tr>
+          <td>保險</td>
+          <td>活動公共意外險、運動傷害專案</td>
+          <td>平台辦賽必備；可與保險公司 ESG 合作</td>
+        </tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:0;">
+        官方入口示例：<a href="https://www.sa.gov.tw/" style="color:var(--blue)" target="_blank" rel="noopener">運動部</a>、
+        各單項協會、<a href="https://isports.sa.gov.tw/" style="color:var(--blue)" target="_blank" rel="noopener">運動資訊系統</a>。
+        平台應做<strong>整理與導覽</strong>，並標註更新日期，避免過期資訊害選手錯失期限。
+      </p>
+    </section>
+
+    <section id="action">
+      <h2>我的協助行動檢核（本機儲存）</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-top:0;">
+        勾選你願意在本季實際推進的項目；每季重新檢視。
+      </p>
+      <ul class="checklist" id="actionChecklist"></ul>
+      <div class="toolbar">
+        <button class="action btn-primary" id="exportAction">匯出進度 JSON</button>
+        <button class="action btn-secondary" id="resetAction">清除勾選</button>
+      </div>
+    </section>
+
+    <footer>運動平台專案 · 選手養成協助指南 · 非法律／醫療建議 · 離線可用</footer>
+  </div>
+
+  <script>
+    const ACTION_KEY = 'athlete-support-action-v1';
+
+    const CHALLENGES = [
+      {
+        id: 1, cat: 'money',
+        tag: '經費資源', tagClass: 'tag-money',
+        title: '訓練與遠征費用沉重',
+        problem: '教練費、裝備、交通、出國比賽自費比例高；家庭無法長期支撐即中斷。',
+        help: '媒合 ESG／企業贊助「交通＋保險＋補給」套餐；平台設透明補助申請；優先贊助偏鄉與經濟弱勢選手。'
+      },
+      {
+        id: 2, cat: 'money',
+        tag: '經費資源', tagClass: 'tag-money',
+        title: '非奧、新興項目資源更少',
+        problem: '媒體與補助偏向主流項目；扯鈴、武道、壁球等選手難被看見。',
+        help: '分運動分館深度報導；自辦小型賽事；向運動企業（如巨大、美利達）提案「基層項目」專案。'
+      },
+      {
+        id: 3, cat: 'edu',
+        tag: '升學課業', tagClass: 'tag-edu',
+        title: '升學與訓練時間衝突',
+        problem: '國中會考、高中學測、段考與賽季重疊；請假與補課壓力大。',
+        help: '整理各校體育績優時程；教練端建立「段考週減量」共識；平台提供學長經驗分享與時間管理模板。'
+      },
+      {
+        id: 4, cat: 'edu',
+        tag: '升學課業', tagClass: 'tag-edu',
+        title: '升學資訊不對稱',
+        problem: '家長與選手不清楚體育績優、運動專班、海外升學條件，錯過準備期。',
+        help: '建立升學情報頁（標註年份）；每季一場線上講座；與學校輔導室、協會合作更新。'
+      },
+      {
+        id: 5, cat: 'health',
+        tag: '傷病防護', tagClass: 'tag-health',
+        title: '運動傷害處理不及時',
+        problem: '基層缺乏防護員；輕傷拖成慢性；不知何時該休息、轉介。',
+        help: '前中後資源模組：傷病紀錄、物理治療轉介名單；活動必保保險；教練安全 SOP 共識。'
+      },
+      {
+        id: 6, cat: 'health',
+        tag: '傷病防護', tagClass: 'tag-health',
+        title: '營養與恢復觀念不足',
+        problem: '過度依賴補充品；睡眠不足仍加練；青春期營養需求被忽略。',
+        help: '運動營養衛教（標示「輔助非替代」）；與佳格等健康食品 ESG 合作試飲＋教育；強調睡眠優先。'
+      },
+      {
+        id: 7, cat: 'career',
+        tag: '職涯出路', tagClass: 'tag-career',
+        title: '退役／轉職沒有地圖',
+        problem: '競技高峰短；教練證、體育行政、運動產業、創業路徑分散。',
+        help: '選手發展模組：職涯地圖、mentor 配對、國手轉職故事；第 2 年辦「第二專長」講座。'
+      },
+      {
+        id: 8, cat: 'career',
+        tag: '職涯出路', tagClass: 'tag-career',
+        title: '贊助與合約知識不足',
+        problem: '年輕選手與家庭不熟悉肖像、代言、經紀條款，易遭剝削。',
+        help: '基礎法律衛教（進階轉介律師）；平台拒絕不當綁約案；透明標示商業合作。'
+      },
+      {
+        id: 9, cat: 'system',
+        tag: '制度資訊', tagClass: 'tag-system',
+        title: '協會、學校、社團資訊斷層',
+        problem: '賽程、選拔、國家隊標準分散各處；選手與家長難以整合。',
+        help: '賽事資訊聚合（標註來源）；訂閱推播；與協會洽 MOU 取得官方賽程。'
+      },
+      {
+        id: 10, cat: 'psy',
+        tag: '心理壓力', tagClass: 'tag-psy',
+        title: '成績、社群與身份壓力',
+        problem: '輸贏綁定自我價值；同儕比較；網路輿論；受傷或退隊的失落。',
+        help: '運動心理衛教、同儕支持團；報導強調過程；家長與教練溝通「非勝負唯一指標」；必要時轉介專業心理諮商。'
+      }
+    ];
+
+    const ACTION_ITEMS = [
+      { id: 'a1', text: '整理 1 份「所屬項目」升學與補助情報（含連結與更新日）' },
+      { id: 'a2', text: '與 1 位基層教練訪談：選手最缺的三項資源是什麼？' },
+      { id: 'a3', text: '向 ESG 名單 A 級企業提案：基層選手交通／保險補助試點' },
+      { id: 'a4', text: '平台／家庭端建立傷病與賽程紀錄模板（供孩子或選手使用）' },
+      { id: 'a5', text: '辦 1 場低壓力體驗賽或社團賽，含保險與防護' },
+      { id: 'a6', text: '邀 1 位退役或轉職選手分享「運動以外的人生選項」' },
+      { id: 'a7', text: '報導或記錄 1 則非奧項目選手故事（經本人同意）' },
+      { id: 'a8', text: '檢視是否有選手因經濟因素想退隊——評估能否媒合資源' },
+      { id: 'a9', text: '與學校或運動中心洽談場地／試點合作' },
+      { id: 'a10', text: '每季檢核：協助行動是否「對選手有直接幫助」而非只有曝光' }
+    ];
+
+    function renderChallenges(cat) {
+      const root = document.getElementById('challengeList');
+      root.innerHTML = '';
+      CHALLENGES.filter(c => cat === 'all' || c.cat === cat).forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'challenge-card';
+        div.innerHTML = `
+          <h4>
+            <span class="tag ${c.tagClass}">${c.tag}</span>
+            ${c.id}. ${c.title}
+          </h4>
+          <p style="margin:0 0 8px;font-size:0.88rem;color:var(--muted);"><strong style="color:var(--text);">挑戰：</strong>${c.problem}</p>
+          <div class="help-box"><strong>你可以協助：</strong>${c.help}</div>`;
+        root.appendChild(div);
+      });
+    }
+
+    function loadAction() {
+      try { return JSON.parse(localStorage.getItem(ACTION_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function renderAction() {
+      const root = document.getElementById('actionChecklist');
+      const state = loadAction();
+      root.innerHTML = '';
+      ACTION_ITEMS.forEach(item => {
+        const li = document.createElement('li');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!state[item.id];
+        cb.addEventListener('change', () => {
+          state[item.id] = cb.checked;
+          localStorage.setItem(ACTION_KEY, JSON.stringify(state));
+        });
+        const span = document.createElement('span');
+        span.textContent = item.text;
+        li.appendChild(cb);
+        li.appendChild(span);
+        root.appendChild(li);
+      });
+    }
+
+    document.getElementById('catFilters').addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      document.querySelectorAll('#catFilters button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      renderChallenges(e.target.dataset.cat);
+    });
+
+    document.getElementById('exportAction').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(loadAction(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'athlete-support-action.json';
+      a.click();
+    });
+
+    document.getElementById('resetAction').addEventListener('click', () => {
+      if (confirm('清除所有勾選？')) {
+        localStorage.removeItem(ACTION_KEY);
+        renderAction();
+      }
+    });
+
+    renderChallenges('all');
+    renderAction();
+  </script>
+</body>
+</html>
