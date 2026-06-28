@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最新羽球賽事｜2026 台灣與國際</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+      --shuttle: #fbbf24;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(251, 191, 36, 0.09), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .wrap { max-width: 1020px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 8px; font-size: clamp(1.4rem, 2.4vw, 1.95rem); }
+    h2 { margin: 0 0 12px; font-size: 1.1rem; color: var(--accent-2); }
+
+    .subtitle { color: var(--muted); max-width: 820px; }
+    .meta { font-size: 0.85rem; color: var(--muted); margin: 10px 0 18px; }
+    .related { font-size: 0.9rem; margin-bottom: 16px; }
+    .related a { color: var(--blue); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat .n { font-size: 1.5rem; font-weight: 800; color: var(--shuttle); }
+    .stat .l { font-size: 0.78rem; color: var(--muted); }
+
+    .toolbar, .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .filters button, .toolbar button {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.85rem;
+    }
+    .filters button.active {
+      background: var(--shuttle);
+      color: #422006;
+      border-color: var(--shuttle);
+      font-weight: 700;
+    }
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #064e3b;
+      border: 0;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); position: sticky; top: 0; }
+
+    .table-wrap { overflow-x: auto; max-height: 70vh; overflow-y: auto; border-radius: 12px; border: 1px solid var(--border); }
+
+    .badge {
+      display: inline-block;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .st-upcoming { background: rgba(94, 179, 255, 0.2); color: var(--blue); }
+    .st-ongoing { background: rgba(52, 211, 153, 0.25); color: var(--accent); }
+    .st-ended { background: rgba(139, 164, 190, 0.2); color: var(--muted); }
+    .st-tbd { background: rgba(251, 191, 36, 0.2); color: var(--warm); }
+
+    .type-dom { color: var(--shuttle); }
+    .type-int { color: var(--blue); }
+
+    a.ext { color: var(--blue); text-decoration: none; }
+    a.ext:hover { text-decoration: underline; }
+
+    .highlight {
+      background: rgba(252, 211, 77, 0.08);
+      border: 1px solid rgba(252, 211, 77, 0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+    }
+
+    .disclaimer {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.86rem;
+      margin-bottom: 16px;
+    }
+
+    tr.star { background: rgba(251, 191, 36, 0.06); }
+    tr.bookmarked { outline: 1px solid rgba(52, 211, 153, 0.4); }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>最新羽球賽事（2026）</h1>
+      <p class="subtitle">彙整 CTBA 國內賽事與 BWF 國際賽程；資料可離線瀏覽。執行 <code>更新羽球賽事.py</code> 可重算狀態並同步本頁。</p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="羽球選手養成挑戰與協助指南.html">羽球協助指南</a> ·
+        <a href="https://www.ctb.org.tw/" target="_blank" rel="noopener">CTBA 官網</a> ·
+        <a href="https://ctba.mylivescore.tw/" target="_blank" rel="noopener">羽協報名系統</a>
+      </div>
+      <p class="meta">資料更新日：<strong id="updatedDate">—</strong> · 今日：<strong id="todayDate">—</strong></p>
+    </header>
+
+    <div class="disclaimer">
+      <strong>注意：</strong>標示「預定」之國內賽事日期為慣例估算，報名與地點請以
+      <a class="ext" href="https://www.ctb.org.tw/" target="_blank" rel="noopener">中華民國羽球協會</a> 及
+      <a class="ext" href="https://ctba.mylivescore.tw/" target="_blank" rel="noopener">My Livescore 報名系統</a> 最新公告為準。
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="filters" id="typeFilters">
+      <button class="active" data-type="all">全部</button>
+      <button data-type="domestic">🇹🇼 國內 CTBA</button>
+      <button data-type="international">🌏 國際 BWF</button>
+    </div>
+    <div class="filters" id="statusFilters">
+      <button class="active" data-status="active">進行中＋即將</button>
+      <button data-status="all">全部狀態</button>
+      <button data-status="upcoming">即將舉行</button>
+      <button data-status="ongoing">進行中</button>
+      <button data-status="ended">已結束</button>
+      <button data-status="tbd">待公告</button>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-accent" id="exportIcs">匯出訂閱賽事（.ics）</button>
+      <button type="button" id="clearBookmarks">清除我的訂閱</button>
+    </div>
+
+    <section>
+      <h2>賽事列表</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px">★</th>
+              <th style="width:88px">狀態</th>
+              <th style="width:52px">類型</th>
+              <th>賽事名稱</th>
+              <th style="width:118px">日期</th>
+              <th>地點</th>
+              <th>級別／年齡</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>近期焦點（2026 年 6 月底～8 月）</h2>
+      <div class="highlight" id="focusBox"></div>
+    </section>
+
+    <footer>運動平台專案 · 最新羽球賽事 · 離線可用 · python3 更新羽球賽事.py --open</footer>
+  </div>
+
+  <!-- TOURNAMENT_DATA_BEGIN -->
+<script type="application/json" id="tournament-data">
+{
+  "updated": "2026-06-28",
+  "sources": [
+    "https://www.ctb.org.tw/",
+    "https://bwfworldtour.bwfbadminton.com/calendar/?cyear=2026",
+    "https://bwfbadminton.com/"
+  ],
+  "events": [
+    {
+      "id": "dom-2026-rank1",
+      "type": "domestic",
+      "name": "2026 年第一次全國羽球排名賽",
+      "start": "2025-12-27",
+      "end": "2026-01-07",
+      "location": "長庚科技大學體育館（桃園龜山）",
+      "level": "全國排名賽（甲／乙組）",
+      "age": "成人組為主",
+      "status": "ended",
+      "url": "https://www.ctb.org.tw/",
+      "note": "CTBA 主辦；選拔與排名參考賽事之一"
+    },
+    {
+      "id": "dom-2026-youth1",
+      "type": "domestic",
+      "name": "2026 年第一次全國青年（U19）暨青少年（U17＆U15）羽球錦標賽",
+      "start": "2026-03-30",
+      "end": "2026-04-07",
+      "location": "依 CTBA 公告",
+      "level": "全國錦標賽",
+      "age": "U19／U17／U15",
+      "status": "ended",
+      "url": "https://www.ctb.org.tw/",
+      "note": "青少年重要國內賽；與 9・11・13 歲選手路徑相關（U15 為 13 歲級距參考）"
+    },
+    {
+      "id": "dom-2026-team",
+      "type": "domestic",
+      "name": "115 年全國羽球團體錦標賽",
+      "start": "2026-05-02",
+      "end": "2026-05-11",
+      "location": "依 CTBA 公告",
+      "level": "全國團體賽",
+      "age": "各組別",
+      "status": "ended",
+      "url": "https://www.ctb.org.tw/",
+      "note": "校隊、俱樂部團體代表常見目標賽"
+    },
+    {
+      "id": "int-2026-asia-jr-team",
+      "type": "international",
+      "name": "2026 亞洲羽球青少年錦標賽（團體）",
+      "start": "2026-06-26",
+      "end": "2026-07-05",
+      "location": "日本八代（Yatsushiro）",
+      "level": "洲際青少年",
+      "age": "青少年代表隊",
+      "status": "ongoing",
+      "url": "https://www.ctb.org.tw/",
+      "note": "CTBA 官網列 0626–0705；國家青少年代表層級"
+    },
+    {
+      "id": "int-2026-canada",
+      "type": "international",
+      "name": "加拿大公開賽 Canada Open 2026",
+      "start": "2026-06-30",
+      "end": "2026-07-05",
+      "location": "Markham, Ontario, Canada",
+      "level": "BWF Super 300",
+      "age": "成人國際",
+      "status": "upcoming",
+      "url": "https://bwfworldtour.bwfbadminton.com/calendar/?cyear=2026",
+      "note": "BWF 世界巡迴賽"
+    },
+    {
+      "id": "int-2026-asia-jr-ind",
+      "type": "international",
+      "name": "2026 亞洲羽球青少年錦標賽（個人）",
+      "start": "2026-07-01",
+      "end": "2026-07-05",
+      "location": "日本八代（Yatsushiro）",
+      "level": "洲際青少年",
+      "age": "U19 及以下代表",
+      "status": "upcoming",
+      "url": "https://www.ctb.org.tw/",
+      "note": "CTBA 官網列個人賽程"
+    },
+    {
+      "id": "int-2026-japan",
+      "type": "international",
+      "name": "日本公開賽 DAIHATSU Japan Open 2026",
+      "start": "2026-07-14",
+      "end": "2026-07-19",
+      "location": "東京，日本",
+      "level": "BWF Super 750",
+      "age": "成人國際",
+      "status": "upcoming",
+      "url": "https://bwfworldtour.bwfbadminton.com/tournament/5213/daihatsu-japan-open-2026/overview/",
+      "note": "Super 750；台灣頂尖選手常參賽"
+    },
+    {
+      "id": "int-2026-china",
+      "type": "international",
+      "name": "中國公開賽 VICTOR China Open 2026",
+      "start": "2026-07-21",
+      "end": "2026-07-26",
+      "location": "常州，中國",
+      "level": "BWF Super 1000",
+      "age": "成人國際",
+      "status": "upcoming",
+      "url": "https://bwfworldtour.bwfbadminton.com/calendar/?cyear=2026",
+      "note": "Super 1000 最高等級之一"
+    },
+    {
+      "id": "int-2026-taipei",
+      "type": "international",
+      "name": "台北公開賽 YONEX Taipei Open 2026",
+      "start": "2026-07-28",
+      "end": "2026-08-02",
+      "location": "台北，台灣",
+      "level": "BWF Super 300",
+      "age": "成人國際（台灣主場）",
+      "status": "upcoming",
+      "url": "https://bwfworldtour.bwfbadminton.com/calendar/?cyear=2026",
+      "note": "★ 在台灣舉行之 BWF 世界巡迴賽；適合帶孩子現場觀賽學習"
+    },
+    {
+      "id": "int-2026-korea",
+      "type": "international",
+      "name": "韓國大師賽 VICTOR Korea Masters 2026",
+      "start": "2026-08-04",
+      "end": "2026-08-09",
+      "location": "光州，韓國",
+      "level": "BWF Super 300",
+      "age": "成人國際",
+      "status": "upcoming",
+      "url": "https://bwfworldtour.bwfbadminton.com/calendar/?cyear=2026",
+      "note": "緊接台北公開賽後之 Super 300"
+    },
+    {
+      "id": "int-2026-worlds",
+      "type": "international",
+      "name": "2026 BWF 世界羽球錦標賽",
+      "start": "2026-08-17",
+      "end": "2026-08-23",
+      "location": "新德里，印度",
+      "level": "世界錦標賽",
+      "age": "成人國際",
+      "status": "upcoming",
+      "url": "https://bwfbadminton.com/tournament/5601/bwf-world-championships-2026/info",
+      "note": "年度最重要世界個人賽之一"
+    },
+    {
+      "id": "dom-2026-rank2-tbd",
+      "type": "domestic",
+      "name": "2026 年第二次全國羽球排名賽（預定）",
+      "start": "2026-09-01",
+      "end": "2026-09-30",
+      "location": "待 CTBA 公告",
+      "level": "全國排名賽",
+      "age": "甲／乙組",
+      "status": "tbd",
+      "url": "https://www.ctb.org.tw/",
+      "note": "日期為慣例估算，請以 CTBA 正式公告為準"
+    },
+    {
+      "id": "dom-2026-youth-rank-tbd",
+      "type": "domestic",
+      "name": "2026 年全國青少年羽球分齡排名賽（預定）",
+      "start": "2026-10-01",
+      "end": "2026-11-30",
+      "location": "待 CTBA 公告",
+      "level": "分齡排名賽",
+      "age": "U13／U15／U17 等",
+      "status": "tbd",
+      "url": "https://ctba.mylivescore.tw/",
+      "note": "9・11・13 歲選手常見目標；報名見羽協 My Livescore 系統"
+    }
+  ]
+}
+</script>
+<!-- TOURNAMENT_DATA_END -->
+
+  <script>
+    const BOOKMARK_KEY = 'badminton-events-bookmark-v1';
+    const STATUS_LABEL = {
+      upcoming: '即將舉行',
+      ongoing: '進行中',
+      ended: '已結束',
+      tbd: '待公告'
+    };
+    const TYPE_LABEL = { domestic: '國內', international: '國際' };
+
+    let data = JSON.parse(document.getElementById('tournament-data').textContent);
+    let typeFilter = 'all';
+    let statusFilter = 'active';
+
+    function fmtRange(start, end) {
+      const s = start.slice(5).replace('-', '/');
+      const e = end.slice(5).replace('-', '/');
+      return start.slice(0, 4) === end.slice(0, 4)
+        ? `${start.slice(0, 4)}/${s}～${e}`
+        : `${start.replace(/-/g, '/')}～${end.replace(/-/g, '/')}`;
+    }
+
+    function loadBookmarks() {
+      try { return JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveBookmarks(b) { localStorage.setItem(BOOKMARK_KEY, JSON.stringify(b)); }
+
+    function recomputeStatus(ev) {
+      if (ev.status === 'tbd' || ev.id.includes('-tbd')) return 'tbd';
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const s = new Date(ev.start + 'T00:00:00');
+      const e = new Date(ev.end + 'T23:59:59');
+      if (today < s) return 'upcoming';
+      if (today >= s && today <= e) return 'ongoing';
+      return 'ended';
+    }
+
+    function filteredEvents() {
+      return data.events.filter(ev => {
+        const st = recomputeStatus(ev);
+        if (typeFilter !== 'all' && ev.type !== typeFilter) return false;
+        if (statusFilter === 'active') return st === 'upcoming' || st === 'ongoing';
+        if (statusFilter !== 'all' && st !== statusFilter) return false;
+        return true;
+      }).sort((a, b) => a.start.localeCompare(b.start));
+    }
+
+    function renderStats() {
+      const counts = { upcoming: 0, ongoing: 0, ended: 0, tbd: 0 };
+      data.events.forEach(ev => { counts[recomputeStatus(ev)]++; });
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="n">${counts.ongoing}</div><div class="l">進行中</div></div>
+        <div class="stat"><div class="n">${counts.upcoming}</div><div class="l">即將舉行</div></div>
+        <div class="stat"><div class="n">${counts.tbd}</div><div class="l">待公告</div></div>
+        <div class="stat"><div class="n">${counts.ended}</div><div class="l">已結束</div></div>`;
+    }
+
+    function renderTable() {
+      const bm = loadBookmarks();
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+      filteredEvents().forEach(ev => {
+        const st = recomputeStatus(ev);
+        const tr = document.createElement('tr');
+        if (ev.note && ev.note.includes('★')) tr.classList.add('star');
+        if (bm[ev.id]) tr.classList.add('bookmarked');
+        tr.innerHTML = `
+          <td><input type="checkbox" data-id="${ev.id}" ${bm[ev.id] ? 'checked' : ''} title="我的訂閱"></td>
+          <td><span class="badge st-${st}">${STATUS_LABEL[st]}</span></td>
+          <td class="type-${ev.type === 'domestic' ? 'dom' : 'int'}">${TYPE_LABEL[ev.type]}</td>
+          <td><a class="ext" href="${ev.url}" target="_blank" rel="noopener">${ev.name}</a><br><span style="font-size:0.78rem;color:var(--muted)">${ev.level}</span></td>
+          <td>${fmtRange(ev.start, ev.end)}</td>
+          <td>${ev.location}</td>
+          <td>${ev.age}</td>
+          <td style="font-size:0.82rem;color:var(--muted)">${ev.note}</td>`;
+        tr.querySelector('input').addEventListener('change', e => {
+          bm[ev.id] = e.target.checked;
+          saveBookmarks(bm);
+          renderTable();
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderFocus() {
+      const focus = data.events.filter(ev => {
+        const st = recomputeStatus(ev);
+        return (st === 'upcoming' || st === 'ongoing') && ev.start <= '2026-08-31';
+      }).sort((a, b) => a.start.localeCompare(b.start));
+      const lines = focus.map(ev => {
+        const st = STATUS_LABEL[recomputeStatus(ev)];
+        return `<strong>${ev.name}</strong>（${st}，${fmtRange(ev.start, ev.end)}，${ev.location}）`;
+      });
+      document.getElementById('focusBox').innerHTML = lines.length
+        ? '<ul><li>' + lines.join('</li><li>') + '</li></ul>'
+        : '目前無符合條件之賽事。';
+    }
+
+    function exportIcs() {
+      const bm = loadBookmarks();
+      const list = data.events.filter(ev => bm[ev.id]);
+      if (!list.length) { alert('請先勾選★訂閱至少一場賽事'); return; }
+      const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//運動平台專案//羽球賽事//ZH'];
+      list.forEach(ev => {
+        const dtStart = ev.start.replace(/-/g, '');
+        const dtEnd = ev.end.replace(/-/g, '');
+        lines.push('BEGIN:VEVENT', `UID:${ev.id}@sport-platform`, `DTSTART;VALUE=DATE:${dtStart}`, `DTEND;VALUE=DATE:${dtEnd}`,
+          `SUMMARY:${ev.name}`, `LOCATION:${ev.location}`, `DESCRIPTION:${ev.note}`, 'END:VEVENT');
+      });
+      lines.push('END:VCALENDAR');
+      const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'badminton-events.ics';
+      a.click();
+    }
+
+    document.getElementById('updatedDate').textContent = data.updated || '—';
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('zh-TW');
+
+    document.getElementById('typeFilters').addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      document.querySelectorAll('#typeFilters button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      typeFilter = e.target.dataset.type;
+      renderTable();
+    });
+    document.getElementById('statusFilters').addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      document.querySelectorAll('#statusFilters button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      statusFilter = e.target.dataset.status;
+      renderTable();
+    });
+    document.getElementById('exportIcs').addEventListener('click', exportIcs);
+    document.getElementById('clearBookmarks').addEventListener('click', () => {
+      if (confirm('清除所有訂閱？')) { localStorage.removeItem(BOOKMARK_KEY); renderTable(); }
+    });
+
+    renderStats();
+    renderTable();
+    renderFocus();
+  </script>
+</body>
+</html>
