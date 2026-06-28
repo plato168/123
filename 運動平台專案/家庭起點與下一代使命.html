@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>家庭起點與下一代使命｜運動健康平台</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --panel: #151f2e;
+      --panel-2: #1e2d42;
+      --border: #2d4158;
+      --text: #e8f0f8;
+      --muted: #8ba4be;
+      --accent: #34d399;
+      --accent-2: #6ee7b7;
+      --blue: #5eb3ff;
+      --warm: #fcd34d;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(252, 211, 77, 0.08), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.1), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.75;
+    }
+
+    .wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 56px; }
+
+    h1 { margin: 0 0 10px; font-size: clamp(1.45rem, 2.4vw, 1.95rem); line-height: 1.35; }
+    h2 { margin: 0 0 14px; font-size: 1.12rem; color: var(--accent-2); scroll-margin-top: 16px; }
+    h3 { margin: 14px 0 8px; font-size: 1rem; color: var(--blue); }
+
+    .subtitle { color: var(--muted); max-width: 760px; }
+    .related { margin: 14px 0 20px; font-size: 0.9rem; }
+    .related a { color: var(--blue); }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 26px;
+      margin-bottom: 18px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(252, 211, 77, 0.1), rgba(52, 211, 153, 0.08));
+      border: 1px solid rgba(252, 211, 77, 0.28);
+      border-radius: 18px;
+      padding: 28px 32px;
+      margin: 22px 0;
+      text-align: center;
+    }
+
+    .hero .quote {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      font-weight: 600;
+      color: var(--warm);
+      margin: 0 0 14px;
+      line-height: 1.55;
+    }
+
+    .hero p { margin: 0; color: var(--muted); max-width: 620px; margin-inline: auto; font-size: 0.95rem; }
+
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .nav a {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.85rem;
+      color: var(--blue); text-decoration: none;
+    }
+
+    .flow {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 8px; margin: 18px 0; font-size: 0.9rem;
+    }
+    .flow span {
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 14px;
+    }
+    .flow .arrow { color: var(--accent); border: 0; background: none; padding: 0 4px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 12px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); color: var(--accent-2); }
+
+    .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+    .steps li {
+      counter-increment: step;
+      padding: 14px 0 14px 48px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .steps li:last-child { border-bottom: 0; }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 14px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); color: #064e3b;
+      font-weight: 700; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .highlight {
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 12px; padding: 14px 18px;
+      font-size: 0.9rem; margin-top: 14px;
+    }
+    .highlight strong { color: var(--accent-2); }
+
+    .guard {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 12px; padding: 14px 18px;
+      font-size: 0.9rem;
+    }
+
+    .child-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px; margin: 14px 0;
+    }
+    .child-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .child-card h4 { margin: 0 0 8px; color: var(--warm); font-size: 0.95rem; }
+    .child-card p { margin: 0; font-size: 0.86rem; color: var(--muted); }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      padding: 10px 12px; font: inherit;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+
+    button {
+      border: 0; border-radius: 10px; padding: 10px 14px;
+      cursor: pointer; font: inherit; margin-top: 8px; margin-right: 8px;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #064e3b; font-weight: 700; }
+    .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 24px; }
+
+    ul { padding-left: 1.3rem; }
+    li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>家庭起點與下一代使命</h1>
+      <p class="subtitle">
+        三位孩子都參與運動、對運動有高度興趣——這不是平台的「行銷素材」，
+        而是創辦初衷：把家庭裡看見的美好，擴展成更多家庭與社會能受惠的結構。
+      </p>
+      <div class="related">
+        <a href="index.html">← 專案入口</a> ·
+        <a href="品牌定位與運動行銷策略.html">品牌定位</a> ·
+        <a href="利他主義可行性評估報告.html">可行性評估</a> ·
+        <a href="賽事資訊與選手發展模組.html">選手發展</a>
+      </div>
+    </header>
+
+    <div class="hero">
+      <p class="quote">
+        從三個孩子的運動熱情出發，<br>
+        不是為了打造另一個競技工廠，<br>
+        而是為了讓「動起來、活得好、彼此照應」成為社會的常態。
+      </p>
+      <p>
+        你所說的「走向正確的高度文明」，在這個專案裡可以具體化為：<br>
+        健康素養、公平與誠信、尊重專業、預防勝於治療、以及運動連結人的能力。
+      </p>
+    </div>
+
+    <nav class="nav">
+      <a href="#why">為什麼這是強起點</a>
+      <a href="#civilization">高度文明的具體意涵</a>
+      <a href="#children">孩子與平台</a>
+      <a href="#path">發展路徑</a>
+      <a href="#family">家庭行動</a>
+      <a href="#guard">護欄</a>
+    </nav>
+
+    <section id="why">
+      <h2>為什麼「三個愛運動的孩子」是極強的起點？</h2>
+      <p>許多平台從商業模式或技術出發；你從<strong>真實的生命經驗</strong>出發。這帶來三項別人難以複製的優勢：</p>
+      <ul>
+        <li><strong>你懂家長的心：</strong>接送、費用、受傷、升學壓力、要不要繼續比賽——這些不是報表上的數字，而是你每天都在面對的事。</li>
+        <li><strong>你懂孩子的動機：</strong>有人為競技、有人為同儕、有人為健康；平台若只服務「拿獎牌的人」，就背離了大多數家庭。</li>
+        <li><strong>你的時間尺度夠長：</strong>你不是在賭一季營收，而是在思考孩子未來十年、二十年——這與 ESG、健康政策、社會企業的時間觀一致。</li>
+      </ul>
+      <div class="flow">
+        <span>家庭：三個孩子的運動經驗</span>
+        <span class="arrow">→</span>
+        <span>社區：教練、社團、學校、場地</span>
+        <span class="arrow">→</span>
+        <span>社會：企業 ESG、政策、健康文化</span>
+        <span class="arrow">→</span>
+        <span>文明：素養、信任、照顧彼此</span>
+      </div>
+      <div class="highlight">
+        <strong>與可行性評估的連結：</strong>
+        這份家庭初衷讓「利他主義」不再是口號，而是可驗證的承諾——
+        也讓你在洽談 ESG 贊助時，有一段真實、克制、不煽情的創辦故事可說。
+      </div>
+    </section>
+
+    <section id="civilization">
+      <h2>「高度文明」在這裡代表什麼？（具體，不空泛）</h2>
+      <p>文明不是口號，是<strong>一群人如何對待身體、對待競爭、對待弱者、對待專業</strong>。運動是練習這些價值的最低成本場域之一。</p>
+      <table>
+        <tr><th>文明面向</th><th>在運動裡的樣子</th><th>平台可以做的事</th></tr>
+        <tr>
+          <td><strong>身體自主</strong></td>
+          <td>知道何時該停、如何恢復、不為勝利傷害自己</td>
+          <td>前中後資源、防護與物理治療轉介、傷病衛教</td>
+        </tr>
+        <tr>
+          <td><strong>公平與誠信</strong></td>
+          <td>尊重規則、裁判、對手；拒絕投機與作弊</td>
+          <td>賽事報導重教育、輕八卦；公開贊助與利益關係</td>
+        </tr>
+        <tr>
+          <td><strong>照顧彼此</strong></td>
+          <td>強者帶弱者、學長帶學弟、社團互相支援</td>
+          <td>共辦活動、合作社團分潤、銀髮／親子／入門組</td>
+        </tr>
+        <tr>
+          <td><strong>尊重專業</strong></td>
+          <td>教練、防護、醫療各有邊界，不互相取代</td>
+          <td>教練是主角；內容需顧問審核；不賣 miracle</td>
+        </tr>
+        <tr>
+          <td><strong>預防文化</strong></td>
+          <td>用運動減少對藥物與醫療的過度依賴（在專業前提下）</td>
+          <td>健康科普、企業員工健康、可衡量的參與數據</td>
+        </tr>
+      </table>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:0;">
+        你所期待的「社會發展」，不必等到平台上市或變大；<strong>每多一個家庭因為運動而更健康、更連結，文明就前進一小步。</strong>
+      </p>
+    </section>
+
+    <section id="children">
+      <h2>三個孩子：各自的路，同一條價值線</h2>
+      <p>不必假設三個孩子將來都走競技；平台設計應服務<strong>不同志向</strong>，就像同一個家庭裡也可能有三種運動人生：</p>
+
+      <div class="child-grid">
+        <div class="child-card">
+          <h4>競技探索者</h4>
+          <p>若有人熱愛比賽：提供訓練計畫模板、紀錄對照、職涯地圖、防護資源——但<strong>不催逼、不綁商業</strong>。</p>
+        </div>
+        <div class="child-card">
+          <h4>終身運動者</h4>
+          <p>若有人只為健康與快樂：體驗課、約練、知識庫就足夠——這其實是<strong>大多數人，也是社會最大效益</strong>。</p>
+        </div>
+        <div class="child-card">
+          <h4>傳承與領導者</h4>
+          <p>若有人將來想當教練、志工、活動發起人：平台是<strong>實務練習場</strong>（在成年與適當訓練後），不是童年標籤。</p>
+        </div>
+      </div>
+
+      <h3>平台從孩子身上學到的設計原則</h3>
+      <ul>
+        <li>運動要<strong>有趣、有同伴</strong>，不只是 KPI。</li>
+        <li>家長需要<strong>透明</strong>：費用、風險、教練資格、贊助來源。</li>
+        <li>失敗、受傷、想休息都正常——平台<strong>不製造焦慮</strong>。</li>
+        <li>不同項目（球類、武道、路跑、舞蹈等）需要<strong>分館</strong>，而非一體適用。</li>
+      </ul>
+    </section>
+
+    <section id="path">
+      <h2>從家庭到社會：建議的發展路徑</h2>
+      <ol class="steps">
+        <li>
+          <strong>現在～第 1 年：以家長＋創辦人身份「做給其他家庭看」</strong><br>
+          參與或共辦 6～8 場體驗活動；記錄：孩子與其他參與者的回饋、3 個月後是否仍規律運動。這就是你的第一版 impact 報告。
+        </li>
+        <li>
+          <strong>第 1～2 年：讓教練與社團看見「對孩子真的好」</strong><br>
+          不拿孩子當招牌；用活動品質、安全 SOP、家長滿意度說話。贊助來了，優先用在保險、防護、獎學金式體驗名額（偏鄉／經濟弱勢）。
+        </li>
+        <li>
+          <strong>第 2～3 年：青少年與選手發展模組「小步上線」</strong><br>
+          若孩子仍熱愛競技，可參與試用訓練計畫、紀錄工具——作為<strong>共創使用者</strong>，而非平台吉祥物。
+        </li>
+        <li>
+          <strong>長期：社會影響可複製</strong><br>
+          把 SOP、影響力報告、ESG 合作模式輸出到其他縣市或亞洲華語圈——那時「高度文明」指的是：<strong>健康與運動的機會，不再只屬於資源多的家庭。</strong>
+        </li>
+      </ol>
+    </section>
+
+    <section id="family">
+      <h2>家庭層面的具體行動（可與平台並行）</h2>
+      <table>
+        <tr><th>對象</th><th>你可以做的事</th><th>與平台的連結</th></tr>
+        <tr>
+          <td>三個孩子</td>
+          <td>定期家庭運動日；討論「運動對你意味著什麼」；尊重各自節奏</td>
+          <td>回饋平台 UX：什麼對青少年真正有用</td>
+        </tr>
+        <tr>
+          <td>他們的教練／社團</td>
+          <td>先問「我能幫什麼」，再談合作；並列 Logo、透明分潤</td>
+          <td>種子教練與合作社團的第一批夥伴</td>
+        </tr>
+        <tr>
+          <td>其他家長</td>
+          <td>分享親身經驗（非推銷）；組小型約練或講座</td>
+          <td>平台早期最真實的口碑來源</td>
+        </tr>
+        <tr>
+          <td>你自己</td>
+          <td>釐清：這是「為孩子建一條路」還是「為社會建一條路」——兩者可以一致，但時間分配要誠實</td>
+          <td>避免 burnout；見 <a href="利他主義可行性評估報告.html" style="color:var(--blue)">可行性報告</a> 續航關卡</td>
+        </tr>
+      </table>
+
+      <h3>記錄三位孩子的運動方向（本機儲存，僅供家庭規劃）</h3>
+      <div class="field">
+        <label>孩子一：主要項目／興趣／現階段目標</label>
+        <textarea id="child1" placeholder="例：羽球 · 校隊 · 希望保持快樂與體能"></textarea>
+      </div>
+      <div class="field">
+        <label>孩子二：主要項目／興趣／現階段目標</label>
+        <textarea id="child2" placeholder="例：游泳 · 競技 · 注意肩頸與週期調整"></textarea>
+      </div>
+      <div class="field">
+        <label>孩子三：主要項目／興趣／現階段目標</label>
+        <textarea id="child3" placeholder="例：武道 · 品格與專注 · 不一定走比賽"></textarea>
+      </div>
+      <div class="field">
+        <label>家庭共同願景（一句話）</label>
+        <input type="text" id="familyVision" placeholder="例：用運動讓我們家更強壯，也讓更多孩子有機會動起來">
+      </div>
+      <button class="btn-primary" id="saveFamily">儲存家庭筆記</button>
+      <button class="btn-secondary" id="clearFamily">清除</button>
+    </section>
+
+    <section id="guard">
+      <h2>重要護欄：保護孩子，也保護使命</h2>
+      <div class="guard">
+        <ul style="margin:0;">
+          <li><strong>不將未成年子女作為平台主要曝光或廣告形象</strong>，除非本人同意且符合個資與兒少保護規範。</li>
+          <li>平台內容與商業合作<strong>不得綁定</strong>「創辦人孩子的成績或名次」作為賣點。</li>
+          <li>競技壓力與健康快樂衝突時，<strong>以孩子福祉為先</strong>——這本身就是在示範「正確的文明」。</li>
+          <li>對外簡報可提「因為是父親／母親，所以懂家長與孩子」，但<strong>界線清楚、不消費隱私</strong>。</li>
+        </ul>
+      </div>
+      <div class="highlight" style="margin-top:16px;">
+        <strong>給你的一句話：</strong>
+        三個孩子讓你看見運動的美好；平台讓更多家庭也能看見。
+        這條路走得通，但不必急——<strong>先把第一場活動辦好，比寫完所有計畫更重要。</strong>
+      </div>
+    </section>
+
+    <footer>運動平台專案 · 家庭起點與下一代使命 · 離線可用</footer>
+  </div>
+
+  <script>
+    const KEY = 'family-sports-mission-v1';
+    const fields = ['child1', 'child2', 'child3', 'familyVision'];
+
+    function load() {
+      try {
+        const data = JSON.parse(localStorage.getItem(KEY)) || {};
+        fields.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && data[id]) el.value = data[id];
+        });
+      } catch {}
+    }
+
+    function save() {
+      const data = {};
+      fields.forEach(id => { data[id] = document.getElementById(id).value; });
+      localStorage.setItem(KEY, JSON.stringify(data));
+      alert('已儲存至本機');
+    }
+
+    function clearAll() {
+      if (!confirm('清除家庭筆記？')) return;
+      fields.forEach(id => { document.getElementById(id).value = ''; });
+      localStorage.removeItem(KEY);
+    }
+
+    document.getElementById('saveFamily').addEventListener('click', save);
+    document.getElementById('clearFamily').addEventListener('click', clearAll);
+    load();
+  </script>
+</body>
+</html>
