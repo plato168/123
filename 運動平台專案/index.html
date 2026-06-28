@@ -12,16 +12,21 @@
     }
     .card {
       background: #151f2e; border: 1px solid #2d4158; border-radius: 18px;
-      padding: 32px; max-width: 520px; width: 100%;
+      padding: 32px; max-width: 540px; width: 100%;
     }
     h1 { margin: 0 0 8px; font-size: 1.5rem; }
-    p { color: #8ba4be; line-height: 1.6; margin-bottom: 8px; }
+    .tagline {
+      color: #6ee7b7; font-size: 0.95rem; line-height: 1.5;
+      margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #2d4158;
+    }
+    p { color: #8ba4be; line-height: 1.6; margin-bottom: 8px; font-size: 0.92rem; }
     a {
-      display: block; margin-top: 12px; padding: 14px 16px;
+      display: block; margin-top: 10px; padding: 14px 16px;
       background: #1e2d42; border: 1px solid #2d4158; border-radius: 12px;
       color: #6ee7b7; text-decoration: none;
     }
     a:hover { border-color: #34d399; }
+    a.featured { border-color: rgba(252, 211, 77, 0.4); background: rgba(252, 211, 77, 0.06); }
     a strong { color: #e8f0f8; display: block; margin-bottom: 4px; }
     a span { font-size: 0.88rem; color: #8ba4be; }
   </style>
@@ -29,14 +34,22 @@
 <body>
   <div class="card">
     <h1>運動平台專案</h1>
-    <p>運動健康平台策略、三年計畫與產業整合文件。所有頁面可離線使用。</p>
+    <p class="tagline">
+      積極有效的運動行銷與健康促進平台——<br>
+      以推廣運動價值為先，建立品牌信任，非逐利出發。
+    </p>
+    <p>所有頁面可離線使用，檢核表支援本機進度儲存。</p>
+    <a href="品牌定位與運動行銷策略.html" class="featured">
+      <strong>★ 品牌定位與運動行銷策略</strong>
+      <span>使命 · 降低排斥 · 知名度 · 品牌宣言（建議從此讀起）</span>
+    </a>
     <a href="運動健康平台三年計畫檢核表.html">
       <strong>運動健康平台三年計畫檢核表</strong>
       <span>教練優先 · 贊助 · 預算 · 受眾 · 分季檢核</span>
     </a>
     <a href="運動前中後資源整合與全球化策略.html">
       <strong>運動前中後資源整合與全球化策略</strong>
-      <span>知識 · 防護 · 飲食 · 物理治療 · 台灣→亞洲→全球 · 人力架構</span>
+      <span>知識 · 防護 · 飲食 · 物理治療 · 台灣→亞洲→全球</span>
     </a>
     <a href="賽事資訊與選手發展模組.html">
       <strong>賽事資訊與選手發展模組</strong>
