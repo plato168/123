@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>投資標的一年高點差距分析</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101318;
+      --panel: #171b22;
+      --panel-2: #1f2530;
+      --text: #eef3fb;
+      --muted: #aab4c3;
+      --line: #2b3340;
+      --good: #7dd3fc;
+      --warn: #facc15;
+      --risk: #fb923c;
+      --deep: #f87171;
+      --accent: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, rgba(139, 92, 246, .2), transparent 32rem), var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0 56px;
+    }
+
+    header {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      letter-spacing: .02em;
+    }
+
+    .lead {
+      max-width: 900px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .04);
+      padding: 6px 10px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 26px 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+      padding: 18px;
+      min-height: 132px;
+    }
+
+    .card strong {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .card .value {
+      margin-top: 10px;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .card .note {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    section {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(23, 27, 34, .9);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, .24);
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend span {
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+    }
+
+    th, td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, .02);
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2),
+    th:nth-child(3), td:nth-child(3) {
+      text-align: left;
+    }
+
+    tbody tr:hover {
+      background: rgba(139, 92, 246, .09);
+    }
+
+    .symbol {
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .name {
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tag {
+      display: inline-flex;
+      min-width: 44px;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .bar {
+      position: relative;
+      width: 160px;
+      height: 9px;
+      margin-left: auto;
+      border-radius: 999px;
+      background: #303846;
+      overflow: hidden;
+    }
+
+    .bar i {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: var(--width);
+      border-radius: inherit;
+      background: var(--color);
+    }
+
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+    .risk { color: var(--risk); }
+    .deep { color: var(--deep); }
+
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0 26px;
+    }
+
+    .insight {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .035);
+      padding: 16px;
+    }
+
+    .insight h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .insight p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 860px) {
+      .cards, .insights {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(100% - 22px, 1180px);
+        padding-top: 28px;
+      }
+
+      .cards, .insights {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>投資標的一年高點差距分析</h1>
+      <p class="lead">依照截圖中的不重複代號，計算「目前股價 / 近一年高點 - 1」。數值越負，代表距離一年高點越遠；表格另列「回高點需漲幅」協助評估反彈門檻。</p>
+      <div class="meta">
+        <span class="pill">資料時間：2026-07-07</span>
+        <span class="pill">主要來源：CNBC quote pages</span>
+        <span class="pill">USD/JPY 來源：Investing.com 搜尋摘要</span>
+        <span class="pill">公式：(現價 ÷ 一年高點 - 1) × 100%</span>
+      </div>
+    </header>
+
+    <div class="cards" id="cards"></div>
+
+    <div class="insights">
+      <article class="insight">
+        <h3>接近高點</h3>
+        <p id="nearHigh"></p>
+      </article>
+      <article class="insight">
+        <h3>大幅回落</h3>
+        <p id="deepDrop"></p>
+      </article>
+      <article class="insight">
+        <h3>組合觀察</h3>
+        <p>科技股與半導體標的分散在不同跌幅層級；ETF 如 SPY、QQQ 較接近高點，槓桿 ETF 則放大波動。</p>
+      </article>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>距一年高點差距表</h2>
+        <div class="legend">
+          <span class="good">0% 至 -5%</span>
+          <span class="warn">-5% 至 -15%</span>
+          <span class="risk">-15% 至 -30%</span>
+          <span class="deep">低於 -30%</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代號</th>
+              <th>類型</th>
+              <th>名稱</th>
+              <th>現價</th>
+              <th>一年高點</th>
+              <th>距高點</th>
+              <th>回高點需漲幅</th>
+              <th>差距視覺化</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      註：VIX 與 USD/JPY 不是股票，保留於表內是因為出現在截圖清單；匯率與指數的解讀方式不同，不宜與個股估值直接比較。
+    </footer>
+  </main>
+
+  <script>
+    const data = [
+      { symbol: "SNDK", type: "股票", name: "Sandisk Corp", price: 1610.00, high: 2354.39, gap: -31.62 },
+      { symbol: "CRWD", type: "股票", name: "CrowdStrike Holdings Inc A", price: 198.48, high: 209.50, gap: -5.26 },
+      { symbol: "DELL", type: "股票", name: "Dell Technologies Inc C", price: 422.54, high: 469.47, gap: -10.00 },
+      { symbol: "CAT", type: "股票", name: "Caterpillar Inc", price: 925.10, high: 1073.46, gap: -13.82 },
+      { symbol: "UBER", type: "股票", name: "Uber Technologies Inc", price: 73.77, high: 101.99, gap: -27.67 },
+      { symbol: "WDC", type: "股票", name: "Western Digital Corp", price: 531.83, high: 799.87, gap: -33.51 },
+      { symbol: "STX", type: "股票", name: "Seagate Technology Holdings", price: 820.21, high: 1145.00, gap: -28.37 },
+      { symbol: "SMCI", type: "股票", name: "Super Micro Computer Inc", price: 26.43, high: 62.36, gap: -57.62 },
+      { symbol: "MRVL", type: "股票", name: "Marvell Technology Inc", price: 231.15, high: 329.88, gap: -29.93 },
+      { symbol: "MU", type: "股票", name: "Micron Technology Inc", price: 934.29, high: 1255.00, gap: -25.55 },
+      { symbol: "GLW", type: "股票", name: "Corning Inc", price: 185.67, high: 271.78, gap: -31.68 },
+      { symbol: "RBLX", type: "股票", name: "Roblox Corp Class A", price: 56.87, high: 150.59, gap: -62.24 },
+      { symbol: "ORCL", type: "股票", name: "Oracle Corp", price: 140.83, high: 345.72, gap: -59.26 },
+      { symbol: "MDB", type: "股票", name: "MongoDB Inc", price: 368.10, high: 444.72, gap: -17.23 },
+      { symbol: "HNHPF", type: "股票", name: "Hon Hai Precision Industry GDR", price: 14.78, high: 20.26, gap: -27.05 },
+      { symbol: "HPE", type: "股票", name: "Hewlett Packard Enterprise", price: 44.13, high: 64.25, gap: -31.32 },
+      { symbol: "SPXL", type: "ETF", name: "Direxion Daily S&P 500 Bull 3X", price: 273.17, high: 289.00, gap: -5.48 },
+      { symbol: "SPY", type: "ETF", name: "SPDR S&P 500 ETF Trust", price: 749.07, high: 760.40, gap: -1.49 },
+      { symbol: "AMD", type: "股票", name: "Advanced Micro Devices Inc", price: 522.35, high: 584.73, gap: -10.67 },
+      { symbol: "INTC", type: "股票", name: "Intel Corp", price: 111.05, high: 142.35, gap: -21.99 },
+      { symbol: "TLT", type: "ETF", name: "iShares 20+ Year Treasury Bond ETF", price: 84.77, high: 92.19, gap: -8.05 },
+      { symbol: "MSFT", type: "股票", name: "Microsoft Corp", price: 392.85, high: 555.45, gap: -29.27 },
+      { symbol: "AAPL", type: "股票", name: "Apple Inc", price: 312.74, high: 317.40, gap: -1.47 },
+      { symbol: "USO", type: "ETF", name: "United States Oil Fund LP", price: 107.14, high: 154.08, gap: -30.46 },
+      { symbol: "GOOGL", type: "股票", name: "Alphabet Inc Class A", price: 369.71, high: 408.61, gap: -9.52 },
+      { symbol: "VIX", type: "指數", name: "CBOE Volatility Index", price: 15.62, high: 35.30, gap: -55.75 },
+      { symbol: "USD.JPY", type: "匯率", name: "US Dollar / Japanese Yen", price: 162.24, high: 162.85, gap: -0.37 },
+      { symbol: "QCOM", type: "股票", name: "Qualcomm Inc", price: 183.17, high: 259.92, gap: -29.53 },
+      { symbol: "BRK.B", type: "股票", name: "Berkshire Hathaway Inc Class B", price: 505.37, high: 516.85, gap: -2.22 },
+      { symbol: "NVDA", type: "股票", name: "NVIDIA Corp", price: 197.82, high: 236.54, gap: -16.37 },
+      { symbol: "TSM", type: "ADR", name: "Taiwan Semiconductor Manufacturing ADR", price: 437.28, high: 479.00, gap: -8.71 },
+      { symbol: "AVGO", type: "股票", name: "Broadcom Inc", price: 372.05, high: 495.00, gap: -24.84 },
+      { symbol: "ARM", type: "ADR", name: "Arm Holdings PLC ADR", price: 304.21, high: 452.70, gap: -32.80 },
+      { symbol: "SAP", type: "ADR", name: "SAP SE ADR", price: 164.27, high: 313.28, gap: -47.56 },
+      { symbol: "AMZN", type: "股票", name: "Amazon.com Inc", price: 245.61, high: 278.56, gap: -11.83 },
+      { symbol: "META", type: "股票", name: "Meta Platforms Inc Class A", price: 608.11, high: 796.25, gap: -23.63 },
+      { symbol: "COST", type: "股票", name: "Costco Wholesale Corp", price: 949.19, high: 1096.50, gap: -13.43 },
+      { symbol: "ASML", type: "ADR", name: "ASML Holding NV NY Reg Shs", price: 1758.09, high: 1999.96, gap: -12.09 },
+      { symbol: "QQQ", type: "ETF", name: "Invesco QQQ Trust Series 1", price: 713.22, high: 748.65, gap: -4.73 },
+      { symbol: "TSLA", type: "股票", name: "Tesla Inc", price: 406.66, high: 498.83, gap: -18.48 },
+      { symbol: "TQQQ", type: "ETF", name: "ProShares UltraPro QQQ", price: 73.45, high: 88.09, gap: -16.62 }
+    ];
+
+    const fmt = new Intl.NumberFormat("zh-TW", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const pct = value => `${value >= 0 ? "+" : ""}${fmt.format(value)}%`;
+    const rebound = item => (item.high / item.price - 1) * 100;
+
+    function level(gap) {
+      if (gap >= -5) return { key: "good", label: "接近高點", color: "var(--good)" };
+      if (gap >= -15) return { key: "warn", label: "小幅回落", color: "var(--warn)" };
+      if (gap >= -30) return { key: "risk", label: "中度回落", color: "var(--risk)" };
+      return { key: "deep", label: "大幅回落", color: "var(--deep)" };
+    }
+
+    function renderCards(sorted) {
+      const avgGap = data.reduce((sum, item) => sum + item.gap, 0) / data.length;
+      const deepCount = data.filter(item => item.gap < -30).length;
+      const near = sorted[sorted.length - 1];
+      const deepest = sorted[0];
+      document.querySelector("#cards").innerHTML = [
+        ["標的數量", `${data.length}`, "截圖去重後含股票、ETF、ADR、指數與匯率"],
+        ["平均距高點", pct(avgGap), "所有標的簡單平均，不代表持倉權重"],
+        ["最接近高點", `${near.symbol} ${pct(near.gap)}`, `${near.name}`],
+        ["離高點最遠", `${deepest.symbol} ${pct(deepest.gap)}`, `${deepest.name}`]
+      ].map(card => `
+        <article class="card">
+          <strong>${card[0]}</strong>
+          <div class="value">${card[1]}</div>
+          <div class="note">${card[2]}</div>
+        </article>
+      `).join("");
+      document.querySelector("#nearHigh").textContent = sorted.slice(-5).reverse().map(item => `${item.symbol} ${pct(item.gap)}`).join("、");
+      document.querySelector("#deepDrop").textContent = sorted.slice(0, 5).map(item => `${item.symbol} ${pct(item.gap)}`).join("、");
+      document.querySelector("#cards .card:nth-child(2) .value").className = `value ${level(avgGap).key}`;
+      document.querySelector("#cards .card:nth-child(3) .value").className = `value ${level(near.gap).key}`;
+      document.querySelector("#cards .card:nth-child(4) .value").className = `value ${level(deepest.gap).key}`;
+    }
+
+    function renderRows(sorted) {
+      document.querySelector("#rows").innerHTML = sorted.map(item => {
+        const state = level(item.gap);
+        const width = Math.min(Math.abs(item.gap), 65) / 65 * 100;
+        return `
+          <tr>
+            <td><span class="symbol">${item.symbol}</span></td>
+            <td><span class="tag">${item.type}</span></td>
+            <td class="name">${item.name}</td>
+            <td>${fmt.format(item.price)}</td>
+            <td>${fmt.format(item.high)}</td>
+            <td class="${state.key}">${pct(item.gap)}</td>
+            <td>${pct(rebound(item))}</td>
+            <td><div class="bar" title="${state.label}"><i style="--width:${width}%;--color:${state.color}"></i></div></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    const sortedByGap = [...data].sort((a, b) => a.gap - b.gap);
+    renderCards(sortedByGap);
+    renderRows(sortedByGap);
+  </script>
+</body>
+</html>
