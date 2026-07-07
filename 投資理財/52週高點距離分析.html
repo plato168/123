@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>52週高點距離分析</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #141b24;
+      --panel-2: #1c2633;
+      --border: #2a3647;
+      --text: #e8edf4;
+      --muted: #8b9bb0;
+      --accent: #4da3ff;
+      --accent-2: #22d3ee;
+      --near-high: #34d399;
+      --moderate: #fbbf24;
+      --drawdown: #fb923c;
+      --deep: #f87171;
+      --shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(77,163,255,.12), transparent 30%),
+        radial-gradient(circle at 90% 10%, rgba(34,211,238,.08), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 56px; }
+    header { margin-bottom: 24px; }
+    h1 { margin: 0 0 8px; font-size: clamp(1.5rem, 2.5vw, 2rem); }
+    .subtitle { color: var(--muted); line-height: 1.7; max-width: 820px; }
+    .meta { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin: 22px 0 28px;
+    }
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .stat .label { color: var(--muted); font-size: .85rem; }
+    .stat .value { font-size: 1.6rem; font-weight: 700; margin-top: 6px; }
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+    }
+    .tab {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #062033;
+      border-color: transparent;
+      font-weight: 700;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 18px 8px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+    .panel h2 { margin: 0 0 14px; font-size: 1.1rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-size: .82rem; font-weight: 600; }
+    .ticker { display: block; font-weight: 700; letter-spacing: .02em; }
+    .name { display: block; color: var(--muted); font-size: .78rem; margin-top: 2px; }
+    .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .pct.near-high { color: var(--near-high); }
+    .pct.moderate { color: var(--moderate); }
+    .pct.drawdown { color: var(--drawdown); }
+    .pct.deep-drawdown { color: var(--deep); }
+    .bar-wrap {
+      height: 8px; background: #0f141a; border-radius: 999px; overflow: hidden; min-width: 120px;
+    }
+    .bar { height: 100%; border-radius: 999px; }
+    .bar.near-high { background: linear-gradient(90deg, #059669, var(--near-high)); }
+    .bar.moderate { background: linear-gradient(90deg, #d97706, var(--moderate)); }
+    .bar.drawdown { background: linear-gradient(90deg, #ea580c, var(--drawdown)); }
+    .bar.deep-drawdown { background: linear-gradient(90deg, #dc2626, var(--deep)); }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: .82rem; margin: 8px 0 20px;
+    }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .watchlist { display: none; }
+    .watchlist.active { display: block; }
+    .err { color: var(--deep); }
+    .note {
+      background: var(--panel-2);
+      border-left: 3px solid var(--accent);
+      padding: 12px 14px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+    @media (max-width: 640px) {
+      th:nth-child(5), td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>52 週高點距離分析</h1>
+      <p class="subtitle">
+        分析投資清單中各標的「目前價格」相對於「過去 52 週最高價」的百分比差距。
+        數值越接近 0% 代表越接近一年高點；負值越大代表距離高點越遠（回撤越深）。
+      </p>
+      <p class="meta">資料更新時間：2026-07-07 17:30 UTC · 共 41 檔不重複標的 · 資料來源：Yahoo Finance</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><div class="label">平均距高點</div><div class="value pct drawdown">-22.72%</div></div>
+      <div class="stat"><div class="label">距高點 10% 內</div><div class="value">10 檔</div></div>
+      <div class="stat"><div class="label">回撤超過 30%</div><div class="value">11 檔</div></div>
+      <div class="stat"><div class="label">清單數量</div><div class="value">4 組</div></div>
+    </div>
+
+    <div class="legend">
+      <span><span class="dot" style="background:var(--near-high)"></span>≥ -5% 接近高點</span>
+      <span><span class="dot" style="background:var(--moderate)"></span>-5% ~ -15% 小幅回撤</span>
+      <span><span class="dot" style="background:var(--drawdown)"></span>-15% ~ -30% 明顯回撤</span>
+      <span><span class="dot" style="background:var(--deep)"></span>&lt; -30% 深度回撤</span>
+    </div>
+
+    <section class="panel" id="overview">
+      <h2>全部標的總覽（依距高點排序）</h2>
+      <div class="table-wrap">
+        <table id="sortable">
+          <thead>
+            <tr>
+              <th data-sort="ticker">代號</th>
+              <th data-sort="current">現價</th>
+              <th data-sort="high">52週最高</th>
+              <th data-sort="pct">距高點 ↓</th>
+              <th>視覺化</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-pct="-0.5613">
+          <td><span class="ticker">USD.JPY</span><span class="name">美元/日圓 · USD/JPY</span></td>
+          <td class="num">¥161.92</td>
+          <td class="num">¥162.84</td>
+          <td class="num pct near-high">-0.56%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:99.4%"></div></div></td>
+        </tr>
+<tr data-pct="-1.4288">
+          <td><span class="ticker">AAPL</span><span class="name">蘋果 · Apple Inc</span></td>
+          <td class="num">$312.87</td>
+          <td class="num">$317.40</td>
+          <td class="num pct near-high">-1.43%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:98.6%"></div></div></td>
+        </tr>
+<tr data-pct="-1.5203">
+          <td><span class="ticker">SPY</span><span class="name">標普500 ETF · SPDR S&P 500 ETF</span></td>
+          <td class="num">$748.84</td>
+          <td class="num">$760.40</td>
+          <td class="num pct near-high">-1.52%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:98.5%"></div></div></td>
+        </tr>
+<tr data-pct="-2.2736">
+          <td><span class="ticker">BRK B</span><span class="name">波克夏 B · Berkshire Hathaway B</span></td>
+          <td class="num">$505.10</td>
+          <td class="num">$516.85</td>
+          <td class="num pct near-high">-2.27%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:97.7%"></div></div></td>
+        </tr>
+<tr data-pct="-4.7912">
+          <td><span class="ticker">QQQ</span><span class="name">納斯達克100 ETF · Invesco QQQ Trust</span></td>
+          <td class="num">$712.78</td>
+          <td class="num">$748.65</td>
+          <td class="num pct near-high">-4.79%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:95.2%"></div></div></td>
+        </tr>
+<tr data-pct="-5.2983">
+          <td><span class="ticker">CRWD</span><span class="name">CrowdStrike控股 · CrowdStrike Holdings</span></td>
+          <td class="num">$198.40</td>
+          <td class="num">$209.50</td>
+          <td class="num pct moderate">-5.30%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:94.7%"></div></div></td>
+        </tr>
+<tr data-pct="-5.5208">
+          <td><span class="ticker">SPXL</span><span class="name">標普500 3倍做多 · Direxion S&P 500 Bull 3X</span></td>
+          <td class="num">$273.05</td>
+          <td class="num">$289.00</td>
+          <td class="num pct moderate">-5.52%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:94.5%"></div></div></td>
+        </tr>
+<tr data-pct="-8.0540">
+          <td><span class="ticker">TLT</span><span class="name">20年美債ETF · iShares 20+ Year Treasury</span></td>
+          <td class="num">$84.77</td>
+          <td class="num">$92.19</td>
+          <td class="num pct moderate">-8.05%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:91.9%"></div></div></td>
+        </tr>
+<tr data-pct="-8.7891">
+          <td><span class="ticker">TSM</span><span class="name">台積電 ADR · Taiwan Semiconductor</span></td>
+          <td class="num">$436.90</td>
+          <td class="num">$479.00</td>
+          <td class="num pct moderate">-8.79%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:91.2%"></div></div></td>
+        </tr>
+<tr data-pct="-9.5029">
+          <td><span class="ticker">GOOGL</span><span class="name">Alphabet · Alphabet Inc</span></td>
+          <td class="num">$369.78</td>
+          <td class="num">$408.61</td>
+          <td class="num pct moderate">-9.50%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:90.5%"></div></div></td>
+        </tr>
+<tr data-pct="-10.3020">
+          <td><span class="ticker">DELL</span><span class="name">戴尔科技 · Dell Technologies</span></td>
+          <td class="num">$421.11</td>
+          <td class="num">$469.47</td>
+          <td class="num pct moderate">-10.30%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:89.7%"></div></div></td>
+        </tr>
+<tr data-pct="-10.7930">
+          <td><span class="ticker">AMD</span><span class="name">超微半導體 · Advanced Micro Devices</span></td>
+          <td class="num">$521.62</td>
+          <td class="num">$584.73</td>
+          <td class="num pct moderate">-10.79%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:89.2%"></div></div></td>
+        </tr>
+<tr data-pct="-11.8861">
+          <td><span class="ticker">AMZN</span><span class="name">亞馬遜 · Amazon.com Inc</span></td>
+          <td class="num">$245.45</td>
+          <td class="num">$278.56</td>
+          <td class="num pct moderate">-11.89%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:88.1%"></div></div></td>
+        </tr>
+<tr data-pct="-12.2216">
+          <td><span class="ticker">ASML</span><span class="name">阿斯麥 · ASML Holding</span></td>
+          <td class="num">$1,755.53</td>
+          <td class="num">$1,999.96</td>
+          <td class="num pct moderate">-12.22%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:87.8%"></div></div></td>
+        </tr>
+<tr data-pct="-13.4706">
+          <td><span class="ticker">COST</span><span class="name">好市多 · Costco Wholesale</span></td>
+          <td class="num">$948.79</td>
+          <td class="num">$1,096.50</td>
+          <td class="num pct moderate">-13.47%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:86.5%"></div></div></td>
+        </tr>
+<tr data-pct="-13.8387">
+          <td><span class="ticker">CAT</span><span class="name">卡特彼勒 · Caterpillar Inc</span></td>
+          <td class="num">$924.91</td>
+          <td class="num">$1,073.46</td>
+          <td class="num pct moderate">-13.84%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:86.2%"></div></div></td>
+        </tr>
+<tr data-pct="-16.5257">
+          <td><span class="ticker">NVDA</span><span class="name">英偉達 · NVIDIA Corp</span></td>
+          <td class="num">$197.45</td>
+          <td class="num">$236.54</td>
+          <td class="num pct drawdown">-16.53%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:83.5%"></div></div></td>
+        </tr>
+<tr data-pct="-16.8487">
+          <td><span class="ticker">TQQQ</span><span class="name">QQQ 3倍做多 · ProShares UltraPro QQQ 3X</span></td>
+          <td class="num">$73.25</td>
+          <td class="num">$88.09</td>
+          <td class="num pct drawdown">-16.85%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:83.2%"></div></div></td>
+        </tr>
+<tr data-pct="-17.1838">
+          <td><span class="ticker">MDB</span><span class="name">MongoDB · MongoDB Inc</span></td>
+          <td class="num">$368.30</td>
+          <td class="num">$444.72</td>
+          <td class="num pct drawdown">-17.18%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:82.8%"></div></div></td>
+        </tr>
+<tr data-pct="-18.3991">
+          <td><span class="ticker">TSLA</span><span class="name">特斯拉 · Tesla Inc</span></td>
+          <td class="num">$407.05</td>
+          <td class="num">$498.83</td>
+          <td class="num pct drawdown">-18.40%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:81.6%"></div></div></td>
+        </tr>
+<tr data-pct="-22.0021">
+          <td><span class="ticker">INTC</span><span class="name">英特爾 · Intel Corporation</span></td>
+          <td class="num">$111.03</td>
+          <td class="num">$142.35</td>
+          <td class="num pct drawdown">-22.00%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:78.0%"></div></div></td>
+        </tr>
+<tr data-pct="-23.7250">
+          <td><span class="ticker">META</span><span class="name">Meta · Meta Platforms</span></td>
+          <td class="num">$607.34</td>
+          <td class="num">$796.25</td>
+          <td class="num pct drawdown">-23.72%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:76.3%"></div></div></td>
+        </tr>
+<tr data-pct="-24.9758">
+          <td><span class="ticker">AVGO</span><span class="name">博通 · Broadcom Inc</span></td>
+          <td class="num">$371.37</td>
+          <td class="num">$495.00</td>
+          <td class="num pct drawdown">-24.98%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:75.0%"></div></div></td>
+        </tr>
+<tr data-pct="-25.5988">
+          <td><span class="ticker">MU</span><span class="name">美光科技 · Micron Technology</span></td>
+          <td class="num">$933.74</td>
+          <td class="num">$1,255.00</td>
+          <td class="num pct drawdown">-25.60%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:74.4%"></div></div></td>
+        </tr>
+<tr data-pct="-27.1964">
+          <td><span class="ticker">HNHPF</span><span class="name">鴻海精密 · Hon Hai Precision (GDR)</span></td>
+          <td class="num">$14.75</td>
+          <td class="num">$20.26</td>
+          <td class="num pct drawdown">-27.20%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:72.8%"></div></div></td>
+        </tr>
+<tr data-pct="-27.6988">
+          <td><span class="ticker">UBER</span><span class="name">优步技术 · Uber Technologies</span></td>
+          <td class="num">$73.74</td>
+          <td class="num">$101.99</td>
+          <td class="num pct drawdown">-27.70%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:72.3%"></div></div></td>
+        </tr>
+<tr data-pct="-28.3284">
+          <td><span class="ticker">STX</span><span class="name">Seagate Technology · Seagate Technology</span></td>
+          <td class="num">$820.64</td>
+          <td class="num">$1,145.00</td>
+          <td class="num pct drawdown">-28.33%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:71.7%"></div></div></td>
+        </tr>
+<tr data-pct="-29.1502">
+          <td><span class="ticker">MSFT</span><span class="name">微軟 · Microsoft Corporation</span></td>
+          <td class="num">$393.54</td>
+          <td class="num">$555.45</td>
+          <td class="num pct drawdown">-29.15%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:70.8%"></div></div></td>
+        </tr>
+<tr data-pct="-29.6168">
+          <td><span class="ticker">QCOM</span><span class="name">高通 · Qualcomm Inc</span></td>
+          <td class="num">$182.94</td>
+          <td class="num">$259.92</td>
+          <td class="num pct drawdown">-29.62%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:70.4%"></div></div></td>
+        </tr>
+<tr data-pct="-29.7927">
+          <td><span class="ticker">MRVL</span><span class="name">美满电子 · Marvell Technology</span></td>
+          <td class="num">$231.60</td>
+          <td class="num">$329.88</td>
+          <td class="num pct drawdown">-29.79%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:70.2%"></div></div></td>
+        </tr>
+<tr data-pct="-30.4705">
+          <td><span class="ticker">USO</span><span class="name">美國石油基金 · United States Oil Fund</span></td>
+          <td class="num">$107.13</td>
+          <td class="num">$154.08</td>
+          <td class="num pct deep-drawdown">-30.47%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:69.5%"></div></div></td>
+        </tr>
+<tr data-pct="-31.3930">
+          <td><span class="ticker">HPE</span><span class="name">慧與 · Hewlett Packard Enterprise</span></td>
+          <td class="num">$44.08</td>
+          <td class="num">$64.25</td>
+          <td class="num pct deep-drawdown">-31.39%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.6%"></div></div></td>
+        </tr>
+<tr data-pct="-31.6526">
+          <td><span class="ticker">SNDK</span><span class="name">闪迪公司 · SanDisk Corp</span></td>
+          <td class="num">$1,609.16</td>
+          <td class="num">$2,354.39</td>
+          <td class="num pct deep-drawdown">-31.65%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.3%"></div></div></td>
+        </tr>
+<tr data-pct="-31.8566">
+          <td><span class="ticker">GLW</span><span class="name">康宁公司 · Corning Inc</span></td>
+          <td class="num">$185.20</td>
+          <td class="num">$271.78</td>
+          <td class="num pct deep-drawdown">-31.86%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.1%"></div></div></td>
+        </tr>
+<tr data-pct="-32.7457">
+          <td><span class="ticker">ARM</span><span class="name">ARM控股 · ARM Holdings</span></td>
+          <td class="num">$304.46</td>
+          <td class="num">$452.70</td>
+          <td class="num pct deep-drawdown">-32.75%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:67.3%"></div></div></td>
+        </tr>
+<tr data-pct="-33.7305">
+          <td><span class="ticker">WDC</span><span class="name">西部数据 · Western Digital</span></td>
+          <td class="num">$530.07</td>
+          <td class="num">$799.87</td>
+          <td class="num pct deep-drawdown">-33.73%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:66.3%"></div></div></td>
+        </tr>
+<tr data-pct="-47.5262">
+          <td><span class="ticker">SAP</span><span class="name">SAP · SAP SE</span></td>
+          <td class="num">$164.39</td>
+          <td class="num">$313.28</td>
+          <td class="num pct deep-drawdown">-47.53%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:52.5%"></div></div></td>
+        </tr>
+<tr data-pct="-55.5524">
+          <td><span class="ticker">VIX</span><span class="name">波動率指數 · CBOE Volatility Index</span></td>
+          <td class="num">$15.69</td>
+          <td class="num">$35.30</td>
+          <td class="num pct deep-drawdown">-55.55%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:44.4%"></div></div></td>
+        </tr>
+<tr data-pct="-57.6203">
+          <td><span class="ticker">SMCI</span><span class="name">超微电脑 · Super Micro Computer</span></td>
+          <td class="num">$26.43</td>
+          <td class="num">$62.36</td>
+          <td class="num pct deep-drawdown">-57.62%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:42.4%"></div></div></td>
+        </tr>
+<tr data-pct="-59.3197">
+          <td><span class="ticker">ORCL</span><span class="name">甲骨文 · Oracle Corp</span></td>
+          <td class="num">$140.64</td>
+          <td class="num">$345.72</td>
+          <td class="num pct deep-drawdown">-59.32%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:40.7%"></div></div></td>
+        </tr>
+<tr data-pct="-62.3448">
+          <td><span class="ticker">RBLX</span><span class="name">Roblox公司 · Roblox Corp</span></td>
+          <td class="num">$56.70</td>
+          <td class="num">$150.59</td>
+          <td class="num pct deep-drawdown">-62.34%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:37.7%"></div></div></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-target="list-1">清單一</button>
+      <button class="tab" data-target="list-2">清單二</button>
+      <button class="tab" data-target="list-3">清單三</button>
+      <button class="tab" data-target="list-4">清單四</button>
+    </div>
+
+    
+    <section class="panel watchlist" id="list-1">
+      <h2>清單一：儲存與科技</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代號</th>
+              <th>現價</th>
+              <th>52週最高</th>
+              <th>距高點</th>
+              <th>視覺化</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-pct="-31.6526">
+          <td><span class="ticker">SNDK</span><span class="name">闪迪公司 · SanDisk Corp</span></td>
+          <td class="num">$1,609.16</td>
+          <td class="num">$2,354.39</td>
+          <td class="num pct deep-drawdown">-31.65%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.3%"></div></div></td>
+        </tr>
+<tr data-pct="-5.2983">
+          <td><span class="ticker">CRWD</span><span class="name">CrowdStrike控股 · CrowdStrike Holdings</span></td>
+          <td class="num">$198.40</td>
+          <td class="num">$209.50</td>
+          <td class="num pct moderate">-5.30%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:94.7%"></div></div></td>
+        </tr>
+<tr data-pct="-10.3020">
+          <td><span class="ticker">DELL</span><span class="name">戴尔科技 · Dell Technologies</span></td>
+          <td class="num">$421.11</td>
+          <td class="num">$469.47</td>
+          <td class="num pct moderate">-10.30%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:89.7%"></div></div></td>
+        </tr>
+<tr data-pct="-13.8387">
+          <td><span class="ticker">CAT</span><span class="name">卡特彼勒 · Caterpillar Inc</span></td>
+          <td class="num">$924.91</td>
+          <td class="num">$1,073.46</td>
+          <td class="num pct moderate">-13.84%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:86.2%"></div></div></td>
+        </tr>
+<tr data-pct="-27.6988">
+          <td><span class="ticker">UBER</span><span class="name">优步技术 · Uber Technologies</span></td>
+          <td class="num">$73.74</td>
+          <td class="num">$101.99</td>
+          <td class="num pct drawdown">-27.70%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:72.3%"></div></div></td>
+        </tr>
+<tr data-pct="-33.7305">
+          <td><span class="ticker">WDC</span><span class="name">西部数据 · Western Digital</span></td>
+          <td class="num">$530.07</td>
+          <td class="num">$799.87</td>
+          <td class="num pct deep-drawdown">-33.73%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:66.3%"></div></div></td>
+        </tr>
+<tr data-pct="-28.3284">
+          <td><span class="ticker">STX</span><span class="name">Seagate Technology · Seagate Technology</span></td>
+          <td class="num">$820.64</td>
+          <td class="num">$1,145.00</td>
+          <td class="num pct drawdown">-28.33%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:71.7%"></div></div></td>
+        </tr>
+<tr data-pct="-57.6203">
+          <td><span class="ticker">SMCI</span><span class="name">超微电脑 · Super Micro Computer</span></td>
+          <td class="num">$26.43</td>
+          <td class="num">$62.36</td>
+          <td class="num pct deep-drawdown">-57.62%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:42.4%"></div></div></td>
+        </tr>
+<tr data-pct="-29.7927">
+          <td><span class="ticker">MRVL</span><span class="name">美满电子 · Marvell Technology</span></td>
+          <td class="num">$231.60</td>
+          <td class="num">$329.88</td>
+          <td class="num pct drawdown">-29.79%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:70.2%"></div></div></td>
+        </tr>
+<tr data-pct="-25.5988">
+          <td><span class="ticker">MU</span><span class="name">美光科技 · Micron Technology</span></td>
+          <td class="num">$933.74</td>
+          <td class="num">$1,255.00</td>
+          <td class="num pct drawdown">-25.60%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:74.4%"></div></div></td>
+        </tr>
+<tr data-pct="-31.8566">
+          <td><span class="ticker">GLW</span><span class="name">康宁公司 · Corning Inc</span></td>
+          <td class="num">$185.20</td>
+          <td class="num">$271.78</td>
+          <td class="num pct deep-drawdown">-31.86%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.1%"></div></div></td>
+        </tr>
+<tr data-pct="-62.3448">
+          <td><span class="ticker">RBLX</span><span class="name">Roblox公司 · Roblox Corp</span></td>
+          <td class="num">$56.70</td>
+          <td class="num">$150.59</td>
+          <td class="num pct deep-drawdown">-62.34%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:37.7%"></div></div></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel watchlist" id="list-2">
+      <h2>清單二：企業軟體與槓桿</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代號</th>
+              <th>現價</th>
+              <th>52週最高</th>
+              <th>距高點</th>
+              <th>視覺化</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-pct="-59.3197">
+          <td><span class="ticker">ORCL</span><span class="name">甲骨文 · Oracle Corp</span></td>
+          <td class="num">$140.64</td>
+          <td class="num">$345.72</td>
+          <td class="num pct deep-drawdown">-59.32%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:40.7%"></div></div></td>
+        </tr>
+<tr data-pct="-17.1838">
+          <td><span class="ticker">MDB</span><span class="name">MongoDB · MongoDB Inc</span></td>
+          <td class="num">$368.30</td>
+          <td class="num">$444.72</td>
+          <td class="num pct drawdown">-17.18%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:82.8%"></div></div></td>
+        </tr>
+<tr data-pct="-27.1964">
+          <td><span class="ticker">HNHPF</span><span class="name">鴻海精密 · Hon Hai Precision (GDR)</span></td>
+          <td class="num">$14.75</td>
+          <td class="num">$20.26</td>
+          <td class="num pct drawdown">-27.20%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:72.8%"></div></div></td>
+        </tr>
+<tr data-pct="-31.3930">
+          <td><span class="ticker">HPE</span><span class="name">慧與 · Hewlett Packard Enterprise</span></td>
+          <td class="num">$44.08</td>
+          <td class="num">$64.25</td>
+          <td class="num pct deep-drawdown">-31.39%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.6%"></div></div></td>
+        </tr>
+<tr data-pct="-5.5208">
+          <td><span class="ticker">SPXL</span><span class="name">標普500 3倍做多 · Direxion S&P 500 Bull 3X</span></td>
+          <td class="num">$273.05</td>
+          <td class="num">$289.00</td>
+          <td class="num pct moderate">-5.52%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:94.5%"></div></div></td>
+        </tr>
+<tr data-pct="-31.6526">
+          <td><span class="ticker">SNDK</span><span class="name">闪迪公司 · SanDisk Corp</span></td>
+          <td class="num">$1,609.16</td>
+          <td class="num">$2,354.39</td>
+          <td class="num pct deep-drawdown">-31.65%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:68.3%"></div></div></td>
+        </tr>
+<tr data-pct="-5.2983">
+          <td><span class="ticker">CRWD</span><span class="name">CrowdStrike控股 · CrowdStrike Holdings</span></td>
+          <td class="num">$198.40</td>
+          <td class="num">$209.50</td>
+          <td class="num pct moderate">-5.30%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:94.7%"></div></div></td>
+        </tr>
+<tr data-pct="-10.3020">
+          <td><span class="ticker">DELL</span><span class="name">戴尔科技 · Dell Technologies</span></td>
+          <td class="num">$421.11</td>
+          <td class="num">$469.47</td>
+          <td class="num pct moderate">-10.30%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:89.7%"></div></div></td>
+        </tr>
+<tr data-pct="-13.8387">
+          <td><span class="ticker">CAT</span><span class="name">卡特彼勒 · Caterpillar Inc</span></td>
+          <td class="num">$924.91</td>
+          <td class="num">$1,073.46</td>
+          <td class="num pct moderate">-13.84%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:86.2%"></div></div></td>
+        </tr>
+<tr data-pct="-27.6988">
+          <td><span class="ticker">UBER</span><span class="name">优步技术 · Uber Technologies</span></td>
+          <td class="num">$73.74</td>
+          <td class="num">$101.99</td>
+          <td class="num pct drawdown">-27.70%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:72.3%"></div></div></td>
+        </tr>
+<tr data-pct="-33.7305">
+          <td><span class="ticker">WDC</span><span class="name">西部数据 · Western Digital</span></td>
+          <td class="num">$530.07</td>
+          <td class="num">$799.87</td>
+          <td class="num pct deep-drawdown">-33.73%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:66.3%"></div></div></td>
+        </tr>
+<tr data-pct="-28.3284">
+          <td><span class="ticker">STX</span><span class="name">Seagate Technology · Seagate Technology</span></td>
+          <td class="num">$820.64</td>
+          <td class="num">$1,145.00</td>
+          <td class="num pct drawdown">-28.33%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:71.7%"></div></div></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel watchlist" id="list-3">
+      <h2>清單三：大盤與多元資產</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代號</th>
+              <th>現價</th>
+              <th>52週最高</th>
+              <th>距高點</th>
+              <th>視覺化</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-pct="-1.5203">
+          <td><span class="ticker">SPY</span><span class="name">標普500 ETF · SPDR S&P 500 ETF</span></td>
+          <td class="num">$748.84</td>
+          <td class="num">$760.40</td>
+          <td class="num pct near-high">-1.52%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:98.5%"></div></div></td>
+        </tr>
+<tr data-pct="-10.7930">
+          <td><span class="ticker">AMD</span><span class="name">超微半導體 · Advanced Micro Devices</span></td>
+          <td class="num">$521.62</td>
+          <td class="num">$584.73</td>
+          <td class="num pct moderate">-10.79%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:89.2%"></div></div></td>
+        </tr>
+<tr data-pct="-22.0021">
+          <td><span class="ticker">INTC</span><span class="name">英特爾 · Intel Corporation</span></td>
+          <td class="num">$111.03</td>
+          <td class="num">$142.35</td>
+          <td class="num pct drawdown">-22.00%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:78.0%"></div></div></td>
+        </tr>
+<tr data-pct="-8.0540">
+          <td><span class="ticker">TLT</span><span class="name">20年美債ETF · iShares 20+ Year Treasury</span></td>
+          <td class="num">$84.77</td>
+          <td class="num">$92.19</td>
+          <td class="num pct moderate">-8.05%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:91.9%"></div></div></td>
+        </tr>
+<tr data-pct="-29.1502">
+          <td><span class="ticker">MSFT</span><span class="name">微軟 · Microsoft Corporation</span></td>
+          <td class="num">$393.54</td>
+          <td class="num">$555.45</td>
+          <td class="num pct drawdown">-29.15%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:70.8%"></div></div></td>
+        </tr>
+<tr data-pct="-1.4288">
+          <td><span class="ticker">AAPL</span><span class="name">蘋果 · Apple Inc</span></td>
+          <td class="num">$312.87</td>
+          <td class="num">$317.40</td>
+          <td class="num pct near-high">-1.43%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:98.6%"></div></div></td>
+        </tr>
+<tr data-pct="-30.4705">
+          <td><span class="ticker">USO</span><span class="name">美國石油基金 · United States Oil Fund</span></td>
+          <td class="num">$107.13</td>
+          <td class="num">$154.08</td>
+          <td class="num pct deep-drawdown">-30.47%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:69.5%"></div></div></td>
+        </tr>
+<tr data-pct="-9.5029">
+          <td><span class="ticker">GOOGL</span><span class="name">Alphabet · Alphabet Inc</span></td>
+          <td class="num">$369.78</td>
+          <td class="num">$408.61</td>
+          <td class="num pct moderate">-9.50%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:90.5%"></div></div></td>
+        </tr>
+<tr data-pct="-55.5524">
+          <td><span class="ticker">VIX</span><span class="name">波動率指數 · CBOE Volatility Index</span></td>
+          <td class="num">$15.69</td>
+          <td class="num">$35.30</td>
+          <td class="num pct deep-drawdown">-55.55%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:44.4%"></div></div></td>
+        </tr>
+<tr data-pct="-0.5613">
+          <td><span class="ticker">USD.JPY</span><span class="name">美元/日圓 · USD/JPY</span></td>
+          <td class="num">¥161.92</td>
+          <td class="num">¥162.84</td>
+          <td class="num pct near-high">-0.56%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:99.4%"></div></div></td>
+        </tr>
+<tr data-pct="-29.6168">
+          <td><span class="ticker">QCOM</span><span class="name">高通 · Qualcomm Inc</span></td>
+          <td class="num">$182.94</td>
+          <td class="num">$259.92</td>
+          <td class="num pct drawdown">-29.62%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:70.4%"></div></div></td>
+        </tr>
+<tr data-pct="-2.2736">
+          <td><span class="ticker">BRK B</span><span class="name">波克夏 B · Berkshire Hathaway B</span></td>
+          <td class="num">$505.10</td>
+          <td class="num">$516.85</td>
+          <td class="num pct near-high">-2.27%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:97.7%"></div></div></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel watchlist" id="list-4">
+      <h2>清單四：半導體與科技巨頭</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代號</th>
+              <th>現價</th>
+              <th>52週最高</th>
+              <th>距高點</th>
+              <th>視覺化</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-pct="-16.5257">
+          <td><span class="ticker">NVDA</span><span class="name">英偉達 · NVIDIA Corp</span></td>
+          <td class="num">$197.45</td>
+          <td class="num">$236.54</td>
+          <td class="num pct drawdown">-16.53%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:83.5%"></div></div></td>
+        </tr>
+<tr data-pct="-8.7891">
+          <td><span class="ticker">TSM</span><span class="name">台積電 ADR · Taiwan Semiconductor</span></td>
+          <td class="num">$436.90</td>
+          <td class="num">$479.00</td>
+          <td class="num pct moderate">-8.79%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:91.2%"></div></div></td>
+        </tr>
+<tr data-pct="-24.9758">
+          <td><span class="ticker">AVGO</span><span class="name">博通 · Broadcom Inc</span></td>
+          <td class="num">$371.37</td>
+          <td class="num">$495.00</td>
+          <td class="num pct drawdown">-24.98%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:75.0%"></div></div></td>
+        </tr>
+<tr data-pct="-32.7457">
+          <td><span class="ticker">ARM</span><span class="name">ARM控股 · ARM Holdings</span></td>
+          <td class="num">$304.46</td>
+          <td class="num">$452.70</td>
+          <td class="num pct deep-drawdown">-32.75%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:67.3%"></div></div></td>
+        </tr>
+<tr data-pct="-47.5262">
+          <td><span class="ticker">SAP</span><span class="name">SAP · SAP SE</span></td>
+          <td class="num">$164.39</td>
+          <td class="num">$313.28</td>
+          <td class="num pct deep-drawdown">-47.53%</td>
+          <td><div class="bar-wrap"><div class="bar deep-drawdown" style="width:52.5%"></div></div></td>
+        </tr>
+<tr data-pct="-11.8861">
+          <td><span class="ticker">AMZN</span><span class="name">亞馬遜 · Amazon.com Inc</span></td>
+          <td class="num">$245.45</td>
+          <td class="num">$278.56</td>
+          <td class="num pct moderate">-11.89%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:88.1%"></div></div></td>
+        </tr>
+<tr data-pct="-23.7250">
+          <td><span class="ticker">META</span><span class="name">Meta · Meta Platforms</span></td>
+          <td class="num">$607.34</td>
+          <td class="num">$796.25</td>
+          <td class="num pct drawdown">-23.72%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:76.3%"></div></div></td>
+        </tr>
+<tr data-pct="-13.4706">
+          <td><span class="ticker">COST</span><span class="name">好市多 · Costco Wholesale</span></td>
+          <td class="num">$948.79</td>
+          <td class="num">$1,096.50</td>
+          <td class="num pct moderate">-13.47%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:86.5%"></div></div></td>
+        </tr>
+<tr data-pct="-12.2216">
+          <td><span class="ticker">ASML</span><span class="name">阿斯麥 · ASML Holding</span></td>
+          <td class="num">$1,755.53</td>
+          <td class="num">$1,999.96</td>
+          <td class="num pct moderate">-12.22%</td>
+          <td><div class="bar-wrap"><div class="bar moderate" style="width:87.8%"></div></div></td>
+        </tr>
+<tr data-pct="-4.7912">
+          <td><span class="ticker">QQQ</span><span class="name">納斯達克100 ETF · Invesco QQQ Trust</span></td>
+          <td class="num">$712.78</td>
+          <td class="num">$748.65</td>
+          <td class="num pct near-high">-4.79%</td>
+          <td><div class="bar-wrap"><div class="bar near-high" style="width:95.2%"></div></div></td>
+        </tr>
+<tr data-pct="-18.3991">
+          <td><span class="ticker">TSLA</span><span class="name">特斯拉 · Tesla Inc</span></td>
+          <td class="num">$407.05</td>
+          <td class="num">$498.83</td>
+          <td class="num pct drawdown">-18.40%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:81.6%"></div></div></td>
+        </tr>
+<tr data-pct="-16.8487">
+          <td><span class="ticker">TQQQ</span><span class="name">QQQ 3倍做多 · ProShares UltraPro QQQ 3X</span></td>
+          <td class="num">$73.25</td>
+          <td class="num">$88.09</td>
+          <td class="num pct drawdown">-16.85%</td>
+          <td><div class="bar-wrap"><div class="bar drawdown" style="width:83.2%"></div></div></td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="note">
+      計算公式：(現價 − 52週最高) ÷ 52週最高 × 100%。
+      VIX 與 USD/JPY 等指數／匯率亦以 Yahoo Finance 52 週區間計算。
+      槓桿型 ETF（SPXL、TQQQ）波動較大，解讀時請留意。
+    </p>
+  </div>
+
+  <script>
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.watchlist').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+    document.querySelector('.tab').click();
+
+    const table = document.getElementById('sortable');
+    let asc = true;
+    table.querySelector('th[data-sort="pct"]').addEventListener('click', () => {
+      const tbody = table.querySelector('tbody');
+      const rows = [...tbody.querySelectorAll('tr')].sort((a,b) => {
+        const av = parseFloat(a.dataset.pct || 0);
+        const bv = parseFloat(b.dataset.pct || 0);
+        return asc ? av - bv : bv - av;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+      asc = !asc;
+    });
+  </script>
+</body>
+</html>
