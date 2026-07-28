@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>股票 52 週高點差距比對工具</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22d3ee;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 780px;
+      margin: 0;
+    }
+
+    .pill {
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      border-radius: 999px;
+      padding: 8px 12px;
+      white-space: nowrap;
+      font-size: 0.92rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      header { flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .pill { white-space: normal; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), transparent), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-head h2 {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+    }
+
+    .card-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.94rem;
+    }
+
+    .card-body { padding: 18px 20px 20px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    input[type="file"],
+    textarea,
+    select,
+    button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font: inherit;
+    }
+
+    input[type="file"],
+    select {
+      color: var(--text);
+      background: var(--panel-2);
+      padding: 10px 12px;
+    }
+
+    textarea {
+      min-height: 260px;
+      resize: vertical;
+      color: var(--text);
+      background: #101826;
+      padding: 12px;
+      line-height: 1.55;
+      font-family: "Cascadia Code", "Consolas", monospace;
+    }
+
+    .field { margin-bottom: 15px; }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      padding: 11px 14px;
+      font-weight: 700;
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .btn-primary {
+      color: #082f49;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      margin: 14px 0 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .stat {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+
+    .stat strong {
+      font-size: 1.25rem;
+      letter-spacing: 0.01em;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 620px) {
+      .toolbar { grid-template-columns: 1fr; }
+    }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+      max-height: 620px;
+      background: rgba(15, 20, 25, 0.72);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.72);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      color: var(--muted);
+      background: #111827;
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    td:first-child,
+    td:nth-child(2),
+    th:first-child,
+    th:nth-child(2) {
+      text-align: left;
+    }
+
+    tbody tr:hover { background: rgba(56, 189, 248, 0.06); }
+
+    .symbol {
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 0.02em;
+    }
+
+    .muted { color: var(--muted); }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .danger { color: var(--danger); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 74px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-weight: 800;
+    }
+
+    .badge.ok {
+      color: #064e3b;
+      background: rgba(52, 211, 153, 0.9);
+    }
+
+    .badge.warn {
+      color: #422006;
+      background: rgba(251, 191, 36, 0.9);
+    }
+
+    .badge.danger {
+      color: #450a0a;
+      background: rgba(248, 113, 113, 0.9);
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 14px;
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      background: rgba(251, 191, 36, 0.09);
+      color: #fde68a;
+      border-radius: 14px;
+      padding: 12px 14px;
+      line-height: 1.55;
+    }
+
+    .message.show { display: block; }
+
+    .empty {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div>
+        <h1>股票 52 週高點差距比對工具</h1>
+        <p class="subtitle">
+          上傳或貼上檔案內容後，程式會列出所有個股的目前股價、52 週高點，以及距離高點的百分比差距。
+          差距公式：<strong>(52 週高點 - 目前股價) / 52 週高點 × 100%</strong>。
+        </p>
+      </div>
+      <div class="pill">支援 CSV、TSV、JSON 與一般分隔文字</div>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="card-head">
+          <h2>輸入股票檔案</h2>
+          <p>欄位名稱可用中文或英文，例如：代號、目前股價、52週高點，或 symbol、price、52WeekHigh。</p>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="fileInput">選擇資料檔</label>
+            <input id="fileInput" type="file" accept=".csv,.tsv,.txt,.json,application/json,text/csv,text/plain">
+          </div>
+
+          <div class="field">
+            <label for="rawInput">或直接貼上資料</label>
+            <textarea id="rawInput" spellcheck="false" placeholder="symbol,name,currentPrice,52WeekHigh&#10;ASML,ASML Holding,1581.27,1999.96&#10;NVDA,NVIDIA,194.00,212.19"></textarea>
+          </div>
+
+          <div class="actions">
+            <button id="analyzeBtn" class="btn-primary" type="button">開始比對</button>
+            <button id="sampleBtn" class="btn-secondary" type="button">填入範例</button>
+          </div>
+
+          <p class="hint">
+            JSON 格式可使用陣列，例如：
+            [{"symbol":"ASML","currentPrice":1581.27,"fiftyTwoWeekHigh":1999.96}]。
+            無標題列的文字檔會依序視為：代號、名稱、目前股價、52 週高點。
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>比對結果</h2>
+          <p>預設由距離 52 週高點最遠的個股排序，方便快速找出折價幅度較大的標的。</p>
+        </div>
+        <div class="card-body">
+          <div id="message" class="message"></div>
+
+          <div class="stats">
+            <div class="stat">
+              <span>有效個股</span>
+              <strong id="totalCount">0</strong>
+            </div>
+            <div class="stat">
+              <span>平均距高點</span>
+              <strong id="avgGap">--</strong>
+            </div>
+            <div class="stat">
+              <span>距高點最遠</span>
+              <strong id="maxGap">--</strong>
+            </div>
+            <div class="stat">
+              <span>接近高點</span>
+              <strong id="nearHigh">0</strong>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <select id="sortSelect" aria-label="排序方式">
+              <option value="gapDesc">距高點差距：大到小</option>
+              <option value="gapAsc">距高點差距：小到大</option>
+              <option value="symbolAsc">代號：A 到 Z</option>
+              <option value="priceDesc">目前股價：高到低</option>
+            </select>
+            <select id="filterSelect" aria-label="篩選距離">
+              <option value="all">顯示全部</option>
+              <option value="near">10% 以內</option>
+              <option value="middle">10% 到 30%</option>
+              <option value="far">30% 以上</option>
+            </select>
+          </div>
+
+          <div id="emptyState" class="empty">請先上傳或貼上股票資料，再按「開始比對」。</div>
+          <div id="tableWrap" class="table-wrap" hidden>
+            <table>
+              <thead>
+                <tr>
+                  <th>代號</th>
+                  <th>名稱</th>
+                  <th>目前股價</th>
+                  <th>52 週高點</th>
+                  <th>價差</th>
+                  <th>距高點差距</th>
+                  <th>目前 / 高點</th>
+                  <th>狀態</th>
+                </tr>
+              </thead>
+              <tbody id="resultBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const sampleData = `symbol,name,currentPrice,52WeekHigh
+ASML,ASML Holding,1581.27,1999.96
+WDC,Western Digital,470.90,499.60
+DELL,Dell Technologies,409.99,447.78
+TSM,Taiwan Semiconductor,384.42,412.10
+NVDA,NVIDIA,194.00,212.19
+AAPL,Apple,338.95,355.80
+SPY,SPDR S&P 500 ETF,737.99,745.20
+MDB,MongoDB,309.71,480.00`;
+
+    const aliases = {
+      symbol: ["symbol", "ticker", "代號", "股票代號", "產品", "股號", "stock"],
+      name: ["name", "company", "公司", "名稱", "股票名稱", "產品名稱"],
+      currentPrice: ["currentprice", "current", "price", "last", "close", "lastprice", "目前股價", "現價", "最新價", "最後", "最後價格", "收盤價"],
+      high52: ["52weekhigh", "52whigh", "52week_high", "fiftytwoweekhigh", "yearhigh", "high52", "52週高點", "52周高點", "52週最高", "52周最高", "52w高點"]
+    };
+
+    const state = {
+      rows: []
+    };
+
+    const fileInput = document.getElementById("fileInput");
+    const rawInput = document.getElementById("rawInput");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const sampleBtn = document.getElementById("sampleBtn");
+    const sortSelect = document.getElementById("sortSelect");
+    const filterSelect = document.getElementById("filterSelect");
+    const message = document.getElementById("message");
+    const emptyState = document.getElementById("emptyState");
+    const tableWrap = document.getElementById("tableWrap");
+    const resultBody = document.getElementById("resultBody");
+
+    fileInput.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      rawInput.value = await file.text();
+      analyze();
+    });
+
+    analyzeBtn.addEventListener("click", analyze);
+    sampleBtn.addEventListener("click", () => {
+      rawInput.value = sampleData;
+      analyze();
+    });
+    sortSelect.addEventListener("change", render);
+    filterSelect.addEventListener("change", render);
+
+    function normalizeKey(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[\s_\-()%/：:]+/g, "");
+    }
+
+    function findField(headers, fieldName) {
+      const normalizedHeaders = headers.map(normalizeKey);
+      const candidates = aliases[fieldName].map(normalizeKey);
+      return normalizedHeaders.findIndex((header) => candidates.includes(header));
+    }
+
+    function parseNumber(value) {
+      if (value === null || value === undefined) return NaN;
+      const cleaned = String(value)
+        .trim()
+        .replace(/[$,%\s]/g, "")
+        .replace(/,/g, "");
+      return Number(cleaned);
+    }
+
+    function splitLine(line, delimiter) {
+      const cells = [];
+      let cell = "";
+      let inQuotes = false;
+
+      for (let index = 0; index < line.length; index += 1) {
+        const char = line[index];
+        const next = line[index + 1];
+
+        if (char === '"' && next === '"') {
+          cell += '"';
+          index += 1;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === delimiter && !inQuotes) {
+          cells.push(cell.trim());
+          cell = "";
+        } else {
+          cell += char;
+        }
+      }
+
+      cells.push(cell.trim());
+      return cells;
+    }
+
+    function detectDelimiter(lines) {
+      const firstDataLine = lines.find((line) => line.trim());
+      if (!firstDataLine) return ",";
+
+      const options = [",", "\t", "|", ";"];
+      return options
+        .map((delimiter) => ({
+          delimiter,
+          count: splitLine(firstDataLine, delimiter).length
+        }))
+        .sort((a, b) => b.count - a.count)[0].delimiter;
+    }
+
+    function parseText(rawText) {
+      const lines = rawText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (!lines.length) return [];
+
+      const delimiter = detectDelimiter(lines);
+      const firstRow = splitLine(lines[0], delimiter);
+      const hasHeader = findField(firstRow, "symbol") >= 0 && findField(firstRow, "currentPrice") >= 0 && findField(firstRow, "high52") >= 0;
+      const headers = hasHeader ? firstRow : ["symbol", "name", "currentPrice", "52WeekHigh"];
+      const rows = hasHeader ? lines.slice(1) : lines;
+
+      const symbolIndex = findField(headers, "symbol");
+      const nameIndex = findField(headers, "name");
+      const priceIndex = findField(headers, "currentPrice");
+      const highIndex = findField(headers, "high52");
+
+      return rows.map((line) => {
+        const cells = splitLine(line, delimiter);
+        return {
+          symbol: cells[symbolIndex >= 0 ? symbolIndex : 0],
+          name: nameIndex >= 0 ? cells[nameIndex] : "",
+          currentPrice: cells[priceIndex >= 0 ? priceIndex : 2],
+          high52: cells[highIndex >= 0 ? highIndex : 3],
+          source: line
+        };
+      });
+    }
+
+    function parseJson(rawText) {
+      const parsed = JSON.parse(rawText);
+      const rows = Array.isArray(parsed) ? parsed : parsed.stocks || parsed.data || parsed.items;
+
+      if (!Array.isArray(rows)) {
+        throw new Error("JSON 必須是陣列，或包含 stocks、data、items 陣列。");
+      }
+
+      return rows.map((row) => {
+        const entries = Object.entries(row);
+        const headers = entries.map(([key]) => key);
+
+        const getByAlias = (fieldName) => {
+          const index = findField(headers, fieldName);
+          return index >= 0 ? entries[index][1] : "";
+        };
+
+        return {
+          symbol: getByAlias("symbol"),
+          name: getByAlias("name"),
+          currentPrice: getByAlias("currentPrice"),
+          high52: getByAlias("high52"),
+          source: JSON.stringify(row)
+        };
+      });
+    }
+
+    function parseRows(rawText) {
+      const text = rawText.trim();
+      if (!text) return [];
+
+      if (text.startsWith("{") || text.startsWith("[")) {
+        return parseJson(text);
+      }
+
+      return parseText(text);
+    }
+
+    function toResult(row, index) {
+      const symbol = String(row.symbol || "").trim().toUpperCase();
+      const currentPrice = parseNumber(row.currentPrice);
+      const high52 = parseNumber(row.high52);
+
+      if (!symbol || !Number.isFinite(currentPrice) || !Number.isFinite(high52) || high52 <= 0) {
+        return {
+          valid: false,
+          reason: `第 ${index + 1} 筆資料缺少代號、目前股價或有效的 52 週高點。`,
+          source: row.source
+        };
+      }
+
+      const priceGap = high52 - currentPrice;
+      const gapPercent = (priceGap / high52) * 100;
+      const ratioPercent = (currentPrice / high52) * 100;
+
+      return {
+        valid: true,
+        symbol,
+        name: String(row.name || "").trim(),
+        currentPrice,
+        high52,
+        priceGap,
+        gapPercent,
+        ratioPercent
+      };
+    }
+
+    function analyze() {
+      try {
+        const parsedRows = parseRows(rawInput.value);
+        const results = parsedRows.map(toResult);
+        const validRows = results.filter((row) => row.valid);
+        const invalidRows = results.filter((row) => !row.valid);
+
+        state.rows = validRows;
+        showMessage(invalidRows);
+        render();
+      } catch (error) {
+        state.rows = [];
+        showTextMessage(error.message);
+        render();
+      }
+    }
+
+    function showMessage(invalidRows) {
+      if (!invalidRows.length) {
+        message.classList.remove("show");
+        message.textContent = "";
+        return;
+      }
+
+      showTextMessage(`已略過 ${invalidRows.length} 筆無法解析的資料：${invalidRows.map((row) => row.reason).join(" ")}`);
+    }
+
+    function showTextMessage(text) {
+      message.textContent = text;
+      message.classList.add("show");
+    }
+
+    function getFilteredRows() {
+      const filter = filterSelect.value;
+      const rows = state.rows.filter((row) => {
+        if (filter === "near") return row.gapPercent <= 10;
+        if (filter === "middle") return row.gapPercent > 10 && row.gapPercent <= 30;
+        if (filter === "far") return row.gapPercent > 30;
+        return true;
+      });
+
+      return rows.sort((a, b) => {
+        if (sortSelect.value === "gapAsc") return a.gapPercent - b.gapPercent;
+        if (sortSelect.value === "symbolAsc") return a.symbol.localeCompare(b.symbol);
+        if (sortSelect.value === "priceDesc") return b.currentPrice - a.currentPrice;
+        return b.gapPercent - a.gapPercent;
+      });
+    }
+
+    function render() {
+      const rows = getFilteredRows();
+      updateStats(state.rows);
+
+      emptyState.hidden = state.rows.length > 0;
+      tableWrap.hidden = state.rows.length === 0;
+      resultBody.innerHTML = "";
+
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="symbol">${escapeHtml(row.symbol)}</span></td>
+          <td class="muted">${escapeHtml(row.name || "-")}</td>
+          <td>${formatMoney(row.currentPrice)}</td>
+          <td>${formatMoney(row.high52)}</td>
+          <td class="${row.priceGap >= 0 ? "ok" : "danger"}">${formatMoney(row.priceGap)}</td>
+          <td>${gapBadge(row.gapPercent)}</td>
+          <td>${formatPercent(row.ratioPercent)}</td>
+          <td>${statusText(row.gapPercent)}</td>
+        `;
+        resultBody.appendChild(tr);
+      });
+    }
+
+    function updateStats(rows) {
+      const totalCount = document.getElementById("totalCount");
+      const avgGap = document.getElementById("avgGap");
+      const maxGap = document.getElementById("maxGap");
+      const nearHigh = document.getElementById("nearHigh");
+
+      totalCount.textContent = rows.length;
+
+      if (!rows.length) {
+        avgGap.textContent = "--";
+        maxGap.textContent = "--";
+        nearHigh.textContent = "0";
+        return;
+      }
+
+      const average = rows.reduce((sum, row) => sum + row.gapPercent, 0) / rows.length;
+      const farthest = rows.reduce((max, row) => Math.max(max, row.gapPercent), -Infinity);
+      const nearCount = rows.filter((row) => row.gapPercent <= 10).length;
+
+      avgGap.textContent = formatPercent(average);
+      maxGap.textContent = formatPercent(farthest);
+      nearHigh.textContent = nearCount;
+    }
+
+    function gapBadge(value) {
+      const className = value <= 10 ? "ok" : value <= 30 ? "warn" : "danger";
+      return `<span class="badge ${className}">${formatPercent(value)}</span>`;
+    }
+
+    function statusText(value) {
+      if (value < 0) return `<span class="danger">高於 52 週高點</span>`;
+      if (value <= 10) return `<span class="ok">接近高點</span>`;
+      if (value <= 30) return `<span class="warn">中度回落</span>`;
+      return `<span class="danger">明顯低於高點</span>`;
+    }
+
+    function formatMoney(value) {
+      return Number(value).toLocaleString("zh-TW", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatPercent(value) {
+      return `${Number(value).toLocaleString("zh-TW", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}%`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
