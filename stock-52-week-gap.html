@@ -647,10 +647,13 @@ MDB,MongoDB,309.71,480.00`;
         const invalidRows = results.filter((row) => !row.valid);
 
         state.rows = validRows;
+        sortSelect.value = "gapDesc";
+        filterSelect.value = "all";
         showMessage(invalidRows);
         render();
       } catch (error) {
         state.rows = [];
+        filterSelect.value = "all";
         showTextMessage(error.message);
         render();
       }
