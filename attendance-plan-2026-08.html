@@ -165,10 +165,14 @@
 
     table {
       width: 100%;
-      min-width: 1320px;
+      min-width: 1700px;
       border-collapse: separate;
       border-spacing: 0;
       font-size: 0.88rem;
+    }
+
+    .statistics-table {
+      min-width: 860px;
     }
 
     th,
@@ -227,6 +231,24 @@
       width: 28px;
     }
 
+    .status-select {
+      width: 62px;
+      border: 0;
+      border-radius: 9px;
+      padding: 6px 4px;
+      color: #ffffff;
+      font: inherit;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      outline: 2px solid transparent;
+    }
+
+    .status-select:focus {
+      outline-color: rgba(37, 99, 235, 0.45);
+      outline-offset: 2px;
+    }
+
     .status-present { background: rgba(22, 163, 74, 0.11); }
     .status-annual { background: rgba(124, 58, 237, 0.12); }
     .status-sick { background: rgba(220, 38, 38, 0.12); }
@@ -243,9 +265,45 @@
     .status-special .day-cell { background: var(--special); }
     .status-weekend .day-cell { background: var(--weekend); }
 
+    .status-select.status-present { background: var(--present); }
+    .status-select.status-annual { background: var(--annual); }
+    .status-select.status-sick { background: var(--sick); }
+    .status-select.status-personal { background: var(--personal); }
+    .status-select.status-official { background: var(--official); }
+    .status-select.status-special { background: var(--special); }
+    .status-select.status-weekend { background: var(--weekend); }
+
     .total-cell {
       font-weight: 800;
       background: #f8fafc;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    tfoot td {
+      position: sticky;
+      bottom: 0;
+      z-index: 1;
+      color: #0f172a;
+      background: #e0f2fe;
+      font-weight: 900;
     }
 
     .note {
@@ -293,8 +351,8 @@
       <div>
         <h1>2026 年 8 月出勤規劃表</h1>
         <p class="intro">
-          30 位人員以固定亂數種子產生範例排班，工作日使用「✓」代表出勤，請假則以不同代碼區分；
-          週末標示為休，統計會排除週末並自動彙總每人與全月資料。
+          30 位人員以固定亂數種子產生範例排班；人事可直接在每日欄位選擇「✓ 出勤」或不同假別，
+          變更後會即時更新全月統計與下方統計表。
         </p>
       </div>
       <button class="print-button" type="button" onclick="window.print()">列印 / 匯出 PDF</button>
@@ -313,7 +371,7 @@
 
     <section class="panel">
       <div class="summary-grid" id="summaryGrid" aria-label="全月統計"></div>
-      <p class="note">統計口徑：2026 年 8 月共有 31 天，其中 21 個工作日、10 個週末日；出勤率以「全體人員工作日應出勤人次」為分母。</p>
+      <p class="note">操作方式：在日期欄位中打開選單，選「✓ 出勤」或假別；統計口徑以 2026 年 8 月 21 個工作日、30 位人員，共 630 應出勤人次為基準。</p>
     </section>
 
     <section class="table-wrap" aria-label="2026 年 8 月出勤明細">
@@ -321,6 +379,35 @@
         <thead id="attendanceHead"></thead>
         <tbody id="attendanceBody"></tbody>
       </table>
+    </section>
+
+    <section class="panel" aria-label="統計表">
+      <div class="section-heading">
+        <div>
+          <h2>統計表</h2>
+          <p>依員工彙整出勤與各假別次數，會隨上方欄位選擇即時更新。</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="statistics-table">
+          <thead>
+            <tr>
+              <th>姓名</th>
+              <th>出勤</th>
+              <th>年假</th>
+              <th>病假</th>
+              <th>事假</th>
+              <th>公假</th>
+              <th>特休</th>
+              <th>請假合計</th>
+              <th>休</th>
+              <th>出勤率</th>
+            </tr>
+          </thead>
+          <tbody id="statisticsBody"></tbody>
+          <tfoot id="statisticsFoot"></tfoot>
+        </table>
+      </div>
     </section>
   </main>
 
@@ -345,10 +432,13 @@
     };
 
     const leaveTypes = ["annual", "sick", "personal", "official", "special"];
+    const allStatuses = ["present", ...leaveTypes, "weekend"];
     const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
     const year = 2026;
     const monthIndex = 7;
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const workdays = Array.from({ length: daysInMonth }, (_, index) => index + 1)
+      .filter((day) => !isWeekend(day)).length;
 
     function seededRandom(seed) {
       const value = Math.sin(seed) * 10000;
@@ -374,21 +464,44 @@
       return "present";
     }
 
+    function calculateStats(days) {
+      const stats = days.reduce((acc, status) => {
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      return {
+        stats,
+        leaveTotal: leaveTypes.reduce((sum, type) => sum + (stats[type] || 0), 0)
+      };
+    }
+
     function buildRows() {
       return people.map((name, personIndex) => {
         const days = Array.from({ length: daysInMonth }, (_, index) => getStatus(personIndex, index + 1));
-        const stats = days.reduce((acc, status) => {
-          acc[status] = (acc[status] || 0) + 1;
-          return acc;
-        }, {});
+        const { stats, leaveTotal } = calculateStats(days);
 
         return {
           name,
           days,
           stats,
-          leaveTotal: leaveTypes.reduce((sum, type) => sum + (stats[type] || 0), 0)
+          leaveTotal
         };
       });
+    }
+
+    function refreshRowStats(row) {
+      const { stats, leaveTotal } = calculateStats(row.days);
+      row.stats = stats;
+      row.leaveTotal = leaveTotal;
+    }
+
+    function renderOptions(selectedStatus) {
+      return allStatuses.map((status) => {
+        const meta = statusMeta[status];
+        const selected = status === selectedStatus ? "selected" : "";
+        return `<option value="${status}" ${selected}>${meta.code} ${meta.label}</option>`;
+      }).join("");
     }
 
     function renderHead() {
@@ -414,12 +527,24 @@
       `;
     }
 
-    function renderBody(rows) {
+    function renderBody(records) {
       const body = document.getElementById("attendanceBody");
-      body.innerHTML = rows.map((row) => {
-        const dayCells = row.days.map((status) => {
+      body.innerHTML = records.map((row, personIndex) => {
+        const dayCells = row.days.map((status, dayIndex) => {
           const meta = statusMeta[status];
-          return `<td class="status-${meta.className}" title="${meta.label}"><span class="day-cell">${meta.code}</span></td>`;
+          const day = dayIndex + 1;
+          return `
+            <td class="status-${meta.className}" title="${meta.label}">
+              <select
+                class="status-select status-${meta.className}"
+                data-person-index="${personIndex}"
+                data-day-index="${dayIndex}"
+                aria-label="${row.name} ${day} 日出勤狀態"
+              >
+                ${renderOptions(status)}
+              </select>
+            </td>
+          `;
         }).join("");
 
         return `
@@ -438,16 +563,17 @@
       }).join("");
     }
 
-    function renderSummary(rows) {
-      const summary = rows.reduce((acc, row) => {
+    function getSummary(records) {
+      return records.reduce((acc, row) => {
         Object.entries(row.stats).forEach(([status, count]) => {
           acc[status] = (acc[status] || 0) + count;
         });
         return acc;
       }, {});
+    }
 
-      const workdays = Array.from({ length: daysInMonth }, (_, index) => index + 1)
-        .filter((day) => !isWeekend(day)).length;
+    function renderSummary(records) {
+      const summary = getSummary(records);
       const expectedAttendance = workdays * people.length;
       const leaveTotal = leaveTypes.reduce((sum, type) => sum + (summary[type] || 0), 0);
       const attendanceRate = ((summary.present || 0) / expectedAttendance * 100).toFixed(1);
@@ -474,10 +600,64 @@
       `).join("");
     }
 
-    const rows = buildRows();
+    function renderStatisticsSheet(records) {
+      const body = document.getElementById("statisticsBody");
+      body.innerHTML = records.map((row) => {
+        const attendanceRate = ((row.stats.present || 0) / workdays * 100).toFixed(1);
+        return `
+          <tr>
+            <td class="name-cell">${row.name}</td>
+            <td>${row.stats.present || 0}</td>
+            <td>${row.stats.annual || 0}</td>
+            <td>${row.stats.sick || 0}</td>
+            <td>${row.stats.personal || 0}</td>
+            <td>${row.stats.official || 0}</td>
+            <td>${row.stats.special || 0}</td>
+            <td class="total-cell">${row.leaveTotal}</td>
+            <td>${row.stats.weekend || 0}</td>
+            <td>${attendanceRate}%</td>
+          </tr>
+        `;
+      }).join("");
+
+      const summary = getSummary(records);
+      const leaveTotal = leaveTypes.reduce((sum, type) => sum + (summary[type] || 0), 0);
+      const attendanceRate = ((summary.present || 0) / (workdays * people.length) * 100).toFixed(1);
+
+      document.getElementById("statisticsFoot").innerHTML = `
+        <tr>
+          <td>總計</td>
+          <td>${summary.present || 0}</td>
+          <td>${summary.annual || 0}</td>
+          <td>${summary.sick || 0}</td>
+          <td>${summary.personal || 0}</td>
+          <td>${summary.official || 0}</td>
+          <td>${summary.special || 0}</td>
+          <td>${leaveTotal}</td>
+          <td>${summary.weekend || 0}</td>
+          <td>${attendanceRate}%</td>
+        </tr>
+      `;
+    }
+
+    function handleStatusChange(event) {
+      if (!event.target.matches(".status-select")) return;
+
+      const personIndex = Number(event.target.dataset.personIndex);
+      const dayIndex = Number(event.target.dataset.dayIndex);
+      rows[personIndex].days[dayIndex] = event.target.value;
+      refreshRowStats(rows[personIndex]);
+      renderBody(rows);
+      renderSummary(rows);
+      renderStatisticsSheet(rows);
+    }
+
+    let rows = buildRows();
     renderHead();
     renderBody(rows);
     renderSummary(rows);
+    renderStatisticsSheet(rows);
+    document.getElementById("attendanceBody").addEventListener("change", handleStatusChange);
   </script>
 </body>
 </html>
