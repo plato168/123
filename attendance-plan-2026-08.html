@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 年 8 月 30 人出勤規劃表</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --line: #d8dee9;
+      --text: #1f2937;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --present: #16a34a;
+      --annual: #7c3aed;
+      --sick: #dc2626;
+      --personal: #ea580c;
+      --official: #0891b2;
+      --special: #be123c;
+      --weekend: #94a3b8;
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 30%),
+        radial-gradient(circle at top right, rgba(8, 145, 178, 0.10), transparent 28%),
+        var(--bg);
+    }
+
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      letter-spacing: 0.02em;
+    }
+
+    .intro {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 780px;
+    }
+
+    .print-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      color: #ffffff;
+      background: var(--primary);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.22);
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(216, 222, 233, 0.9);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .legend-title {
+      width: 100%;
+      margin: 0 0 2px;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: #eef2ff;
+      color: #334155;
+    }
+
+    .badge .mark {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      color: #ffffff;
+      font-size: 0.82rem;
+    }
+
+    .mark.present { background: var(--present); }
+    .mark.annual { background: var(--annual); }
+    .mark.sick { background: var(--sick); }
+    .mark.personal { background: var(--personal); }
+    .mark.official { background: var(--official); }
+    .mark.special { background: var(--special); }
+    .mark.weekend { background: var(--weekend); }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--card);
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.85rem;
+      line-height: 1;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      max-height: 76vh;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1320px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.88rem;
+    }
+
+    th,
+    td {
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 9px 8px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      color: #ffffff;
+      background: #1e293b;
+      font-weight: 800;
+    }
+
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #ffffff;
+    }
+
+    th:first-child {
+      z-index: 4;
+      background: #0f172a;
+    }
+
+    tbody tr:nth-child(even) td:first-child,
+    tbody tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover td {
+      background-color: #eff6ff;
+    }
+
+    .name-cell {
+      min-width: 112px;
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .day-cell {
+      min-width: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 3px 0;
+      display: inline-block;
+      width: 28px;
+    }
+
+    .status-present { background: rgba(22, 163, 74, 0.11); }
+    .status-annual { background: rgba(124, 58, 237, 0.12); }
+    .status-sick { background: rgba(220, 38, 38, 0.12); }
+    .status-personal { background: rgba(234, 88, 12, 0.13); }
+    .status-official { background: rgba(8, 145, 178, 0.13); }
+    .status-special { background: rgba(190, 18, 60, 0.13); }
+    .status-weekend { background: #f1f5f9; color: var(--muted); }
+
+    .status-present .day-cell { background: var(--present); }
+    .status-annual .day-cell { background: var(--annual); }
+    .status-sick .day-cell { background: var(--sick); }
+    .status-personal .day-cell { background: var(--personal); }
+    .status-official .day-cell { background: var(--official); }
+    .status-special .day-cell { background: var(--special); }
+    .status-weekend .day-cell { background: var(--weekend); }
+
+    .total-cell {
+      font-weight: 800;
+      background: #f8fafc;
+    }
+
+    .note {
+      margin: 14px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.92rem;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      .page {
+        max-width: none;
+        padding: 0;
+      }
+
+      .print-button {
+        display: none;
+      }
+
+      .panel,
+      .table-wrap {
+        box-shadow: none;
+      }
+
+      .table-wrap {
+        max-height: none;
+        overflow: visible;
+      }
+
+      th,
+      td {
+        padding: 5px 4px;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div>
+        <h1>2026 年 8 月出勤規劃表</h1>
+        <p class="intro">
+          30 位人員以固定亂數種子產生範例排班，工作日使用「✓」代表出勤，請假則以不同代碼區分；
+          週末標示為休，統計會排除週末並自動彙總每人與全月資料。
+        </p>
+      </div>
+      <button class="print-button" type="button" onclick="window.print()">列印 / 匯出 PDF</button>
+    </header>
+
+    <section class="panel legend" aria-label="符號說明">
+      <p class="legend-title">符號說明</p>
+      <span class="badge"><span class="mark present">✓</span>出勤</span>
+      <span class="badge"><span class="mark annual">年</span>年假</span>
+      <span class="badge"><span class="mark sick">病</span>病假</span>
+      <span class="badge"><span class="mark personal">事</span>事假</span>
+      <span class="badge"><span class="mark official">公</span>公假</span>
+      <span class="badge"><span class="mark special">特</span>特休</span>
+      <span class="badge"><span class="mark weekend">休</span>週末</span>
+    </section>
+
+    <section class="panel">
+      <div class="summary-grid" id="summaryGrid" aria-label="全月統計"></div>
+      <p class="note">統計口徑：2026 年 8 月共有 31 天，其中 21 個工作日、10 個週末日；出勤率以「全體人員工作日應出勤人次」為分母。</p>
+    </section>
+
+    <section class="table-wrap" aria-label="2026 年 8 月出勤明細">
+      <table>
+        <thead id="attendanceHead"></thead>
+        <tbody id="attendanceBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const people = [
+      "陳怡君", "林建宏", "黃鈺婷", "張志明", "李雅雯",
+      "王冠宇", "吳佩珊", "劉家豪", "蔡欣妤", "楊宗翰",
+      "許孟潔", "鄭博文", "謝佳玲", "郭俊廷", "洪詩涵",
+      "曾柏諺", "邱郁婷", "廖偉倫", "賴品妍", "徐子軒",
+      "宋婉如", "蘇哲宇", "葉庭安", "莊凱翔", "江慧君",
+      "何承恩", "羅美琪", "高維哲", "潘宜蓁", "戴柏霖"
+    ];
+
+    const statusMeta = {
+      present: { code: "✓", label: "出勤", className: "present" },
+      annual: { code: "年", label: "年假", className: "annual" },
+      sick: { code: "病", label: "病假", className: "sick" },
+      personal: { code: "事", label: "事假", className: "personal" },
+      official: { code: "公", label: "公假", className: "official" },
+      special: { code: "特", label: "特休", className: "special" },
+      weekend: { code: "休", label: "週末", className: "weekend" }
+    };
+
+    const leaveTypes = ["annual", "sick", "personal", "official", "special"];
+    const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
+    const year = 2026;
+    const monthIndex = 7;
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+    function seededRandom(seed) {
+      const value = Math.sin(seed) * 10000;
+      return value - Math.floor(value);
+    }
+
+    function isWeekend(day) {
+      const weekday = new Date(year, monthIndex, day).getDay();
+      return weekday === 0 || weekday === 6;
+    }
+
+    function getStatus(personIndex, day) {
+      if (isWeekend(day)) return "weekend";
+
+      const seed = (personIndex + 1) * 97 + day * 31;
+      const roll = seededRandom(seed);
+
+      if (roll < 0.105) {
+        const leaveSeed = Math.floor(seededRandom(seed + 17) * leaveTypes.length);
+        return leaveTypes[leaveSeed];
+      }
+
+      return "present";
+    }
+
+    function buildRows() {
+      return people.map((name, personIndex) => {
+        const days = Array.from({ length: daysInMonth }, (_, index) => getStatus(personIndex, index + 1));
+        const stats = days.reduce((acc, status) => {
+          acc[status] = (acc[status] || 0) + 1;
+          return acc;
+        }, {});
+
+        return {
+          name,
+          days,
+          stats,
+          leaveTotal: leaveTypes.reduce((sum, type) => sum + (stats[type] || 0), 0)
+        };
+      });
+    }
+
+    function renderHead() {
+      const head = document.getElementById("attendanceHead");
+      const dayHeaders = Array.from({ length: daysInMonth }, (_, index) => {
+        const day = index + 1;
+        const weekday = dayNames[new Date(year, monthIndex, day).getDay()];
+        return `<th>${day}<br><small>${weekday}</small></th>`;
+      }).join("");
+
+      head.innerHTML = `
+        <tr>
+          <th>姓名</th>
+          ${dayHeaders}
+          <th>出勤</th>
+          <th>年假</th>
+          <th>病假</th>
+          <th>事假</th>
+          <th>公假</th>
+          <th>特休</th>
+          <th>請假合計</th>
+        </tr>
+      `;
+    }
+
+    function renderBody(rows) {
+      const body = document.getElementById("attendanceBody");
+      body.innerHTML = rows.map((row) => {
+        const dayCells = row.days.map((status) => {
+          const meta = statusMeta[status];
+          return `<td class="status-${meta.className}" title="${meta.label}"><span class="day-cell">${meta.code}</span></td>`;
+        }).join("");
+
+        return `
+          <tr>
+            <td class="name-cell">${row.name}</td>
+            ${dayCells}
+            <td class="total-cell">${row.stats.present || 0}</td>
+            <td>${row.stats.annual || 0}</td>
+            <td>${row.stats.sick || 0}</td>
+            <td>${row.stats.personal || 0}</td>
+            <td>${row.stats.official || 0}</td>
+            <td>${row.stats.special || 0}</td>
+            <td class="total-cell">${row.leaveTotal}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderSummary(rows) {
+      const summary = rows.reduce((acc, row) => {
+        Object.entries(row.stats).forEach(([status, count]) => {
+          acc[status] = (acc[status] || 0) + count;
+        });
+        return acc;
+      }, {});
+
+      const workdays = Array.from({ length: daysInMonth }, (_, index) => index + 1)
+        .filter((day) => !isWeekend(day)).length;
+      const expectedAttendance = workdays * people.length;
+      const leaveTotal = leaveTypes.reduce((sum, type) => sum + (summary[type] || 0), 0);
+      const attendanceRate = ((summary.present || 0) / expectedAttendance * 100).toFixed(1);
+
+      const cards = [
+        ["人員數", `${people.length} 人`],
+        ["工作日", `${workdays} 天`],
+        ["應出勤人次", `${expectedAttendance}`],
+        ["實際出勤人次", `${summary.present || 0}`],
+        ["請假總人次", `${leaveTotal}`],
+        ["出勤率", `${attendanceRate}%`],
+        ["年假", `${summary.annual || 0}`],
+        ["病假", `${summary.sick || 0}`],
+        ["事假", `${summary.personal || 0}`],
+        ["公假", `${summary.official || 0}`],
+        ["特休", `${summary.special || 0}`]
+      ];
+
+      document.getElementById("summaryGrid").innerHTML = cards.map(([label, value]) => `
+        <article class="summary-card">
+          <span>${label}</span>
+          <strong>${value}</strong>
+        </article>
+      `).join("");
+    }
+
+    const rows = buildRows();
+    renderHead();
+    renderBody(rows);
+    renderSummary(rows);
+  </script>
+</body>
+</html>
