@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 年 8 月出勤規劃表（30 人）</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #34d399;
+      --weekend: #1e293b;
+      --事假: #fbbf24;
+      --病假: #f87171;
+      --特休: #a78bfa;
+      --公假: #38bdf8;
+      --曠職: #ef4444;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .toolbar button {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .toolbar button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .legend-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    table.attendance {
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      min-width: 100%;
+    }
+
+    table.attendance th,
+    table.attendance td {
+      border: 1px solid var(--border);
+      text-align: center;
+      padding: 4px 2px;
+    }
+
+    table.attendance thead th {
+      background: var(--panel-2);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    table.attendance .sticky-col {
+      position: sticky;
+      left: 0;
+      z-index: 3;
+      background: var(--panel-2);
+      min-width: 36px;
+    }
+
+    table.attendance .sticky-name {
+      position: sticky;
+      left: 36px;
+      z-index: 3;
+      background: var(--panel-2);
+      min-width: 72px;
+      text-align: left;
+      padding-left: 8px;
+      font-weight: 500;
+    }
+
+    table.attendance thead .sticky-col,
+    table.attendance thead .sticky-name {
+      z-index: 4;
+    }
+
+    .weekend {
+      background: var(--weekend) !important;
+      color: var(--muted);
+    }
+
+    .day-cell {
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s;
+    }
+
+    .day-cell:hover {
+      transform: scale(1.15);
+      outline: 1px solid var(--accent);
+    }
+
+    .status-present { background: rgba(52, 211, 153, 0.25); color: var(--ok); }
+    .status-事假 { background: rgba(251, 191, 36, 0.3); color: var(--事假); }
+    .status-病假 { background: rgba(248, 113, 113, 0.3); color: var(--病假); }
+    .status-特休 { background: rgba(167, 139, 250, 0.3); color: var(--特休); }
+    .status-公假 { background: rgba(56, 189, 248, 0.3); color: var(--公假); }
+    .status-曠職 { background: rgba(239, 68, 68, 0.35); color: var(--曠職); }
+    .status-empty { background: transparent; color: var(--muted); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .card-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-2);
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 0;
+      overflow-x: auto;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .stats-table th,
+    .stats-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    .stats-table th {
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .stats-table td:first-child {
+      text-align: left;
+    }
+
+    .stats-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-row {
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .total-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      .toolbar { display: none; }
+      .day-cell:hover { transform: none; outline: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>2026 年 8 月出勤規劃表</h1>
+      <p class="subtitle">
+        共 30 人｜點擊日期格可切換狀態（✓ 出勤 → 事假 → 病假 → 特休 → 公假 → 曠職 → 空白）｜週末以灰色標示
+      </p>
+    </header>
+
+    <div class="toolbar">
+      <button type="button" id="btnRandom">重新隨機填入</button>
+      <button type="button" id="btnClear">全部清空</button>
+      <button type="button" onclick="window.print()">列印</button>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="table-scroll">
+      <table class="attendance" id="attendanceTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="stats-grid">
+      <div class="card">
+        <div class="card-head">個人出勤統計</div>
+        <div class="card-body">
+          <table class="stats-table" id="personStats"></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">每日出勤統計</div>
+        <div class="card-body">
+          <table class="stats-table" id="dailyStats"></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">全體彙總</div>
+        <div class="card-body" style="padding: 18px;" id="overallStats"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const YEAR = 2026;
+    const MONTH = 8; // 8 月
+    const DAYS_IN_MONTH = 31;
+
+    const STATUSES = [
+      { key: 'present', label: '出勤', symbol: '✓', className: 'status-present' },
+      { key: '事假', label: '事假', symbol: '事', className: 'status-事假' },
+      { key: '病假', label: '病假', symbol: '病', className: 'status-病假' },
+      { key: '特休', label: '特休', symbol: '特', className: 'status-特休' },
+      { key: '公假', label: '公假', symbol: '公', className: 'status-公假' },
+      { key: '曠職', label: '曠職', symbol: '曠', className: 'status-曠職' },
+      { key: 'empty', label: '未填', symbol: '·', className: 'status-empty' }
+    ];
+
+    const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
+
+    const NAMES = [
+      '陳志明', '林雅婷', '王建宏', '張淑芬', '李俊豪', '黃美玲', '劉冠宇', '吳佳穎',
+      '蔡宗翰', '許雅雯', '鄭宇軒', '謝佩珊', '楊承恩', '周怡君', '趙家豪', '孫詩涵',
+      '馬俊傑', '高淑惠', '胡志偉', '郭欣怡', '梁冠廷', '宋麗華', '唐柏翰', '韓雅琪',
+      '馮志強', '曹美珍', '彭俊凱', '曾雅芳', '蕭宇翔', '潘怡婷'
+    ];
+
+    // 狀態矩陣：people[人員索引][日期-1]
+    let grid = [];
+
+    function seededRandom(seed) {
+      let s = seed;
+      return function () {
+        s = (s * 1103515245 + 12345) & 0x7fffffff;
+        return s / 0x7fffffff;
+      };
+    }
+
+    function getWeekday(day) {
+      return new Date(YEAR, MONTH - 1, day).getDay();
+    }
+
+    function isWeekend(day) {
+      const wd = getWeekday(day);
+      return wd === 0 || wd === 6;
+    }
+
+    function nextStatus(current) {
+      const idx = STATUSES.findIndex(s => s.key === current);
+      return STATUSES[(idx + 1) % STATUSES.length].key;
+    }
+
+    function getStatusInfo(key) {
+      return STATUSES.find(s => s.key === key) || STATUSES[STATUSES.length - 1];
+    }
+
+    function initGrid(randomFill = true) {
+      grid = NAMES.map(() => Array(DAYS_IN_MONTH).fill('empty'));
+
+      if (!randomFill) return;
+
+      const rand = seededRandom(20260805);
+      NAMES.forEach((_, pi) => {
+        for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+          if (isWeekend(d)) {
+            // 週末多數不出勤，偶爾加班
+            grid[pi][d - 1] = rand() < 0.12 ? 'present' : 'empty';
+            continue;
+          }
+          const r = rand();
+          if (r < 0.78) grid[pi][d - 1] = 'present';
+          else if (r < 0.86) grid[pi][d - 1] = '事假';
+          else if (r < 0.92) grid[pi][d - 1] = '病假';
+          else if (r < 0.96) grid[pi][d - 1] = '特休';
+          else if (r < 0.99) grid[pi][d - 1] = '公假';
+          else grid[pi][d - 1] = '曠職';
+        }
+      });
+    }
+
+    function renderLegend() {
+      const el = document.getElementById('legend');
+      el.innerHTML = STATUSES.filter(s => s.key !== 'empty').map(s => `
+        <span class="legend-item">
+          <span class="legend-swatch ${s.className}">${s.symbol}</span>
+          ${s.label}
+        </span>
+      `).join('');
+    }
+
+    function renderTable() {
+      const head = document.getElementById('tableHead');
+      const body = document.getElementById('tableBody');
+
+      let headRow1 = '<tr><th class="sticky-col">#</th><th class="sticky-name">姓名</th>';
+      let headRow2 = '<tr><th class="sticky-col"></th><th class="sticky-name">星期</th>';
+      for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+        const wd = getWeekday(d);
+        const wkCls = isWeekend(d) ? ' weekend' : '';
+        headRow1 += `<th class="${wkCls}">${d}</th>`;
+        headRow2 += `<th class="${wkCls}">${WEEKDAYS[wd]}</th>`;
+      }
+      headRow1 += '<th>出勤</th><th>請假計</th></tr>';
+      headRow2 += '<th></th><th></th></tr>';
+      head.innerHTML = headRow1 + headRow2;
+
+      body.innerHTML = NAMES.map((name, pi) => {
+        let present = 0;
+        let leave = 0;
+        const cells = [];
+        for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+          const status = grid[pi][d - 1];
+          const info = getStatusInfo(status);
+          if (status === 'present') present++;
+          if (['事假', '病假', '特休', '公假', '曠職'].includes(status)) leave++;
+          const wkCls = isWeekend(d) ? ' weekend' : '';
+          cells.push(`
+            <td class="day-cell ${info.className}${wkCls}"
+                data-person="${pi}" data-day="${d}"
+                title="${name} - 8/${d} ${info.label}">
+              ${status === 'empty' ? '' : info.symbol}
+            </td>
+          `);
+        }
+        return `
+          <tr>
+            <td class="sticky-col">${pi + 1}</td>
+            <td class="sticky-name">${name}</td>
+            ${cells.join('')}
+            <td><span class="total-badge status-present">${present}</span></td>
+            <td><span class="total-badge status-事假">${leave}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      body.querySelectorAll('.day-cell').forEach(cell => {
+        cell.addEventListener('click', () => {
+          const pi = +cell.dataset.person;
+          const day = +cell.dataset.day;
+          grid[pi][day - 1] = nextStatus(grid[pi][day - 1]);
+          renderAll();
+        });
+      });
+    }
+
+    function countStatus(filterWeekday = null) {
+      const counts = {};
+      STATUSES.forEach(s => { counts[s.key] = 0; });
+
+      for (let pi = 0; pi < NAMES.length; pi++) {
+        for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+          if (filterWeekday !== null && getWeekday(d) !== filterWeekday) continue;
+          counts[grid[pi][d - 1]]++;
+        }
+      }
+      return counts;
+    }
+
+    function renderPersonStats() {
+      const el = document.getElementById('personStats');
+      const leaveKeys = ['事假', '病假', '特休', '公假', '曠職'];
+      let html = `<tr>
+        <th>姓名</th><th>✓出勤</th>
+        <th>事假</th><th>病假</th><th>特休</th><th>公假</th><th>曠職</th><th>請假小計</th>
+      </tr>`;
+
+      const totals = { present: 0, 事假: 0, 病假: 0, 特休: 0, 公假: 0, 曠職: 0, leave: 0 };
+
+      NAMES.forEach((name, pi) => {
+        const c = { present: 0, 事假: 0, 病假: 0, 特休: 0, 公假: 0, 曠職: 0 };
+        for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+          const s = grid[pi][d - 1];
+          if (c[s] !== undefined) c[s]++;
+        }
+        const leaveSum = leaveKeys.reduce((a, k) => a + c[k], 0);
+        totals.present += c.present;
+        leaveKeys.forEach(k => { totals[k] += c[k]; });
+        totals.leave += leaveSum;
+
+        html += `<tr>
+          <td>${name}</td>
+          <td>${c.present}</td>
+          <td>${c.事假}</td>
+          <td>${c.病假}</td>
+          <td>${c.特休}</td>
+          <td>${c.公假}</td>
+          <td>${c.曠職}</td>
+          <td><strong>${leaveSum}</strong></td>
+        </tr>`;
+      });
+
+      html += `<tr class="summary-row">
+        <td>合計（30 人）</td>
+        <td>${totals.present}</td>
+        <td>${totals.事假}</td>
+        <td>${totals.病假}</td>
+        <td>${totals.特休}</td>
+        <td>${totals.公假}</td>
+        <td>${totals.曠職}</td>
+        <td>${totals.leave}</td>
+      </tr>`;
+
+      el.innerHTML = html;
+    }
+
+    function renderDailyStats() {
+      const el = document.getElementById('dailyStats');
+      let html = `<tr>
+        <th>日期</th><th>星期</th><th>✓出勤</th>
+        <th>事假</th><th>病假</th><th>特休</th><th>公假</th><th>曠職</th><th>未填</th>
+      </tr>`;
+
+      const dayTotals = { present: 0, 事假: 0, 病假: 0, 特休: 0, 公假: 0, 曠職: 0, empty: 0 };
+
+      for (let d = 1; d <= DAYS_IN_MONTH; d++) {
+        const c = { present: 0, 事假: 0, 病假: 0, 特休: 0, 公假: 0, 曠職: 0, empty: 0 };
+        for (let pi = 0; pi < NAMES.length; pi++) {
+          c[grid[pi][d - 1]]++;
+        }
+        Object.keys(c).forEach(k => { dayTotals[k] += c[k]; });
+        const wd = getWeekday(d);
+        const wkCls = isWeekend(d) ? ' style="color: var(--muted)"' : '';
+        html += `<tr${wkCls}>
+          <td>8/${d}</td>
+          <td>週${WEEKDAYS[wd]}</td>
+          <td>${c.present}</td>
+          <td>${c.事假}</td>
+          <td>${c.病假}</td>
+          <td>${c.特休}</td>
+          <td>${c.公假}</td>
+          <td>${c.曠職}</td>
+          <td>${c.empty}</td>
+        </tr>`;
+      }
+
+      html += `<tr class="summary-row">
+        <td colspan="2">全月合計</td>
+        <td>${dayTotals.present}</td>
+        <td>${dayTotals.事假}</td>
+        <td>${dayTotals.病假}</td>
+        <td>${dayTotals.特休}</td>
+        <td>${dayTotals.公假}</td>
+        <td>${dayTotals.曠職}</td>
+        <td>${dayTotals.empty}</td>
+      </tr>`;
+
+      el.innerHTML = html;
+    }
+
+    function renderOverallStats() {
+      const el = document.getElementById('overallStats');
+      const all = countStatus();
+      const workdays = Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1).filter(d => !isWeekend(d)).length;
+      const totalSlots = NAMES.length * DAYS_IN_MONTH;
+      const workSlots = NAMES.length * workdays;
+      const leaveTotal = all.事假 + all.病假 + all.特休 + all.公假 + all.曠職;
+      const attendanceRate = workSlots > 0 ? ((all.present / workSlots) * 100).toFixed(1) : 0;
+
+      el.innerHTML = `
+        <p><strong>統計期間：</strong>2026 年 8 月 1 日 ～ 8 月 31 日</p>
+        <p><strong>人數：</strong>30 人｜<strong>工作日：</strong>${workdays} 天｜<strong>週末：</strong>${DAYS_IN_MONTH - workdays} 天</p>
+        <hr style="border-color: var(--border); margin: 16px 0;">
+        <p><span class="legend-swatch status-present">✓</span> <strong>出勤：</strong>${all.present} 人次</p>
+        <p><span class="legend-swatch status-事假">事</span> <strong>事假：</strong>${all.事假} 人次</p>
+        <p><span class="legend-swatch status-病假">病</span> <strong>病假：</strong>${all.病假} 人次</p>
+        <p><span class="legend-swatch status-特休">特</span> <strong>特休：</strong>${all.特休} 人次</p>
+        <p><span class="legend-swatch status-公假">公</span> <strong>公假：</strong>${all.公假} 人次</p>
+        <p><span class="legend-swatch status-曠職">曠</span> <strong>曠職：</strong>${all.曠職} 人次</p>
+        <p><strong>請假合計：</strong>${leaveTotal} 人次｜<strong>未填：</strong>${all.empty} 格</p>
+        <p><strong>工作日出勤率（估算）：</strong>${attendanceRate}%</p>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 12px;">
+          出勤率 = 工作日出勤人次 ÷（30 人 × ${workdays} 工作日）
+        </p>
+      `;
+    }
+
+    function renderAll() {
+      renderTable();
+      renderPersonStats();
+      renderDailyStats();
+      renderOverallStats();
+    }
+
+    document.getElementById('btnRandom').addEventListener('click', () => {
+      initGrid(true);
+      renderAll();
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => {
+      initGrid(false);
+      renderAll();
+    });
+
+    renderLegend();
+    initGrid(true);
+    renderAll();
+  </script>
+</body>
+</html>
