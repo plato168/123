@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HKK 單頁式網站整理稿</title>
+  <meta name="description" content="依據 https://www.service1.com.tw/HKK/ 可存取狀態整理的一頁式 HTML 交付檔。">
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d9e0ec;
+      --brand: #1e5eff;
+      --brand-dark: #143bb8;
+      --warning: #b42318;
+      --warning-bg: #fff1f0;
+      --ok-bg: #ecfdf3;
+      --ok: #067647;
+      --shadow: 0 22px 70px rgba(23, 32, 51, 0.11);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(30, 94, 255, 0.16), transparent 30rem),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 45%, #eef3ff 100%);
+      line-height: 1.75;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.82);
+      border-bottom: 1px solid rgba(217, 224, 236, 0.72);
+    }
+
+    .nav {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .logo-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--brand), #7a5cff);
+      box-shadow: 0 12px 30px rgba(30, 94, 255, 0.28);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand);
+    }
+
+    .hero,
+    .section {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 92px 0 64px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: var(--brand-dark);
+      background: #eaf0ff;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      margin-top: 22px;
+      font-size: clamp(2.3rem, 6vw, 5rem);
+      max-width: 860px;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.8vw, 3rem);
+      margin-bottom: 18px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .lead {
+      margin: 24px 0 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      border: 1px solid transparent;
+    }
+
+    .button.primary {
+      color: #ffffff;
+      background: var(--brand);
+      box-shadow: 0 14px 32px rgba(30, 94, 255, 0.28);
+    }
+
+    .button.secondary {
+      color: var(--text);
+      background: #ffffff;
+      border-color: var(--line);
+    }
+
+    .status-card {
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      border: 1px solid rgba(217, 224, 236, 0.82);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--warning-bg);
+      color: var(--warning);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 18px;
+      background: #f8faff;
+      border: 1px solid var(--line);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.3rem;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .section {
+      padding: 58px 0;
+    }
+
+    .section-intro {
+      max-width: 720px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      font-size: 1.05rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      min-height: 100%;
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 40px rgba(23, 32, 51, 0.06);
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 16px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr);
+      gap: 18px;
+      padding: 20px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    .timeline-item time {
+      color: var(--brand-dark);
+      font-weight: 800;
+    }
+
+    .quote-box {
+      padding: 28px;
+      border-radius: var(--radius);
+      background: #111827;
+      color: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .quote-box p {
+      margin: 0;
+      color: #d7dce8;
+    }
+
+    .notice {
+      padding: 22px;
+      border-radius: 20px;
+      background: var(--warning-bg);
+      color: #7a271a;
+      border: 1px solid #fecdca;
+      margin-top: 20px;
+    }
+
+    .ready {
+      background: var(--ok-bg);
+      color: var(--ok);
+      border-color: #abefc6;
+    }
+
+    .source-code {
+      display: block;
+      overflow-x: auto;
+      padding: 18px;
+      border-radius: 18px;
+      color: #d7dce8;
+      background: #101828;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .footer {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 36px 0 56px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 16px 0;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .hero,
+      .section,
+      .footer,
+      .nav {
+        width: min(100% - 28px, 1120px);
+      }
+
+      .metric-grid,
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="主要導覽">
+      <a class="logo" href="#top" aria-label="回到頁首">
+        <span class="logo-mark">H</span>
+        <span>HKK 單頁整理</span>
+      </a>
+      <div class="nav-links">
+        <a href="#status">存取狀態</a>
+        <a href="#visible-content">可見內容</a>
+        <a href="#attempts">擷取紀錄</a>
+        <a href="#next">後續補齊</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <span class="eyebrow">來源網址：https://www.service1.com.tw/HKK/</span>
+        <h1 id="hero-title">HKK 網站單頁式 HTML 整理稿</h1>
+        <p class="lead">
+          這份檔案已整理成一頁式網站版型。因來源網站目前由 Cloudflare 阻擋自動與瀏覽器存取，
+          原始網站內容、圖片與內部頁面無法取得；本頁只收錄實際可驗證的可見內容與擷取狀態。
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#visible-content">查看目前可見內容</a>
+          <a class="button secondary" href="https://www.service1.com.tw/HKK/" target="_blank" rel="noopener">開啟原網址</a>
+        </div>
+      </div>
+
+      <aside class="status-card" id="status" aria-label="目前存取狀態">
+        <span class="status-badge">目前狀態：Cloudflare 403 封鎖</span>
+        <div class="metric-grid" aria-label="擷取摘要">
+          <div class="metric">
+            <strong>0</strong>
+            <span>取得的原始網站圖片</span>
+          </div>
+          <div class="metric">
+            <strong>0</strong>
+            <span>取得的原始內容頁</span>
+          </div>
+          <div class="metric">
+            <strong>3+</strong>
+            <span>已測試入口變體</span>
+          </div>
+          <div class="metric">
+            <strong>403</strong>
+            <span>伺服器回應狀態碼</span>
+          </div>
+        </div>
+        <div class="notice">
+          為避免交付錯誤資訊，本檔未將 Cloudflare 錯誤頁包裝成原網站內容，也未使用其他不同網域的資料替代。
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="visible-content" aria-labelledby="visible-title">
+      <h2 id="visible-title">目前唯一可見的頁面內容</h2>
+      <p class="section-intro">
+        實際開啟來源網址時，只能看到 Cloudflare 安全封鎖頁。以下為頁面中可見的文字與資訊整理。
+      </p>
+      <div class="cards">
+        <article class="card">
+          <h3>頁面主標題</h3>
+          <p>Sorry, you have been blocked</p>
+          <p>You are unable to access service1.com.tw</p>
+        </article>
+        <article class="card">
+          <h3>Why have I been blocked?</h3>
+          <p>
+            This website is using a security service to protect itself from online attacks.
+            The action you just performed triggered the security solution.
+          </p>
+        </article>
+        <article class="card">
+          <h3>What can I do to resolve this?</h3>
+          <p>
+            You can email the site owner to let them know you were blocked. Please include
+            what you were doing when this page came up and the Cloudflare Ray ID found at
+            the bottom of this page.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="attempts" aria-labelledby="attempts-title">
+      <h2 id="attempts-title">擷取與驗證紀錄</h2>
+      <p class="section-intro">
+        以下是已完成的取得方式與結果，方便後續交接或請網站管理員解除限制。
+      </p>
+      <div class="timeline">
+        <div class="timeline-item">
+          <time>方式一</time>
+          <div>
+            <h3>直接擷取原網址</h3>
+            <p>使用瀏覽器 User-Agent 存取 <code>https://www.service1.com.tw/HKK/</code>，回應 HTTP 403，內容為 Cloudflare 封鎖頁。</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <time>方式二</time>
+          <div>
+            <h3>瀏覽器開啟確認</h3>
+            <p>以圖形瀏覽器開啟同一網址，結果仍為 Cloudflare 封鎖頁，無法看到原網站實際內容或圖片。</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <time>方式三</time>
+          <div>
+            <h3>入口變體測試</h3>
+            <p>測試 <code>https://service1.com.tw/HKK/</code>、<code>https://www.service1.com.tw/HKK/index.html</code>、<code>http://www.service1.com.tw/HKK/</code>，皆回應 403。</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <time>方式四</time>
+          <div>
+            <h3>公開快照查詢</h3>
+            <p>查詢 Internet Archive availability API，結果沒有可用的 archived snapshots。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="source-title">
+      <h2 id="source-title">封鎖頁關鍵資訊</h2>
+      <p class="section-intro">
+        若要請網站管理員協助解除封鎖，可提供下列 Ray ID 與原始網址。
+      </p>
+      <code class="source-code">原始網址：https://www.service1.com.tw/HKK/
+伺服器回應：HTTP 403
+Cloudflare Ray ID 範例：a2a50eb678642d7c、a2a50fa60c4e302c
+封鎖訊息：Sorry, you have been blocked</code>
+    </section>
+
+    <section class="section" id="next" aria-labelledby="next-title">
+      <div class="quote-box">
+        <h2 id="next-title">後續如何補齊成真正的一頁式網站</h2>
+        <p>
+          只要提供原網站可瀏覽的 HTML、截圖、圖片素材，或請網站管理員暫時允許目前環境存取，
+          就可以把這份檔案中的狀態說明區塊替換成實際品牌內容、服務介紹、活動資訊、圖片與聯絡表單。
+        </p>
+      </div>
+      <div class="notice ready">
+        此 HTML 已是單檔、可離線開啟的一頁式版型；目前缺少的只有被來源網站封鎖而無法合法取得的原始內容素材。
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <strong>交付檔：</strong> hkk-one-page.html<br>
+    <span>製作原則：只整理已實際取得且可驗證的內容，不臆測、不混用其他網域資料。</span>
+  </footer>
+</body>
+</html>
