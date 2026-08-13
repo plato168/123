@@ -504,19 +504,50 @@ button.btn.ghost {
 }
 
 
-.sticky-nav { position: sticky; top: 0; z-index: 100; background: rgba(16, 47, 67, 0.97); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.12); padding: 10px 0; }
-.sticky-nav .shell { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-.sticky-nav a { color: #e4f1ee; text-decoration: none; font-size: 0.78rem; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.08); white-space: nowrap; }
-.sticky-nav a:hover { background: rgba(255,255,255,0.18); }
-.sticky-nav .brand-nav { font-weight: 800; color: #fff; margin-right: 8px; font-size: 0.85rem; }
-.onepage-section { scroll-margin-top: 72px; padding: 48px 0 24px; border-bottom: 2px solid var(--line); }
+.jump-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(16, 47, 67, 0.98);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 0;
+  box-shadow: 0 2px 12px rgba(16, 47, 67, 0.15);
+}
+.jump-bar .shell {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+}
+.jump-bar label {
+  color: #e4f1ee; font-size: 0.82rem; font-weight: 700; white-space: nowrap;
+}
+.jump-bar select {
+  flex: 1 1 220px; min-width: 0; max-width: min(520px, 100%);
+  font: inherit; font-size: 0.9rem; padding: 8px 32px 8px 12px;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 10px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2316354a' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: var(--ink); cursor: pointer; appearance: none;
+}
+.jump-bar select:focus { outline: 2px solid var(--sea); outline-offset: 2px; }
+.jump-bar .jump-quick {
+  display: flex; flex-wrap: wrap; gap: 5px; margin-left: auto;
+}
+.jump-bar .jump-quick a {
+  color: #e4f1ee; text-decoration: none; font-size: 0.76rem; font-weight: 700;
+  padding: 6px 9px; border-radius: 8px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14);
+}
+.jump-bar .jump-quick a:hover { background: rgba(255,255,255,0.22); }
+@media (max-width: 640px) {
+  .jump-bar .jump-quick { margin-left: 0; width: 100%; justify-content: space-between; }
+  .jump-bar select { flex: 1 1 100%; max-width: 100%; }
+}
+.onepage-section { scroll-margin-top: 58px; padding: 48px 0 24px; border-bottom: 2px solid var(--line); }
+.cat-section { scroll-margin-top: 58px; }
 .onepage-section:last-child { border-bottom: none; }
 .section-banner { margin-bottom: 24px; }
 .section-banner h2 { margin: 8px 0 6px; font-family: "Shippori Mincho", "Noto Serif TC", serif; font-size: clamp(1.5rem, 3vw, 2rem); color: var(--navy); }
 .section-tag { display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sea); background: var(--mint); padding: 4px 10px; border-radius: 6px; }
 .back-top { display: inline-block; margin: 24px 0; font-size: 0.85rem; color: var(--sea); text-decoration: none; font-weight: 700; }
 .back-top:hover { text-decoration: underline; }
-#page-manifest { margin: 24px 0 40px; scroll-margin-top: 72px; }
+#page-manifest { margin: 24px 0 40px; scroll-margin-top: 58px; }
 .manifest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 16px; }
 .manifest-col h3 { margin: 0 0 8px; font-size: 1rem; color: var(--sea); border-bottom: 2px solid var(--mint); padding-bottom: 6px; }
 .manifest-col ul { margin: 0; padding-left: 1.1em; font-size: 0.88rem; line-height: 1.7; }
@@ -804,11 +835,75 @@ button.btn.ghost {
       </div>
     </div>
   </header>
-  <nav class="sticky-nav" aria-label="頁面導覽">
+  <nav class="jump-bar" aria-label="頁面導覽">
     <div class="shell">
-      <span class="brand-nav">快速跳轉</span>
-      <a href="#page-manifest">40頁目錄</a>
-      <a href="#page-passport">護照申請攻略</a><a href="#page-japan-entry">日本入境 VJW</a><a href="#page-entry-packing">執行李・入境・檢疫</a><a href="#page-airport-transfer">接機／送機</a><a href="#page-airport-parking">機場停車</a><a href="#page-baggage">行李注意事項</a><a href="#page-powerbank-flight">行動電源／手機飛航</a><a href="#page-lcc">廉價航空緊急</a><a href="#page-overseas">國外旅遊準備總論</a><a href="#page-dining-hokkaido">自備餐附近餐廳</a><a href="#page-shopping">購物・便利商店・免稅</a><a href="#page-cocono-susukino">COCONO SUSUKINO</a><a href="#page-packing-list">出國檢查清單</a><a href="#page-packing">打包清單（精簡）</a><a href="#page-lodging">住宿禮儀</a><a href="#page-tour-etiquette">陌生人跟團禮儀</a><a href="#page-hokkaido">北海道旅遊總整理</a><a href="#page-attractions">跟團景點節奏</a><a href="#page-photo">拍照準備</a><a href="#page-youtubers">北海道影片參考</a><a href="#page-japan-taxfree">日本退稅實務</a><a href="#page-resources">資源總目錄</a><a href="#page-travel-sites">國內外旅遊網站</a><a href="#page-japan-esim">日本 eSIM</a><a href="#page-faq">國外旅行常見問題</a><a href="#page-faq-japan">日本旅行常見問題</a><a href="#page-checklist-trip">出國前・中・後檢核表</a><a href="#page-finance">財務／預算／儲蓄</a><a href="#page-spending">消費統計</a><a href="#page-cards-japan">日本消費信用卡</a><a href="#page-insurance">保險</a><a href="#page-insurance-decision">旅平險決策樹</a><a href="#page-insurance-compare">旅平險比較表</a><a href="#page-connectivity">當地上網</a><a href="#page-jp-phrases">日本旅遊日文包 100 句</a><a href="#page-translate-jp">日中雙向翻譯</a><a href="#page-emergency">緊急／遺失／求助</a><a href="#page-safety">安全</a><a href="#page-notices">旅遊須知</a>
+      <label for="page-jump">前往章節</label>
+      <select id="page-jump">
+        <option value="">— 請選擇章節 —</option>
+        <optgroup label="總覽">
+          <option value="#page-manifest">完整頁面目錄（40 頁）</option>
+          <option value="#page-index">首頁總覽・六大類</option>
+        </optgroup>
+        <optgroup label="食">
+          <option value="#page-dining-hokkaido">自備餐附近餐廳</option>
+          <option value="#page-shopping">購物・便利商店・免稅</option>
+          <option value="#page-cocono-susukino">COCONO SUSUKINO</option>
+        </optgroup>
+        <optgroup label="衣">
+          <option value="#page-packing-list">出國檢查清單</option>
+          <option value="#page-packing">打包清單（精簡）</option>
+        </optgroup>
+        <optgroup label="住">
+          <option value="#page-lodging">住宿禮儀</option>
+        </optgroup>
+        <optgroup label="行">
+          <option value="#page-passport">護照申請攻略</option>
+          <option value="#page-japan-entry">日本入境 VJW</option>
+          <option value="#page-entry-packing">執行李・入境・檢疫</option>
+          <option value="#page-airport-transfer">接機／送機</option>
+          <option value="#page-airport-parking">機場停車</option>
+          <option value="#page-baggage">行李注意事項</option>
+          <option value="#page-powerbank-flight">行動電源／手機飛航</option>
+          <option value="#page-lcc">廉價航空緊急</option>
+        </optgroup>
+        <optgroup label="娛樂">
+          <option value="#page-hokkaido">北海道旅遊總整理</option>
+          <option value="#page-attractions">跟團景點節奏</option>
+          <option value="#page-photo">拍照準備</option>
+          <option value="#page-youtubers">北海道影片參考</option>
+          <option value="#page-japan-taxfree">日本退稅實務</option>
+        </optgroup>
+        <optgroup label="知識">
+          <option value="#page-overseas">國外旅遊準備總論</option>
+          <option value="#page-tour-etiquette">陌生人跟團禮儀</option>
+          <option value="#page-resources">資源總目錄</option>
+          <option value="#page-travel-sites">國內外旅遊網站</option>
+          <option value="#page-japan-esim">日本 eSIM</option>
+          <option value="#page-faq">國外旅行常見問題</option>
+          <option value="#page-faq-japan">日本旅行常見問題</option>
+          <option value="#page-checklist-trip">出國前・中・後檢核表</option>
+          <option value="#page-finance">財務／預算／儲蓄</option>
+          <option value="#page-spending">消費統計</option>
+          <option value="#page-cards-japan">日本消費信用卡</option>
+          <option value="#page-insurance">保險</option>
+          <option value="#page-insurance-decision">旅平險決策樹</option>
+          <option value="#page-insurance-compare">旅平險比較表</option>
+          <option value="#page-connectivity">當地上網</option>
+          <option value="#page-jp-phrases">日本旅遊日文包 100 句</option>
+          <option value="#page-translate-jp">日中雙向翻譯</option>
+          <option value="#page-emergency">緊急／遺失／求助</option>
+          <option value="#page-safety">安全</option>
+          <option value="#page-notices">旅遊須知</option>
+        </optgroup>
+      </select>
+      <div class="jump-quick" aria-label="六大類捷徑">
+        <a href="#cat-food" title="食">食</a>
+        <a href="#cat-wear" title="衣">衣</a>
+        <a href="#cat-stay" title="住">住</a>
+        <a href="#cat-move" title="行">行</a>
+        <a href="#cat-fun" title="娛樂">娛樂</a>
+        <a href="#cat-know" title="知識">知識</a>
+      </div>
     </div>
   </nav>
   <main class="shell">
@@ -6316,6 +6411,22 @@ try {
     fillVoices();
     if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = fillVoices;
 } catch(e) { console.warn('jp-phrases.html script:', e); }
+})();
+  </script>
+  <script>
+(function () {
+  var sel = document.getElementById("page-jump");
+  if (!sel) return;
+  sel.addEventListener("change", function () {
+    var v = this.value;
+    if (!v) return;
+    var el = document.querySelector(v);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    else location.hash = v.slice(1);
+    history.replaceState(null, "", v);
+    var self = this;
+    setTimeout(function () { self.selectedIndex = 0; }, 300);
+  });
 })();
   </script>
 </body>
