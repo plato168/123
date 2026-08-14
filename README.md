@@ -2,9 +2,9 @@
 
 ## 直接開啟（公開網址）
 
-**https://primal-mote-ayjz3t9.shipstatic.com**
+**https://surging-wave-k2fkb9f.shipstatic.com**
 
-用手機或電腦瀏覽器開啟上述連結即可，不需下載檔案。
+用手機或電腦瀏覽器開啟上述連結即可，不需下載檔案。含北海道熊害防範章節（v4）。
 
 > 此網址由免費靜態主機提供。若要永久保留，請使用下方 GitHub Pages 設定（建議）。
 
@@ -25,4 +25,5 @@
 
 ## 離線檔案下載
 
-- [GitHub Release 下載](https://github.com/plato168/123/releases/tag/hkk-onepage-v2)
+- [GitHub Release 下載 v4（含熊害章節）](https://github.com/plato168/123/releases/tag/hkk-onepage-v4)
+- [GitHub Release 下載 v3](https://github.com/plato168/123/releases/tag/hkk-onepage-v3)
