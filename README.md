@@ -1,12 +1,19 @@
 # HKK 國外團體旅遊一頁網站
 
-## 直接開啟（公開網址）
+## 直接開啟（公開網址，任何地方可用）
 
-**https://surging-wave-k2fkb9f.shipstatic.com**
+**永久連結（推薦）：**  
+https://raw.githack.com/plato168/123/gh-pages/index.html
 
-用手機或電腦瀏覽器開啟上述連結即可，不需下載檔案。含北海道熊害防範章節（v4）。
+**北海道熊害防範（直達）：**  
+https://raw.githack.com/plato168/123/gh-pages/index.html#page-hokkaido-bear
 
-> 此網址由免費靜態主機提供。若要永久保留，請使用下方 GitHub Pages 設定（建議）。
+用手機或電腦瀏覽器開啟即可，不需下載檔案。此連結由 GitHub `gh-pages` 分支提供，長期有效。
+
+**備用連結：**  
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/plato168/123/gh-pages/index.html
+
+> 若上方連結偶爾較慢，可改用下方 GitHub Pages 永久網址（需一次性設定）。
 
 ---
 
