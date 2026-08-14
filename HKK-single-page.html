@@ -487,6 +487,24 @@ button.btn.ghost {
   padding: 22px 0;
   font-size: 0.85rem;
 }
+.hkk-export-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 14px;
+}
+.hkk-export-bar .btn { font-size: 0.88rem; }
+.page-hero .hkk-export-bar { margin-top: 16px; }
+.footer .hkk-export-bar {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.footer .hkk-export-bar .btn.ghost {
+  color: #e8f4f6;
+  border-color: rgba(255,255,255,0.35);
+}
 
 @media (max-width: 640px) {
   .form-grid { grid-template-columns: 1fr; }
@@ -833,6 +851,10 @@ button.btn.ghost {
         <p class="eyebrow">Overseas Group Travel Hub · Single Page · 40 Pages</p>
         <h1>國外團體旅遊協助中心</h1>
         <p class="lead">專為<strong>出國跟團／團體旅客</strong>整理。<strong>全部勾稽項目集中於頁首</strong>（已合併重複），勾選狀態存在本機瀏覽器。</p>
+        <div class="hkk-export-bar" aria-label="匯出工具">
+          <button type="button" class="btn" data-hkk-export="checklist">下載勾稽結果</button>
+          <button type="button" class="btn ghost" data-hkk-export="web-archive">下載網頁存檔</button>
+        </div>
       </div>
     </div>
   </header>
@@ -1499,6 +1521,10 @@ button.btn.ghost {
       <button type="button" class="btn ghost" data-clear-checklist>清除本區</button>
     </section>
   <div class="toolbar" style="margin-top:16px">
+    <div class="hkk-export-bar" aria-label="匯出工具">
+      <button type="button" class="btn" data-hkk-export="checklist">下載勾稽結果</button>
+      <button type="button" class="btn ghost" data-hkk-export="web-archive">下載網頁存檔</button>
+    </div>
     <button type="button" class="btn ghost" id="clear-all-master">清除全部勾選</button>
     <span id="master-check-progress" class="progress"></span>
   </div>
@@ -5293,7 +5319,13 @@ button.btn.ghost {
 
   </main>
   <footer class="footer">
-    <div class="shell">HKK · 單頁完整版（40 頁）· <a href="https://www.service1.com.tw/HKK/" target="_blank" rel="noopener" style="color:inherit">service1.com.tw/HKK</a></div>
+    <div class="shell">
+      <div class="hkk-export-bar" aria-label="匯出工具">
+        <button type="button" class="btn" data-hkk-export="checklist">下載勾稽結果</button>
+        <button type="button" class="btn ghost" data-hkk-export="web-archive">下載網頁存檔</button>
+      </div>
+      <div>HKK · 單頁完整版（40 頁）· <a href="https://www.service1.com.tw/HKK/" target="_blank" rel="noopener" style="color:inherit">service1.com.tw/HKK</a></div>
+    </div>
   </footer>
   <script>
 /**
@@ -5516,13 +5548,115 @@ button.btn.ghost {
   paintMaster();
 })();
 
+/* 勾稽結果下載與網頁存檔 */
+(function () {
+  function stamp() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "_" + p(d.getHours()) + p(d.getMinutes());
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function collectChecklistReport() {
+    const sections = [];
+    let doneAll = 0;
+    let totalAll = 0;
+    document.querySelectorAll("#page-master-checklist [data-collection]").forEach((root) => {
+      const ns = root.getAttribute("data-collection");
+      const titleEl = root.querySelector("h3");
+      const title = titleEl ? titleEl.textContent.trim() : ns;
+      const state = window.HKK.load(ns);
+      const items = [...root.querySelectorAll("input[data-key]")].map((el) => {
+        const key = el.getAttribute("data-key");
+        const text = (el.nextElementSibling && el.nextElementSibling.textContent) || "";
+        const checked = !!state[key] || el.checked;
+        return { key, text: text.trim(), checked };
+      });
+      const done = items.filter((i) => i.checked).length;
+      doneAll += done;
+      totalAll += items.length;
+      sections.push({ title, namespace: ns, items, done, total: items.length });
+    });
+    return {
+      exportedAt: new Date().toISOString(),
+      summary: { done: doneAll, total: totalAll },
+      sections,
+    };
+  }
+
+  function exportChecklistTxt() {
+    const report = collectChecklistReport();
+    const lines = [
+      "HKK 出國勾稽結果",
+      "匯出時間：" + new Date(report.exportedAt).toLocaleString("zh-TW"),
+      "總進度：" + report.summary.done + " / " + report.summary.total,
+      "",
+    ];
+    report.sections.forEach((sec) => {
+      lines.push("【" + sec.title + "】 " + sec.done + " / " + sec.total);
+      sec.items.forEach((item) => {
+        lines.push((item.checked ? "✓ " : "□ ") + item.text);
+      });
+      lines.push("");
+    });
+    downloadBlob(
+      new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }),
+      "HKK-勾稽結果-" + stamp() + ".txt"
+    );
+  }
+
+  function exportChecklistJson() {
+    const report = collectChecklistReport();
+    downloadBlob(
+      new Blob([JSON.stringify(report, null, 2)], { type: "application/json;charset=utf-8" }),
+      "HKK-勾稽結果-" + stamp() + ".json"
+    );
+  }
+
+  function exportWebArchive() {
+    const snapshot = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("hkk:")) snapshot[key] = localStorage.getItem(key);
+    }
+    let html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    html = html.replace(/<script id="hkk-embedded-snapshot">[\s\S]*?<\/script>\s*/gi, "");
+    const snapScript =
+      '<script id="hkk-embedded-snapshot">(function(){try{var d=' +
+      JSON.stringify(snapshot) +
+      ';for(var k in d)if(Object.prototype.hasOwnProperty.call(d,k))localStorage.setItem(k,d[k]);}catch(e){console.warn(e);}})();</script>';
+    html = html.replace(/<body([^>]*)>/i, "<body$1>\n" + snapScript);
+    downloadBlob(
+      new Blob([html], { type: "text/html;charset=utf-8" }),
+      "HKK-網頁存檔-" + stamp() + ".html"
+    );
+  }
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-hkk-export]");
+    if (!btn) return;
+    const action = btn.getAttribute("data-hkk-export");
+    if (action === "checklist") {
+      exportChecklistTxt();
+    } else if (action === "web-archive") {
+      exportWebArchive();
+    }
+  });
+})();
 
   </script>
   <script>
-} catch(e) { console.warn('entry-packing.html script:', e); }
-})();
-} catch(e) { console.warn('packing-list.html script:', e); }
-})();
 /* script from faq.html #1 */
 (function(){
 try {
