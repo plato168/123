@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>車床外徑加工程式產生器</title>
+  <style>
+    :root {
+      --bg: #10151c;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #34d399;
+      --accent-2: #22d3ee;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52, 211, 153, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header { margin-bottom: 24px; }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 900px;
+    }
+
+    .offline-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.12);
+      color: #a7f3d0;
+      font-size: 0.85rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 500px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1020px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .card-head h2 { margin: 0; font-size: 1.05rem; }
+
+    .card-body { padding: 18px 20px 20px; }
+
+    form { display: grid; gap: 14px; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    .field small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    input, select, textarea, button { font: inherit; }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.18);
+    }
+
+    .rule-box {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      background: rgba(52, 211, 153, 0.08);
+      color: #d1fae5;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .rule-box strong { color: #ecfdf5; }
+
+    .segment-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: rgba(255,255,255,0.04);
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    table input, table select {
+      padding: 7px 8px;
+      font-size: 0.86rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #059669);
+      color: #052e16;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      padding: 6px 10px;
+      font-size: 0.82rem;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ecfdf5;
+    }
+
+    textarea#output {
+      width: 100%;
+      min-height: 520px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      resize: vertical;
+    }
+
+    .error {
+      display: none;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(248, 113, 113, 0.12);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      color: #fecaca;
+    }
+
+    .error.show { display: block; }
+
+    .note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    details.advanced {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    details.advanced summary {
+      cursor: pointer;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>車床外徑加工程式產生器</h1>
+      <p class="subtitle">
+        依指定規則自動產生 G-code：刀尖 R0.4、外徑直線段預留 Ø0.4、逃角與倒角加工至實際尺寸不預留、
+        不使用 G41/G42 刀尖補正（改以座標手動補償）。
+      </p>
+      <div class="offline-badge">本機離線執行 · 單一 HTML 檔 · 不需安裝 · 不需伺服器</div>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-head"><h2>參數輸入</h2></div>
+        <div class="card-body">
+          <form id="turnForm">
+            <div class="rule-box">
+              <strong>固定加工規則</strong><br>
+              刀尖半徑 R = <strong>0.4</strong> mm<br>
+              外徑直線段粗車預留 = <strong>Ø0.4</strong> mm（精車至圖面尺寸）<br>
+              逃角 R 與倒角 C = <strong>不預留</strong>，直接加工至圖面尺寸<br>
+              <strong>不使用 G41/G42</strong>，肩位與圓角以座標手動補償
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="stockDiameter">材料起始外徑 (mm)</label>
+                <input id="stockDiameter" type="number" step="0.0001" value="52.0000" required>
+              </div>
+              <div class="field">
+                <label for="roughDepth">粗車單次切深 (mm)</label>
+                <input id="roughDepth" type="number" step="0.0001" value="1.5000" required>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="roughFeed">粗車進給 F</label>
+                <input id="roughFeed" type="number" step="0.0001" value="0.2000" required>
+              </div>
+              <div class="field">
+                <label for="finishFeed">精車進給 F</label>
+                <input id="finishFeed" type="number" step="0.0001" value="0.1000" required>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="spindleSpeed">主軸轉速 S</label>
+                <input id="spindleSpeed" type="number" step="1" value="800" required>
+              </div>
+              <div class="field">
+                <label for="approachZ">安全進刀 Z (mm)</label>
+                <input id="approachZ" type="number" step="0.0001" value="2.0000" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>輪廓分段（由右端面 Z0 往左）</label>
+              <div class="segment-table-wrap">
+                <table id="segmentTable">
+                  <thead>
+                    <tr>
+                      <th>類型</th>
+                      <th>Z 起點</th>
+                      <th>Z 終點</th>
+                      <th>完成外徑</th>
+                      <th>R / C</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="segmentBody"></tbody>
+                </table>
+              </div>
+              <small>
+                外徑直線：Z 起點 &gt; Z 終點（往左車削）。逃角：在肩位以 R 過渡至下一外徑。倒角：在 Z 起點端面倒 C×45°。
+              </small>
+            </div>
+
+            <div class="actions">
+              <button type="button" id="addSegment" class="btn-secondary">新增分段</button>
+            </div>
+
+            <details class="advanced">
+              <summary>進階設定</summary>
+              <div class="grid-2" style="margin-top:12px;">
+                <div class="field">
+                  <label for="toolNumber">刀號 T</label>
+                  <input id="toolNumber" type="text" value="0101">
+                </div>
+                <div class="field">
+                  <label for="safeX">安全退刀 X (mm)</label>
+                  <input id="safeX" type="number" step="0.0001" value="80.0000">
+                </div>
+                <div class="field">
+                  <label for="safeZ">安全退刀 Z (mm)</label>
+                  <input id="safeZ" type="number" step="0.0001" value="5.0000">
+                </div>
+                <div class="field">
+                  <label for="outputFileName">下載檔名</label>
+                  <input id="outputFileName" type="text" value="lathe_turning.nc">
+                </div>
+              </div>
+            </details>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary">產生車床程式</button>
+              <button type="button" id="loadSample" class="btn-secondary">載入範例</button>
+              <button type="button" id="copyOutput" class="btn-secondary">複製程式碼</button>
+              <button type="button" id="downloadOutput" class="btn-secondary">下載 .NC 檔</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>CNC 程式輸出</h2></div>
+        <div class="card-body">
+          <div id="errorBox" class="error"></div>
+          <div class="summary">
+            <div class="stat"><div class="label">粗車刀數</div><div class="value" id="statRoughPasses">-</div></div>
+            <div class="stat"><div class="label">精車段數</div><div class="value" id="statFinishSegs">-</div></div>
+            <div class="stat"><div class="label">最小完成外徑</div><div class="value" id="statMinDia">-</div></div>
+          </div>
+          <textarea id="output" readonly placeholder="按「產生車床程式」後，G-code 會顯示在這裡。"></textarea>
+          <p class="note">
+            粗車外徑直線段程式 X = 圖面尺寸 + 0.4；精車外徑直線段 X = 圖面尺寸。
+            肩位手動補償：先車至 Z + R0.4，再 X 進刀至（小徑 + 0.8），最後 Z 走至終點。
+            逃角以 G02 車刀心軌跡半徑（工件 R + 0.4）；倒角 C×45° 直接以圖面尺寸計算端點，不另預留。
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const TOOL_NOSE_R = 0.4;
+    const OD_STOCK = 0.4;
+
+    const form = document.getElementById('turnForm');
+    const output = document.getElementById('output');
+    const errorBox = document.getElementById('errorBox');
+    const segmentBody = document.getElementById('segmentBody');
+
+    const SEGMENT_TYPES = [
+      { value: 'od', label: '外徑直線' },
+      { value: 'fillet', label: '逃角 R' },
+      { value: 'chamfer', label: '倒角 C×45°' }
+    ];
+
+    function fmt(value, digits = 4) {
+      return Number(value).toFixed(digits);
+    }
+
+    function fmtCoord(value) {
+      const text = Number(value).toFixed(4);
+      return text
+        .replace(/(\.\d*?[1-9])0+$/u, '$1')
+        .replace(/\.0+$/u, '');
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.add('show');
+    }
+
+    function clearError() {
+      errorBox.textContent = '';
+      errorBox.classList.remove('show');
+    }
+
+    function createSegmentRow(data = {}) {
+      const tr = document.createElement('tr');
+      const type = data.type || 'od';
+      const zStart = data.zStart ?? 0;
+      const zEnd = data.zEnd ?? -50;
+      const diameter = data.diameter ?? 50;
+      const extra = data.extra ?? 0;
+
+      tr.innerHTML = `
+        <td>
+          <select class="seg-type">
+            ${SEGMENT_TYPES.map((item) => `<option value="${item.value}" ${item.value === type ? 'selected' : ''}>${item.label}</option>`).join('')}
+          </select>
+        </td>
+        <td><input class="seg-z-start" type="number" step="0.0001" value="${zStart}"></td>
+        <td><input class="seg-z-end" type="number" step="0.0001" value="${zEnd}"></td>
+        <td><input class="seg-diameter" type="number" step="0.0001" value="${diameter}"></td>
+        <td><input class="seg-extra" type="number" step="0.0001" value="${extra}" title="逃角 R 或倒角 C"></td>
+        <td><button type="button" class="btn-danger remove-seg">刪除</button></td>
+      `;
+      segmentBody.appendChild(tr);
+    }
+
+    function readSegments() {
+      return [...segmentBody.querySelectorAll('tr')].map((row) => ({
+        type: row.querySelector('.seg-type').value,
+        zStart: Number(row.querySelector('.seg-z-start').value),
+        zEnd: Number(row.querySelector('.seg-z-end').value),
+        diameter: Number(row.querySelector('.seg-diameter').value),
+        extra: Number(row.querySelector('.seg-extra').value)
+      }));
+    }
+
+    function readParams() {
+      return {
+        stockDiameter: Number(document.getElementById('stockDiameter').value),
+        roughDepth: Number(document.getElementById('roughDepth').value),
+        roughFeed: Number(document.getElementById('roughFeed').value),
+        finishFeed: Number(document.getElementById('finishFeed').value),
+        spindleSpeed: Number(document.getElementById('spindleSpeed').value),
+        approachZ: Number(document.getElementById('approachZ').value),
+        toolNumber: document.getElementById('toolNumber').value.trim() || '0101',
+        safeX: Number(document.getElementById('safeX').value),
+        safeZ: Number(document.getElementById('safeZ').value),
+        segments: readSegments()
+      };
+    }
+
+    function validateParams(p) {
+      if (p.stockDiameter <= 0) return '材料起始外徑必須大於 0。';
+      if (p.roughDepth <= 0) return '粗車切深必須大於 0。';
+      if (p.roughFeed <= 0 || p.finishFeed <= 0) return '進給必須大於 0。';
+      if (p.spindleSpeed <= 0) return '主軸轉速必須大於 0。';
+      if (!p.segments.length) return '請至少新增一個輪廓分段。';
+
+      for (let i = 0; i < p.segments.length; i += 1) {
+        const seg = p.segments[i];
+        const idx = i + 1;
+        if (seg.diameter <= 0) return `第 ${idx} 段完成外徑必須大於 0。`;
+
+        if (seg.type === 'od') {
+          if (!(seg.zStart > seg.zEnd)) return `第 ${idx} 段外徑直線：Z 起點必須大於 Z 終點。`;
+        }
+
+        if (seg.type === 'fillet') {
+          if (seg.extra <= 0) return `第 ${idx} 段逃角 R 必須大於 0。`;
+          if (!(seg.zStart > seg.zEnd)) return `第 ${idx} 段逃角：Z 起點必須大於 Z 終點。`;
+        }
+
+        if (seg.type === 'chamfer') {
+          if (seg.extra <= 0) return `第 ${idx} 段倒角 C 必須大於 0。`;
+        }
+      }
+
+      return null;
+    }
+
+    function maxFinishDiameter(segments) {
+      return Math.max(...segments.filter((s) => s.type !== 'chamfer').map((s) => s.diameter));
+    }
+
+    function minFinishDiameter(segments) {
+      const values = segments.filter((s) => s.type !== 'chamfer').map((s) => s.diameter);
+      return values.length ? Math.min(...values) : 0;
+    }
+
+    function roughX(finishDiameter) {
+      return finishDiameter + OD_STOCK;
+    }
+
+    function finishX(finishDiameter) {
+      return finishDiameter;
+    }
+
+    function shoulderZ(z) {
+      return z + TOOL_NOSE_R;
+    }
+
+    function shoulderX(finishDiameter) {
+      return finishDiameter + 2 * TOOL_NOSE_R;
+    }
+
+    function buildRoughPasses(stockDiameter, targetDiameter, roughDepth) {
+      const passes = [];
+      let current = stockDiameter;
+      const goal = roughX(targetDiameter);
+      while (current - roughDepth > goal) {
+        current -= roughDepth;
+        passes.push(current);
+      }
+      if (Math.abs(current - goal) > 1e-6) {
+        passes.push(goal);
+      }
+      return passes;
+    }
+
+    function appendHeader(lines, p, title) {
+      lines.push(`(${title})`);
+      lines.push(`(TOOL NOSE R${fmt(TOOL_NOSE_R)}  OD STOCK DIA+${fmt(OD_STOCK)}  NO G41/G42)`);
+      lines.push(`N2  G0  X${fmtCoord(p.safeX)}. Z${fmtCoord(p.safeZ)}.`);
+      lines.push(`        T${p.toolNumber}`);
+      lines.push(`    G97 S${Math.round(p.spindleSpeed)}`);
+      lines.push('        M3');
+      lines.push('M8');
+    }
+
+    function appendFooter(lines, p) {
+      lines.push('        M09');
+      lines.push(`    G0  X${fmtCoord(p.safeX)}. Z${fmtCoord(p.safeZ)}. M5`);
+      lines.push('        M1');
+    }
+
+    function generateTurningProgram(p) {
+      const lines = [];
+      let roughPasses = 0;
+      let finishSegs = 0;
+
+      const odSegments = p.segments.filter((s) => s.type === 'od');
+      const maxOd = maxFinishDiameter(p.segments);
+
+      appendHeader(lines, p, 'ROUGHING - OD ALLOWANCE 0.4 ON DIAMETER');
+
+      const roughPassList = buildRoughPasses(p.stockDiameter, maxOd, p.roughDepth);
+      roughPasses = roughPassList.length;
+
+      let feedUsed = false;
+      for (const passX of roughPassList) {
+        const feed = feedUsed ? '.' : ` F${fmtCoord(p.roughFeed)}.`;
+        lines.push(`    G00 X${fmtCoord(passX + 2)}. Z${fmtCoord(p.approachZ)}.`);
+        for (const seg of odSegments) {
+          lines.push(`    G01 Z${fmtCoord(shoulderZ(seg.zEnd))}${feed}`);
+          feedUsed = true;
+        }
+        lines.push(`    G00 X${fmtCoord(passX + 4)}. Z${fmtCoord(p.approachZ)}.`);
+      }
+
+      appendFooter(lines, p);
+
+      appendHeader(lines, p, 'FINISHING OD - ACTUAL SIZE, MANUAL NOSE R COMP');
+
+      let currentX = finishX(maxOd);
+      let currentZ = p.approachZ;
+      feedUsed = false;
+
+      lines.push(`    G00 X${fmtCoord(shoulderX(currentX))}. Z${fmtCoord(currentZ)}.`);
+
+      for (let i = 0; i < p.segments.length; i += 1) {
+        const seg = p.segments[i];
+        const feed = feedUsed ? '.' : ` F${fmtCoord(p.finishFeed)}.`;
+
+        if (seg.type === 'od') {
+          lines.push(`(OD FINISH D${fmt(seg.diameter)} Z${fmtCoord(seg.zStart)} TO Z${fmtCoord(seg.zEnd)})`);
+          if (Math.abs(currentX - finishX(seg.diameter)) > 1e-6) {
+            lines.push(`    G00 X${fmtCoord(shoulderX(seg.diameter))}. Z${fmtCoord(Math.max(currentZ, p.approachZ))}.`);
+          }
+          lines.push(`    G01 Z${fmtCoord(shoulderZ(seg.zEnd))}${feed}`);
+          feedUsed = true;
+          currentX = finishX(seg.diameter);
+          currentZ = seg.zEnd;
+          finishSegs += 1;
+
+          const next = p.segments[i + 1];
+          if (next && next.type === 'od' && next.diameter < seg.diameter) {
+            lines.push(`    G01 X${fmtCoord(shoulderX(next.diameter))}.`);
+            lines.push(`    G01 Z${fmtCoord(shoulderZ(next.zEnd))}.`);
+            currentX = finishX(next.diameter);
+            currentZ = next.zEnd;
+          }
+        }
+
+        if (seg.type === 'fillet') {
+          const workR = seg.extra;
+          const toolPathR = workR + TOOL_NOSE_R;
+          const zCenter = seg.zStart - workR;
+          const xCenter = seg.diameter + 2 * workR;
+          lines.push(`(FILLET R${fmt(workR)} TO D${fmt(seg.diameter)} - NO STOCK ALLOWANCE)`);
+          lines.push(`    G01 X${fmtCoord(shoulderX(seg.diameter))}.`);
+          lines.push(`    G02 X${fmtCoord(finishX(seg.diameter))}. Z${fmtCoord(seg.zEnd)}. R${fmtCoord(toolPathR)}.`);
+          feedUsed = true;
+          currentX = finishX(seg.diameter);
+          currentZ = seg.zEnd;
+          finishSegs += 1;
+          lines.push(`(CENTER REF X${fmtCoord(xCenter)} Z${fmtCoord(zCenter)} FOR CHECK)`);
+        }
+
+        if (seg.type === 'chamfer') {
+          const c = seg.extra;
+          const endX = finishX(seg.diameter - 2 * c);
+          const endZ = seg.zStart - c;
+          lines.push(`(CHAMFER C${fmt(c)} X45 - NO STOCK ALLOWANCE)`);
+          lines.push(`    G00 X${fmtCoord(shoulderX(seg.diameter))}. Z${fmtCoord(p.approachZ)}.`);
+          lines.push(`    G01 X${fmtCoord(endX)}. Z${fmtCoord(endZ)}${feed}`);
+          feedUsed = true;
+          currentX = endX;
+          currentZ = endZ;
+          finishSegs += 1;
+        }
+      }
+
+      appendFooter(lines, p);
+
+      return {
+        code: lines.join('\n'),
+        roughPasses,
+        finishSegs,
+        minDia: minFinishDiameter(p.segments)
+      };
+    }
+
+    function updateStats(result) {
+      document.getElementById('statRoughPasses').textContent = String(result.roughPasses);
+      document.getElementById('statFinishSegs').textContent = String(result.finishSegs);
+      document.getElementById('statMinDia').textContent = fmt(result.minDia);
+    }
+
+    function generate() {
+      clearError();
+      try {
+        const params = readParams();
+        const error = validateParams(params);
+        if (error) {
+          showError(error);
+          return;
+        }
+        const result = generateTurningProgram(params);
+        output.value = result.code;
+        updateStats(result);
+      } catch (err) {
+        showError(err.message || '產生程式時發生錯誤。');
+      }
+    }
+
+    function loadSample() {
+      segmentBody.innerHTML = '';
+      createSegmentRow({ type: 'od', zStart: 0, zEnd: -50, diameter: 50, extra: 0 });
+      createSegmentRow({ type: 'fillet', zStart: -50, zEnd: -52, diameter: 40, extra: 2 });
+      createSegmentRow({ type: 'od', zStart: -52, zEnd: -100, diameter: 40, extra: 0 });
+      createSegmentRow({ type: 'chamfer', zStart: 0, zEnd: 0, diameter: 50, extra: 1 });
+      document.getElementById('stockDiameter').value = '52.0000';
+      document.getElementById('roughDepth').value = '1.5000';
+      document.getElementById('roughFeed').value = '0.2000';
+      document.getElementById('finishFeed').value = '0.1000';
+      document.getElementById('spindleSpeed').value = '800';
+      document.getElementById('approachZ').value = '2.0000';
+      document.getElementById('toolNumber').value = '0101';
+      document.getElementById('safeX').value = '80.0000';
+      document.getElementById('safeZ').value = '5.0000';
+      generate();
+    }
+
+    async function copyOutput() {
+      if (!output.value.trim()) {
+        showError('目前沒有可複製的程式碼。');
+        return;
+      }
+      clearError();
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(output.value);
+          return;
+        }
+        throw new Error('clipboard unavailable');
+      } catch (err) {
+        output.focus();
+        output.select();
+        document.execCommand('copy');
+      }
+    }
+
+    function sanitizeFileName(name) {
+      const trimmed = (name || 'lathe_turning.nc').trim() || 'lathe_turning.nc';
+      const base = trimmed.replace(/[\\/:*?"<>|]+/g, '_');
+      return base.toLowerCase().endsWith('.nc') ? base : `${base}.nc`;
+    }
+
+    function downloadOutput() {
+      if (!output.value.trim()) {
+        showError('請先產生程式碼，再下載 .NC 檔。');
+        return;
+      }
+      clearError();
+      const fileName = sanitizeFileName(document.getElementById('outputFileName').value);
+      const blob = new Blob([output.value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('addSegment').addEventListener('click', () => {
+      createSegmentRow();
+    });
+
+    segmentBody.addEventListener('click', (event) => {
+      if (event.target.classList.contains('remove-seg')) {
+        event.target.closest('tr').remove();
+      }
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      generate();
+    });
+
+    document.getElementById('loadSample').addEventListener('click', loadSample);
+    document.getElementById('copyOutput').addEventListener('click', copyOutput);
+    document.getElementById('downloadOutput').addEventListener('click', downloadOutput);
+
+    loadSample();
+  </script>
+</body>
+</html>

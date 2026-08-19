@@ -1,0 +1,39 @@
+(SAMPLE SHAFT - ROUGH/FINISH PER RULES)
+(TOOL NOSE R0.4  OD STOCK DIA+0.4  NO G41/G42)
+N2  G0  X80. Z5.
+        T0101
+    G97 S800
+        M3
+M8
+(--- ROUGHING ---)
+    G00 X52.5. Z2.
+    G01 Z-49.6 F0.2.
+    G01 Z-99.6 F0.2.
+    G00 X54.5. Z2.
+    G00 X52.4. Z2.
+    G01 Z-49.6.
+    G01 Z-99.6.
+    G00 X54.4. Z2.
+        M09
+    G0  X80. Z5. M5
+        M1
+(--- FINISHING ---)
+N2  G0  X80. Z5.
+        T0101
+    G97 S800
+        M3
+M8
+    G00 X50.8. Z2.
+(OD FINISH D50.0000 Z0 TO Z-50)
+    G01 Z-49.6 F0.1.
+(FILLET R2.0000 TO D40.0000 - NO STOCK ALLOWANCE)
+    G01 X40.8.
+    G02 X40. Z-52. R2.4.
+(OD FINISH D40.0000 Z-52 TO Z-100)
+    G01 Z-99.6.
+(CHAMFER C1.0000 X45 - NO STOCK ALLOWANCE)
+    G00 X50.8. Z2.
+    G01 X48. Z-1.
+        M09
+    G0  X80. Z5. M5
+        M1
