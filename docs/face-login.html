@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>瀏覽器人臉登入驗證</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-soft: #1f2937;
+      --border: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-strong: #0ea5e9;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --shadow: 0 24px 70px rgba(2, 6, 23, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(56, 189, 248, 0.20), transparent 28%),
+        radial-gradient(circle at 88% 8%, rgba(52, 211, 153, 0.14), transparent 26%),
+        linear-gradient(135deg, #020617 0%, var(--bg) 100%);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 56px;
+    }
+
+    header {
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 1.08;
+      letter-spacing: 0.02em;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.06rem;
+      line-height: 1.8;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 1.05fr) minmax(300px, 0.95fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent), rgba(15, 23, 42, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .video-wrap {
+      position: relative;
+      min-height: 360px;
+      background: #020617;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    video,
+    canvas {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      display: block;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .camera-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.14), transparent),
+        #020617;
+    }
+
+    .camera-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .status {
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      color: var(--muted);
+      background: rgba(15, 23, 42, 0.74);
+      line-height: 1.7;
+    }
+
+    .status.ok {
+      border-color: rgba(52, 211, 153, 0.45);
+      color: #bbf7d0;
+      background: rgba(20, 83, 45, 0.32);
+    }
+
+    .status.warn {
+      border-color: rgba(251, 191, 36, 0.45);
+      color: #fde68a;
+      background: rgba(113, 63, 18, 0.32);
+    }
+
+    .status.danger {
+      border-color: rgba(251, 113, 133, 0.45);
+      color: #fecdd3;
+      background: rgba(136, 19, 55, 0.32);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 14px;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.86);
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
+    }
+
+    .hint {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 520px) {
+      .actions { grid-template-columns: 1fr; }
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 14px;
+      color: #00111c;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.16s ease, opacity 0.16s ease, filter 0.16s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+    }
+
+    button.danger {
+      color: #fff;
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+    }
+
+    .steps {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .steps span {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #082f49;
+      background: #bae6fd;
+      font-weight: 900;
+    }
+
+    .notice {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(251, 191, 36, 0.42);
+      border-radius: 16px;
+      color: #fde68a;
+      background: rgba(113, 63, 18, 0.26);
+      line-height: 1.7;
+    }
+
+    .meter {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .meter strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    progress {
+      width: 100%;
+      height: 14px;
+      accent-color: var(--accent);
+    }
+
+    code {
+      color: #bae6fd;
+      background: rgba(2, 6, 23, 0.58);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 8px;
+      padding: 2px 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Face Login Demo</p>
+      <h1>瀏覽器人臉登入驗證</h1>
+      <p class="lead">
+        這是一個可直接部署在靜態網站上的前端範例。使用者先輸入帳號並註冊臉部特徵，之後即可透過鏡頭比對同一帳號的人臉特徵完成登入驗證。
+      </p>
+    </header>
+
+    <section class="layout" aria-label="人臉登入操作區">
+      <article class="card">
+        <div class="video-wrap">
+          <video id="camera" autoplay muted playsinline aria-label="鏡頭預覽"></video>
+          <canvas id="overlay" aria-hidden="true"></canvas>
+          <div class="camera-placeholder" id="cameraPlaceholder">
+            <p>
+              <strong>尚未啟動鏡頭</strong>
+              按下「啟動鏡頭」後，請允許瀏覽器使用攝影機。
+            </p>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="status warn" id="status" role="status" aria-live="polite">
+            請先啟動鏡頭，並確保畫面中只有一張正面人臉。
+          </p>
+          <div class="meter" aria-live="polite">
+            <strong id="scoreText">相似度：尚未比對</strong>
+            <progress id="scoreMeter" value="0" max="100">0%</progress>
+          </div>
+        </div>
+      </article>
+
+      <aside class="card">
+        <div class="card-body">
+          <label for="account">帳號</label>
+          <input id="account" type="text" autocomplete="username" placeholder="例如：user@example.com">
+          <p class="hint">此範例會將帳號與人臉特徵向量儲存在本機瀏覽器的 <code>localStorage</code>。</p>
+
+          <div class="actions">
+            <button id="startCamera" type="button">啟動鏡頭</button>
+            <button id="registerFace" type="button" class="secondary" disabled>註冊目前人臉</button>
+            <button id="loginWithFace" type="button" disabled>使用人臉登入</button>
+            <button id="clearAccount" type="button" class="danger">清除本機資料</button>
+          </div>
+
+          <ol class="steps">
+            <li><span>1</span><div>輸入要登入的帳號，按下「啟動鏡頭」。</div></li>
+            <li><span>2</span><div>第一次使用時，面向鏡頭並按「註冊目前人臉」。</div></li>
+            <li><span>3</span><div>之後輸入同一帳號，按「使用人臉登入」進行驗證。</div></li>
+          </ol>
+
+          <div class="notice">
+            正式系統請把特徵資料加密後存放於伺服器，並搭配 HTTPS、活體偵測、裝置風險控管與 WebAuthn/密碼等第二因素。不要只依賴前端 localStorage 作為正式登入依據。
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const MODEL_URL = "https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights";
+    const STORAGE_PREFIX = "face-login-demo:";
+    const CAPTURE_COUNT = 5;
+    const MATCH_THRESHOLD = 0.52;
+
+    const elements = {
+      account: document.getElementById("account"),
+      camera: document.getElementById("camera"),
+      overlay: document.getElementById("overlay"),
+      cameraPlaceholder: document.getElementById("cameraPlaceholder"),
+      status: document.getElementById("status"),
+      scoreText: document.getElementById("scoreText"),
+      scoreMeter: document.getElementById("scoreMeter"),
+      startCamera: document.getElementById("startCamera"),
+      registerFace: document.getElementById("registerFace"),
+      loginWithFace: document.getElementById("loginWithFace"),
+      clearAccount: document.getElementById("clearAccount")
+    };
+
+    let modelsReady = false;
+    let cameraReady = false;
+    let overlayLoopId = 0;
+
+    function setStatus(message, type = "warn") {
+      elements.status.textContent = message;
+      elements.status.className = `status ${type}`;
+    }
+
+    function setScore(distance) {
+      if (typeof distance !== "number") {
+        elements.scoreText.textContent = "相似度：尚未比對";
+        elements.scoreMeter.value = 0;
+        return;
+      }
+
+      const score = Math.max(0, Math.min(100, Math.round((1 - distance) * 100)));
+      elements.scoreText.textContent = `相似度：約 ${score}%（距離 ${distance.toFixed(3)}，門檻 ${MATCH_THRESHOLD}）`;
+      elements.scoreMeter.value = score;
+    }
+
+    function getAccountKey() {
+      const account = elements.account.value.trim().toLowerCase();
+      if (!account) {
+        throw new Error("請先輸入帳號。");
+      }
+      return `${STORAGE_PREFIX}${account}`;
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    async function waitForFaceApi() {
+      for (let i = 0; i < 80; i += 1) {
+        if (window.faceapi) return;
+        await sleep(100);
+      }
+      throw new Error("人臉辨識程式庫載入逾時，請確認網路可連線至 CDN。");
+    }
+
+    async function loadModels() {
+      if (modelsReady) return;
+
+      setStatus("正在載入人臉辨識模型，第一次啟動可能需要數秒。", "warn");
+      await waitForFaceApi();
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+      ]);
+      modelsReady = true;
+    }
+
+    async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("此瀏覽器不支援攝影機 API，請改用最新版 Chrome、Edge、Firefox 或 Safari。");
+      }
+
+      await loadModels();
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+
+      elements.camera.srcObject = stream;
+      await elements.camera.play();
+      cameraReady = true;
+      elements.cameraPlaceholder.hidden = true;
+      elements.registerFace.disabled = false;
+      elements.loginWithFace.disabled = false;
+      setStatus("鏡頭已啟動。請讓臉部正對鏡頭，並保持畫面中只有一個人。", "ok");
+      drawOverlay();
+    }
+
+    function descriptorOptions() {
+      return new faceapi.TinyFaceDetectorOptions({
+        inputSize: 224,
+        scoreThreshold: 0.5
+      });
+    }
+
+    async function detectSingleFace() {
+      if (!cameraReady) {
+        throw new Error("請先啟動鏡頭。");
+      }
+
+      const detections = await faceapi
+        .detectAllFaces(elements.camera, descriptorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      if (detections.length === 0) {
+        throw new Error("沒有偵測到人臉，請靠近鏡頭並保持光線充足。");
+      }
+
+      if (detections.length > 1) {
+        throw new Error("畫面中偵測到多張人臉，請一次只保留登入者本人。");
+      }
+
+      return detections[0].descriptor;
+    }
+
+    function averageDescriptors(descriptors) {
+      const length = descriptors[0].length;
+      const average = new Float32Array(length);
+
+      descriptors.forEach((descriptor) => {
+        for (let i = 0; i < length; i += 1) {
+          average[i] += descriptor[i];
+        }
+      });
+
+      for (let i = 0; i < length; i += 1) {
+        average[i] /= descriptors.length;
+      }
+
+      return average;
+    }
+
+    async function collectDescriptorSamples(actionLabel) {
+      const descriptors = [];
+      for (let i = 0; i < CAPTURE_COUNT; i += 1) {
+        setStatus(`${actionLabel}：正在擷取第 ${i + 1}/${CAPTURE_COUNT} 張臉部特徵。`, "warn");
+        descriptors.push(await detectSingleFace());
+        await sleep(260);
+      }
+      return averageDescriptors(descriptors);
+    }
+
+    function saveDescriptor(accountKey, descriptor) {
+      localStorage.setItem(accountKey, JSON.stringify(Array.from(descriptor)));
+    }
+
+    function loadDescriptor(accountKey) {
+      const raw = localStorage.getItem(accountKey);
+      if (!raw) return null;
+
+      const values = JSON.parse(raw);
+      if (!Array.isArray(values) || values.length === 0) {
+        throw new Error("本機保存的人臉資料格式不正確，請清除後重新註冊。");
+      }
+
+      return new Float32Array(values);
+    }
+
+    async function registerFace() {
+      const accountKey = getAccountKey();
+      const descriptor = await collectDescriptorSamples("註冊");
+      saveDescriptor(accountKey, descriptor);
+      setScore();
+      setStatus("註冊完成。之後可用同一帳號按「使用人臉登入」進行驗證。", "ok");
+    }
+
+    async function loginWithFace() {
+      const accountKey = getAccountKey();
+      const savedDescriptor = loadDescriptor(accountKey);
+
+      if (!savedDescriptor) {
+        throw new Error("這個帳號尚未註冊人臉，請先按「註冊目前人臉」。");
+      }
+
+      const currentDescriptor = await collectDescriptorSamples("登入驗證");
+      const distance = faceapi.euclideanDistance(savedDescriptor, currentDescriptor);
+      setScore(distance);
+
+      if (distance <= MATCH_THRESHOLD) {
+        setStatus("登入驗證成功：目前人臉與此帳號註冊資料相符。", "ok");
+      } else {
+        setStatus("登入驗證失敗：目前人臉與此帳號註冊資料不相符。", "danger");
+      }
+    }
+
+    function clearAccountData() {
+      const account = elements.account.value.trim().toLowerCase();
+      if (!account) {
+        Object.keys(localStorage)
+          .filter((key) => key.startsWith(STORAGE_PREFIX))
+          .forEach((key) => localStorage.removeItem(key));
+        setStatus("已清除所有本機人臉登入示範資料。", "ok");
+        setScore();
+        return;
+      }
+
+      localStorage.removeItem(`${STORAGE_PREFIX}${account}`);
+      setStatus(`已清除帳號「${account}」的本機人臉資料。`, "ok");
+      setScore();
+    }
+
+    async function drawOverlay() {
+      window.cancelAnimationFrame(overlayLoopId);
+      const canvas = elements.overlay;
+      const context = canvas.getContext("2d");
+
+      async function render() {
+        if (!cameraReady || elements.camera.paused || elements.camera.ended) return;
+
+        const displaySize = {
+          width: elements.camera.videoWidth,
+          height: elements.camera.videoHeight
+        };
+
+        if (displaySize.width && displaySize.height) {
+          canvas.width = displaySize.width;
+          canvas.height = displaySize.height;
+          faceapi.matchDimensions(canvas, displaySize);
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          const detections = await faceapi.detectAllFaces(elements.camera, descriptorOptions());
+          const resized = faceapi.resizeResults(detections, displaySize);
+          faceapi.draw.drawDetections(canvas, resized);
+        }
+
+        overlayLoopId = window.requestAnimationFrame(render);
+      }
+
+      render();
+    }
+
+    async function withBusyState(button, action) {
+      const buttons = [elements.startCamera, elements.registerFace, elements.loginWithFace, elements.clearAccount];
+      buttons.forEach((item) => { item.disabled = true; });
+
+      try {
+        await action();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "操作失敗，請稍後再試。", "danger");
+      } finally {
+        elements.startCamera.disabled = false;
+        elements.clearAccount.disabled = false;
+        elements.registerFace.disabled = !cameraReady;
+        elements.loginWithFace.disabled = !cameraReady;
+      }
+    }
+
+    elements.startCamera.addEventListener("click", () => withBusyState(elements.startCamera, startCamera));
+    elements.registerFace.addEventListener("click", () => withBusyState(elements.registerFace, registerFace));
+    elements.loginWithFace.addEventListener("click", () => withBusyState(elements.loginWithFace, loginWithFace));
+    elements.clearAccount.addEventListener("click", clearAccountData);
+
+    if (!window.isSecureContext) {
+      setStatus("攝影機通常需要 HTTPS 或 localhost 才能使用。若直接開啟檔案，請改用本機 HTTP 伺服器或部署到 HTTPS 網站。", "warn");
+    }
+  </script>
+</body>
+</html>
