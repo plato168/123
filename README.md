@@ -8,8 +8,7 @@ https://raw.githack.com/plato168/123/gh-pages/index.html
 **北海道熊害防範（直達）：**  
 https://raw.githack.com/plato168/123/gh-pages/index.html#page-hokkaido-bear
 
-**瀏覽器人臉登入驗證示範：**  
-https://plato168.github.io/123/face-login.html
+**瀏覽器人臉登入驗證示範：** https://plato168.github.io/123/face-login.html
 
 此頁面可讓瀏覽器開啟鏡頭、註冊帳號的人臉特徵，並用同一帳號進行人臉比對登入。攝影機權限需要 HTTPS 或 localhost；正式系統請改由伺服器保存加密後的人臉特徵，並搭配活體偵測、WebAuthn 或密碼等第二因素。
 
