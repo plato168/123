@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>人臉辨識登入驗證</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-2: #334155;
+      --accent: #38bdf8;
+      --accent-2: #22d3ee;
+      --success: #4ade80;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #475569;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 10% -10%, #1d4ed8 0%, transparent 55%),
+        radial-gradient(700px 400px at 100% 0%, #0e7490 0%, transparent 50%),
+        var(--bg);
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(8px);
+    }
+
+    .camera-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid #334155;
+    }
+
+    #video, #overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #overlay { pointer-events: none; }
+
+    .camera-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 20px;
+      line-height: 1.7;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: var(--muted);
+    }
+
+    .badge.ok { color: var(--success); border-color: #166534; }
+    .badge.warn { color: var(--warn); border-color: #854d0e; }
+    .badge.err { color: var(--danger); border-color: #991b1b; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .tab.active {
+      color: #082f49;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: 2px solid rgba(56, 189, 248, 0.35);
+      border-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      color: #082f49;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: #334155;
+    }
+
+    .btn-danger {
+      color: #fff;
+      background: #b91c1c;
+    }
+
+    .hint {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px dashed #475569;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      display: none;
+      line-height: 1.6;
+    }
+
+    .message.show { display: block; }
+    .message.success { background: rgba(22, 101, 52, 0.25); border: 1px solid #166534; color: #bbf7d0; }
+    .message.error { background: rgba(153, 27, 27, 0.25); border: 1px solid #991b1b; color: #fecaca; }
+    .message.info { background: rgba(30, 64, 175, 0.25); border: 1px solid #1d4ed8; color: #bfdbfe; }
+
+    .panel-section { display: none; }
+    .panel-section.active { display: block; }
+
+    .progress {
+      margin-top: 10px;
+      height: 8px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.25s ease;
+    }
+
+    .user-list {
+      margin-top: 16px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      font-size: 0.92rem;
+    }
+
+    .dashboard {
+      display: none;
+      text-align: center;
+      padding: 28px 10px;
+    }
+
+    .dashboard.show { display: block; }
+
+    .avatar {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #082f49;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>人臉辨識登入驗證</h1>
+      <p>使用瀏覽器鏡頭擷取人臉特徵，完成帳號註冊與登入驗證（本機示範版）</p>
+    </header>
+
+    <div class="layout" id="mainView">
+      <section class="card">
+        <div class="camera-wrap">
+          <video id="video" autoplay muted playsinline></video>
+          <canvas id="overlay"></canvas>
+          <div class="camera-placeholder" id="cameraPlaceholder">
+            正在載入 AI 模型與鏡頭…<br>請允許瀏覽器使用相機權限
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="badge" id="modelStatus">模型：載入中</span>
+          <span class="badge" id="cameraStatus">鏡頭：未啟動</span>
+          <span class="badge" id="faceStatus">人臉：偵測中</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="tabs">
+          <button class="tab active" data-tab="login" type="button">登入</button>
+          <button class="tab" data-tab="register" type="button">註冊</button>
+          <button class="tab" data-tab="manage" type="button">管理</button>
+        </div>
+
+        <div class="panel-section active" id="panel-login">
+          <p class="hint">將臉部置於畫面中央，系統會自動比對已註冊的人臉特徵。</p>
+          <div class="actions">
+            <button class="btn-primary" id="btnAutoLogin" type="button" disabled>開始人臉登入</button>
+            <button class="btn-secondary" id="btnStopLogin" type="button" disabled>停止</button>
+          </div>
+          <div class="message" id="loginMessage"></div>
+        </div>
+
+        <div class="panel-section" id="panel-register">
+          <div class="field">
+            <label for="regUsername">帳號（英數，3-20 字）</label>
+            <input id="regUsername" maxlength="20" placeholder="例如：alice" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="regDisplayName">顯示名稱</label>
+            <input id="regDisplayName" maxlength="30" placeholder="例如：王小明" autocomplete="name">
+          </div>
+          <p class="hint">註冊時會連續擷取 3 次人臉樣本並取平均，請緩慢轉動頭部以提升準確度。</p>
+          <div class="progress"><span id="captureProgress"></span></div>
+          <div class="actions">
+            <button class="btn-primary" id="btnRegister" type="button" disabled>擷取並註冊</button>
+          </div>
+          <div class="message" id="registerMessage"></div>
+        </div>
+
+        <div class="panel-section" id="panel-manage">
+          <p class="hint">已註冊帳號儲存在此瀏覽器的 localStorage。清除瀏覽器資料會一併刪除。</p>
+          <div class="user-list" id="userList"></div>
+          <div class="actions">
+            <button class="btn-danger" id="btnClearAll" type="button">清除全部帳號</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card dashboard" id="dashboard">
+      <div class="avatar" id="dashAvatar">U</div>
+      <h2 id="dashTitle">歡迎回來</h2>
+      <p id="dashSubtitle" style="color: var(--muted);"></p>
+      <div class="actions" style="justify-content: center; margin-top: 20px;">
+        <button class="btn-secondary" id="btnLogout" type="button">登出</button>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      此為前端示範程式，人臉特徵僅儲存在本機瀏覽器，未經伺服器加密驗證，請勿用於正式環境的敏感帳號。
+    </p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js"></script>
+  <script>
+    const STORAGE_KEY = 'face_login_users_v1';
+    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model';
+    const MATCH_THRESHOLD = 0.55;
+    const REGISTER_SAMPLES = 3;
+
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('overlay');
+    const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+    const modelStatus = document.getElementById('modelStatus');
+    const cameraStatus = document.getElementById('cameraStatus');
+    const faceStatus = document.getElementById('faceStatus');
+    const loginMessage = document.getElementById('loginMessage');
+    const registerMessage = document.getElementById('registerMessage');
+    const captureProgress = document.getElementById('captureProgress');
+    const userList = document.getElementById('userList');
+    const mainView = document.getElementById('mainView');
+    const dashboard = document.getElementById('dashboard');
+
+    let stream = null;
+    let modelsReady = false;
+    let detecting = false;
+    let loginRunning = false;
+    let registerRunning = false;
+    let lastDetection = null;
+    let animationId = null;
+
+    function loadUsers() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+      renderUserList();
+    }
+
+    function showMessage(el, text, type = 'info') {
+      el.textContent = text;
+      el.className = `message show ${type}`;
+    }
+
+    function hideMessage(el) {
+      el.className = 'message';
+      el.textContent = '';
+    }
+
+    function setBadge(el, text, state = '') {
+      el.textContent = text;
+      el.className = `badge ${state}`.trim();
+    }
+
+    function validateUsername(username) {
+      return /^[a-zA-Z0-9_]{3,20}$/.test(username);
+    }
+
+    function averageDescriptors(descriptors) {
+      const len = descriptors[0].length;
+      const avg = new Float32Array(len);
+      for (let i = 0; i < len; i++) {
+        let sum = 0;
+        for (const d of descriptors) sum += d[i];
+        avg[i] = sum / descriptors.length;
+      }
+      return Array.from(avg);
+    }
+
+    function findBestMatch(descriptor, users) {
+      let best = null;
+      for (const user of users) {
+        const distance = faceapi.euclideanDistance(descriptor, user.descriptor);
+        if (!best || distance < best.distance) {
+          best = { user, distance };
+        }
+      }
+      return best;
+    }
+
+    function renderUserList() {
+      const users = loadUsers();
+      userList.innerHTML = '';
+      if (!users.length) {
+        userList.innerHTML = '<div class="user-item"><span>尚無註冊帳號</span></div>';
+        return;
+      }
+      for (const user of users) {
+        const item = document.createElement('div');
+        item.className = 'user-item';
+        item.innerHTML = `
+          <span><strong>${escapeHtml(user.displayName)}</strong> (@${escapeHtml(user.username)})</span>
+          <button class="btn-danger" data-delete="${escapeHtml(user.username)}" type="button">刪除</button>
+        `;
+        userList.appendChild(item);
+      }
+      userList.querySelectorAll('[data-delete]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const username = btn.getAttribute('data-delete');
+          const next = loadUsers().filter((u) => u.username !== username);
+          saveUsers(next);
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    async function loadModels() {
+      setBadge(modelStatus, '模型：載入中', 'warn');
+
+      const backends = ['webgl', 'cpu'];
+      let ready = false;
+      for (const backend of backends) {
+        try {
+          await faceapi.tf.setBackend(backend);
+          await faceapi.tf.ready();
+          ready = true;
+          break;
+        } catch (err) {
+          console.warn(`後端 ${backend} 初始化失敗`, err);
+        }
+      }
+      if (!ready) {
+        throw new Error('無法初始化 TensorFlow 後端');
+      }
+
+      await Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+      ]);
+      modelsReady = true;
+      setBadge(modelStatus, `模型：就緒（${faceapi.tf.getBackend()}）`, 'ok');
+      document.getElementById('btnAutoLogin').disabled = false;
+      document.getElementById('btnRegister').disabled = false;
+    }
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+        video.srcObject = stream;
+        await video.play();
+        cameraPlaceholder.style.display = 'none';
+        setBadge(cameraStatus, '鏡頭：已啟動', 'ok');
+        resizeOverlay();
+        startDetectionLoop();
+      } catch (err) {
+        setBadge(cameraStatus, '鏡頭：權限被拒', 'err');
+        cameraPlaceholder.textContent = '無法啟動鏡頭，請確認已允許相機權限並使用 HTTPS 或 localhost。';
+        throw err;
+      }
+    }
+
+    function resizeOverlay() {
+      overlay.width = video.videoWidth;
+      overlay.height = video.videoHeight;
+    }
+
+    function drawDetection(detection) {
+      const ctx = overlay.getContext('2d');
+      ctx.clearRect(0, 0, overlay.width, overlay.height);
+      if (!detection) return;
+      const box = detection.detection.box;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(box.x, box.y, box.width, box.height);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.85)';
+      ctx.font = '16px Noto Sans TC, sans-serif';
+      ctx.fillText('已偵測到人臉', box.x, Math.max(20, box.y - 8));
+    }
+
+    async function detectFace() {
+      if (!modelsReady || video.readyState < 2) return null;
+      const result = await faceapi
+        .detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+      return result || null;
+    }
+
+    function startDetectionLoop() {
+      if (detecting) return;
+      detecting = true;
+      const tick = async () => {
+        if (!detecting) return;
+        try {
+          lastDetection = await detectFace();
+          drawDetection(lastDetection);
+          if (lastDetection) {
+            setBadge(faceStatus, '人臉：已偵測', 'ok');
+          } else {
+            setBadge(faceStatus, '人臉：未偵測到', 'warn');
+          }
+        } catch {
+          setBadge(faceStatus, '人臉：偵測錯誤', 'err');
+        }
+        animationId = requestAnimationFrame(tick);
+      };
+      tick();
+    }
+
+    function stopDetectionLoop() {
+      detecting = false;
+      if (animationId) cancelAnimationFrame(animationId);
+    }
+
+    async function waitForStableFace() {
+      for (let i = 0; i < 30; i++) {
+        if (lastDetection) return lastDetection;
+        await new Promise((r) => setTimeout(r, 120));
+      }
+      return null;
+    }
+
+    async function captureDescriptors(count) {
+      const samples = [];
+      for (let i = 0; i < count; i++) {
+        captureProgress.style.width = `${((i) / count) * 100}%`;
+        const face = await waitForStableFace();
+        if (!face) throw new Error('無法偵測到人臉，請調整光線與角度後重試。');
+        samples.push(face.descriptor);
+        captureProgress.style.width = `${((i + 1) / count) * 100}%`;
+        await new Promise((r) => setTimeout(r, 450));
+      }
+      return samples;
+    }
+
+    function showDashboard(user) {
+      mainView.style.display = 'none';
+      dashboard.classList.add('show');
+      document.getElementById('dashAvatar').textContent = user.displayName.slice(0, 1).toUpperCase();
+      document.getElementById('dashTitle').textContent = `歡迎，${user.displayName}`;
+      document.getElementById('dashSubtitle').textContent = `帳號 @${user.username} 已通過人臉驗證登入`;
+    }
+
+    function hideDashboard() {
+      dashboard.classList.remove('show');
+      mainView.style.display = 'grid';
+    }
+
+    async function runAutoLogin() {
+      const users = loadUsers();
+      if (!users.length) {
+        showMessage(loginMessage, '尚無註冊帳號，請先至「註冊」分頁建立人臉帳號。', 'error');
+        return;
+      }
+
+      loginRunning = true;
+      hideMessage(loginMessage);
+      document.getElementById('btnAutoLogin').disabled = true;
+      document.getElementById('btnStopLogin').disabled = false;
+      showMessage(loginMessage, '正在比對人臉，請面向鏡頭…', 'info');
+
+      while (loginRunning) {
+        const face = await waitForStableFace();
+        if (!face) {
+          showMessage(loginMessage, '尚未偵測到人臉，請將臉部置於畫面中央。', 'warn');
+          await new Promise((r) => setTimeout(r, 500));
+          continue;
+        }
+
+        const match = findBestMatch(face.descriptor, users);
+        if (match && match.distance <= MATCH_THRESHOLD) {
+          loginRunning = false;
+          showMessage(loginMessage, `驗證成功！歡迎 ${match.user.displayName}（距離 ${match.distance.toFixed(3)}）`, 'success');
+          setTimeout(() => showDashboard(match.user), 600);
+          break;
+        }
+
+        showMessage(loginMessage, `比對中…最近距離 ${match ? match.distance.toFixed(3) : 'N/A'}（需 ≤ ${MATCH_THRESHOLD}）`, 'info');
+        await new Promise((r) => setTimeout(r, 700));
+      }
+
+      document.getElementById('btnAutoLogin').disabled = false;
+      document.getElementById('btnStopLogin').disabled = true;
+    }
+
+    async function runRegister() {
+      const username = document.getElementById('regUsername').value.trim();
+      const displayName = document.getElementById('regDisplayName').value.trim();
+
+      if (!validateUsername(username)) {
+        showMessage(registerMessage, '帳號格式錯誤，請使用 3-20 字英數或底線。', 'error');
+        return;
+      }
+      if (!displayName) {
+        showMessage(registerMessage, '請輸入顯示名稱。', 'error');
+        return;
+      }
+      if (loadUsers().some((u) => u.username === username)) {
+        showMessage(registerMessage, '此帳號已存在，請改用其他帳號名稱。', 'error');
+        return;
+      }
+
+      registerRunning = true;
+      hideMessage(registerMessage);
+      document.getElementById('btnRegister').disabled = true;
+      showMessage(registerMessage, '開始擷取人臉樣本，請保持臉部在框內並稍微轉動頭部。', 'info');
+
+      try {
+        const samples = await captureDescriptors(REGISTER_SAMPLES);
+        const descriptor = averageDescriptors(samples);
+        const users = loadUsers();
+        users.push({
+          id: crypto.randomUUID(),
+          username,
+          displayName,
+          descriptor,
+          createdAt: new Date().toISOString(),
+        });
+        saveUsers(users);
+        showMessage(registerMessage, `註冊成功！帳號 @${username} 已建立，可切換至登入分頁驗證。`, 'success');
+        document.getElementById('regUsername').value = '';
+        document.getElementById('regDisplayName').value = '';
+        captureProgress.style.width = '0%';
+      } catch (err) {
+        showMessage(registerMessage, err.message || '註冊失敗，請重試。', 'error');
+        captureProgress.style.width = '0%';
+      } finally {
+        registerRunning = false;
+        document.getElementById('btnRegister').disabled = false;
+      }
+    }
+
+    function setupTabs() {
+      document.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+          document.querySelectorAll('.panel-section').forEach((p) => p.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active');
+        });
+      });
+    }
+
+    document.getElementById('btnAutoLogin').addEventListener('click', runAutoLogin);
+    document.getElementById('btnStopLogin').addEventListener('click', () => {
+      loginRunning = false;
+      hideMessage(loginMessage);
+      document.getElementById('btnStopLogin').disabled = true;
+      document.getElementById('btnAutoLogin').disabled = false;
+    });
+    document.getElementById('btnRegister').addEventListener('click', runRegister);
+    document.getElementById('btnClearAll').addEventListener('click', () => {
+      if (confirm('確定要刪除所有本機註冊帳號嗎？')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderUserList();
+      }
+    });
+    document.getElementById('btnLogout').addEventListener('click', hideDashboard);
+    window.addEventListener('resize', resizeOverlay);
+
+    (async function init() {
+      setupTabs();
+      renderUserList();
+      try {
+        await loadModels();
+      } catch (err) {
+        console.error(err);
+        setBadge(modelStatus, '模型：載入失敗', 'err');
+        cameraPlaceholder.textContent = 'AI 模型載入失敗，請確認網路連線後重新整理頁面。';
+        return;
+      }
+      try {
+        await startCamera();
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
