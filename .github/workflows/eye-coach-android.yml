@@ -1,0 +1,29 @@
+name: Eye Coach tests
+
+on:
+  pull_request:
+    paths:
+      - "android-eye-coach/**"
+      - ".github/workflows/eye-coach-android.yml"
+  push:
+    paths:
+      - "android-eye-coach/**"
+      - ".github/workflows/eye-coach-android.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-eye-coach
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: android-actions/setup-android@v3
+      - name: Unit tests and debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon testDebugUnitTest assembleDebug
