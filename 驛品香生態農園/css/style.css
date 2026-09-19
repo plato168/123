@@ -1,0 +1,339 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
+
+:root {
+  --bg: #eef5ea;
+  --bg-deep: #dcead4;
+  --panel: #f7fbf5;
+  --ink: #1a2e22;
+  --muted: #4d6356;
+  --brand: #1f5c3a;
+  --brand-2: #2f7a4d;
+  --accent: #d97706;
+  --accent-soft: rgba(217, 119, 6, 0.12);
+  --line: rgba(31, 92, 58, 0.16);
+  --white: #ffffff;
+  --shadow: 0 18px 40px rgba(26, 46, 34, 0.08);
+  --radius: 18px;
+  --max: 1080px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(47, 122, 77, 0.14), transparent 34%),
+    radial-gradient(circle at 88% 0%, rgba(217, 119, 6, 0.1), transparent 28%),
+    linear-gradient(180deg, #f4faf1 0%, var(--bg) 40%, #e7f1e2 100%);
+  min-height: 100vh;
+  line-height: 1.7;
+}
+
+a { color: var(--brand); text-decoration: none; }
+a:hover { color: var(--accent); }
+
+.site-header {
+  position: sticky; top: 0; z-index: 40;
+  backdrop-filter: blur(12px);
+  background: rgba(247, 251, 245, 0.88);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.brand {
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: var(--brand);
+  letter-spacing: 0.04em;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.brand small {
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 500;
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.nav {
+  display: flex; flex-wrap: wrap; gap: 6px 10px;
+  justify-content: flex-end;
+}
+.nav a {
+  font-size: 0.88rem;
+  color: var(--ink);
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.nav a:hover, .nav a.active {
+  background: rgba(31, 92, 58, 0.1);
+  color: var(--brand);
+}
+.nav-toggle {
+  display: none;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hero {
+  position: relative;
+  min-height: min(78vh, 640px);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(15, 40, 28, 0.15), rgba(15, 40, 28, 0.72)),
+    radial-gradient(circle at 70% 30%, rgba(217, 119, 6, 0.28), transparent 40%),
+    linear-gradient(135deg, #1f5c3a 0%, #0f2d1d 45%, #3d5c2e 100%);
+  color: #f4faf1;
+}
+.hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+  animation: drift 28s linear infinite;
+}
+@keyframes drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(48px); }
+}
+.hero-inner {
+  position: relative;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 56px 20px 48px;
+  animation: rise 0.9s ease both;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero .eyebrow {
+  display: inline-block;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+.hero h1 {
+  margin: 0 0 14px;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+}
+.hero p {
+  max-width: 34rem;
+  margin: 0 0 22px;
+  font-size: 1.05rem;
+  opacity: 0.95;
+}
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-primary {
+  background: linear-gradient(135deg, #f0b429, #d97706);
+  color: #2a1a05;
+  box-shadow: 0 10px 24px rgba(217, 119, 6, 0.28);
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.35);
+}
+.btn-solid {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+
+.wrap { max-width: var(--max); margin: 0 auto; padding: 36px 20px 64px; }
+.section { margin-bottom: 36px; animation: rise 0.7s ease both; }
+.section h2 {
+  margin: 0 0 10px;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  font-size: 1.55rem;
+  color: var(--brand);
+  letter-spacing: 0.04em;
+}
+.section .lead { color: var(--muted); margin: 0 0 18px; max-width: 46rem; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.card .icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: rgba(31, 92, 58, 0.1);
+  color: var(--brand);
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.card h3 { margin: 0 0 8px; font-size: 1.05rem; color: var(--brand); }
+.card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+.price-table, .info-table {
+  width: 100%; border-collapse: collapse; font-size: 0.92rem;
+}
+.price-table th, .price-table td,
+.info-table th, .info-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.price-table th, .info-table th {
+  color: var(--brand);
+  font-weight: 700;
+  background: rgba(31, 92, 58, 0.06);
+}
+
+.news-list { display: grid; gap: 12px; }
+.news-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.news-item .date {
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+.news-item h3 { margin: 0 0 6px; font-size: 1.02rem; }
+.news-item p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+.page-hero {
+  padding: 42px 20px 8px;
+  max-width: var(--max);
+  margin: 0 auto;
+}
+.page-hero h1 {
+  margin: 0 0 8px;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  color: var(--brand);
+  letter-spacing: 0.05em;
+}
+.page-hero p { margin: 0; color: var(--muted); }
+
+.note {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  padding: 12px 14px;
+  border-radius: 0 12px 12px 0;
+  margin: 14px 0;
+  font-size: 0.92rem;
+}
+.list-clean { padding-left: 1.15rem; margin: 8px 0; }
+.list-clean li { margin-bottom: 6px; }
+
+.article { max-width: 760px; }
+.article .meta { color: var(--muted); font-size: 0.88rem; margin-bottom: 18px; }
+.article p { margin: 0 0 14px; }
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  background: #163526;
+  color: #e8f3eb;
+  padding: 36px 20px 28px;
+}
+.footer-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 22px;
+}
+.site-footer h3 {
+  margin: 0 0 10px;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  letter-spacing: 0.04em;
+}
+.site-footer a { color: #d6ebdb; }
+.site-footer a:hover { color: #f0b429; }
+.site-footer p, .site-footer li { color: #c5d9cb; font-size: 0.9rem; }
+.site-footer ul { list-style: none; padding: 0; margin: 0; }
+.site-footer li { margin-bottom: 6px; }
+.copy {
+  max-width: var(--max);
+  margin: 22px auto 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  font-size: 0.82rem;
+  color: #9db5a5;
+}
+
+@media (max-width: 860px) {
+  .nav-toggle { display: inline-flex; }
+  .nav {
+    display: none;
+    position: absolute;
+    left: 12px; right: 12px; top: 64px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+  }
+  .nav.open { display: flex; }
+  .grid-3, .grid-2, .footer-inner, .news-item {
+    grid-template-columns: 1fr;
+  }
+}
