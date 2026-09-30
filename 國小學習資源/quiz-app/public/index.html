@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>國小線上測驗</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">📚 國小線上測驗</a>
+    <nav id="nav" hidden>
+      <a href="#/">科目</a>
+      <a href="#/report">我的報告</a>
+      <a href="#/admin" id="nav-admin" hidden>全體報告</a>
+      <span id="nav-user" class="muted"></span>
+      <button id="logout" class="link">登出</button>
+    </nav>
+  </header>
+
+  <main id="app" class="wrap"></main>
+
+  <template id="tpl-auth">
+    <section class="card auth">
+      <div class="tabs">
+        <button data-tab="login" class="tab active">登入</button>
+        <button data-tab="register" class="tab">註冊新帳號</button>
+      </div>
+      <form id="form-login">
+        <label>帳號<input name="username" autocomplete="username" required></label>
+        <label>密碼<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary" type="submit">登入</button>
+      </form>
+      <form id="form-register" hidden>
+        <label>帳號（英文字母、數字或底線，3～32 字）<input name="username" autocomplete="username" pattern="[A-Za-z0-9_]{3,32}" required></label>
+        <label>密碼（至少 6 個字元）<input name="password" type="password" autocomplete="new-password" minlength="6" required></label>
+        <label>暱稱<input name="displayName" maxlength="40" required></label>
+        <label>年級
+          <select name="grade" required>
+            <option value="1">一年級</option><option value="2">二年級</option><option value="3" selected>三年級</option>
+            <option value="4">四年級</option><option value="5">五年級</option><option value="6">六年級</option>
+          </select>
+        </label>
+        <button class="primary" type="submit">註冊並開始學習</button>
+      </form>
+      <p class="error" id="auth-error" role="alert"></p>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

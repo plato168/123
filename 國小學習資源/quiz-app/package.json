@@ -1,0 +1,21 @@
+{
+  "name": "elementary-quiz-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "國小各科線上測驗系統（學生自行註冊、個人進度、登入與進度統計報告，PostgreSQL）",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "db:init": "node scripts/init-db.js",
+    "db:seed": "node scripts/seed.js",
+    "setup": "node scripts/init-db.js && node scripts/seed.js",
+    "make-admin": "node scripts/make-admin.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
