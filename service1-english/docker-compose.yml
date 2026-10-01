@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: service1
+      POSTGRES_PASSWORD: service1
+      POSTGRES_DB: service1_english
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+  app:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install --omit=dev && npm start"
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://service1:service1@db:5432/service1_english
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+volumes:
+  pgdata:

@@ -1,0 +1,18 @@
+{
+  "name": "service1-english",
+  "version": "1.0.0",
+  "private": true,
+  "description": "English corporate site clone scaffold with separate desktop (/web) and mobile (/m) entry points, backed by PostgreSQL",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "db:init": "node scripts/init-db.js",
+    "db:reset": "node scripts/init-db.js --reset"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}

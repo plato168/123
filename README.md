@@ -1,5 +1,11 @@
 # HKK 國外團體旅遊一頁網站
 
+## 英文企業網站（service1-english）
+
+`service1-english/` 資料夾：網頁版 `/web/` 與手機版 `/m/` 分離入口，PostgreSQL 資料庫。說明見 [service1-english/README.md](service1-english/README.md)。
+
+---
+
 ## 直接開啟（公開網址，任何地方可用）
 
 **永久連結（推薦）：**  

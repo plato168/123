@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service One Demo – Desktop</title>
+  <link rel="alternate" media="only screen and (max-width: 640px)" href="/m/">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <span id="top-contact"></span>
+      <a href="/m/" class="switch">📱 Mobile version</a>
+    </div>
+  </div>
+  <header class="header">
+    <div class="wrap">
+      <a href="#/" class="logo"><span class="logo-mark">S1</span><span id="brand">Service One Demo</span></a>
+      <nav class="nav">
+        <a href="#/" data-nav="home">Home</a>
+        <div class="dropdown">
+          <a href="#/about" data-nav="about">About Us ▾</a>
+          <div class="menu">
+            <a href="#/about">Company Profile</a>
+            <a href="#/about?section=history">History</a>
+            <a href="#/about?section=quality">Quality Policy</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <a href="#/services" data-nav="services">Services ▾</a>
+          <div class="menu" id="menu-services"></div>
+        </div>
+        <div class="dropdown">
+          <a href="#/products" data-nav="products">Products ▾</a>
+          <div class="menu" id="menu-products"></div>
+        </div>
+        <a href="#/news" data-nav="news">News</a>
+        <a href="#/faq" data-nav="faq">FAQ</a>
+        <a href="#/contact" data-nav="contact" class="cta">Contact Us</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app"></main>
+
+  <footer class="footer">
+    <div class="wrap cols">
+      <div>
+        <h4 id="f-name"></h4>
+        <p id="f-tagline"></p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <a href="#/about">About Us</a><a href="#/services">Services</a><a href="#/products">Products</a><a href="#/news">News</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p id="f-contact"></p>
+      </div>
+    </div>
+    <div class="copy">© <span id="year"></span> <span id="f-copy"></span>. All rights reserved.</div>
+  </footer>
+
+  <script src="/shared/api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

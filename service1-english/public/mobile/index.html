@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b4f8a">
+  <title>Service One Demo – Mobile</title>
+  <link rel="canonical" href="/web/">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="appbar">
+    <button class="icon-btn" id="back" aria-label="Back" hidden>‹</button>
+    <a href="#/" class="brand"><span class="logo-mark">S1</span><span id="title">Service One Demo</span></a>
+    <button class="icon-btn" id="menu-btn" aria-label="Menu">☰</button>
+  </header>
+
+  <div class="drawer-mask" id="mask"></div>
+  <nav class="drawer" id="drawer">
+    <div class="drawer-head" id="drawer-head"></div>
+    <a href="#/">Home</a>
+    <a href="#/about">About Us</a>
+    <a href="#/services">Services</a>
+    <a href="#/products">Products</a>
+    <a href="#/news">News</a>
+    <a href="#/faq">FAQ</a>
+    <a href="#/contact">Contact Us</a>
+    <a href="/web/" class="switch">🖥 Desktop version</a>
+  </nav>
+
+  <main id="app"></main>
+
+  <nav class="tabbar">
+    <a href="#/" data-nav="home"><span>🏠</span>Home</a>
+    <a href="#/products" data-nav="products"><span>📦</span>Products</a>
+    <a href="#/services" data-nav="services"><span>🛠️</span>Services</a>
+    <a href="#/news" data-nav="news"><span>📰</span>News</a>
+    <a href="#/contact" data-nav="contact"><span>✉️</span>Contact</a>
+  </nav>
+
+  <script src="/shared/api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
