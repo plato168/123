@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>採購單 CSV 處理器</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22d3ee;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --code-bg: #0b1220;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    header { margin-bottom: 24px; }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 900px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .card-body { padding: 18px 20px 20px; }
+
+    label {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    input, select, textarea, button { font: inherit; }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+    }
+
+    .file-drop {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 28px 16px;
+      text-align: center;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .file-drop:hover,
+    .file-drop.dragover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .file-drop p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .file-drop strong { color: var(--accent); }
+
+    .hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #082f49;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .stat .value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ok);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--code-bg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+      font-size: 0.84rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 6px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--panel-2);
+      color: #cbd5e1;
+      font-weight: 600;
+      z-index: 1;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    td input {
+      min-width: 72px;
+      padding: 6px 8px;
+      font-size: 0.84rem;
+    }
+
+    td input.wide { min-width: 160px; }
+
+    .empty-state {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .status.show { display: block; }
+    .status.ok {
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: #a7f3d0;
+    }
+
+    .status.error {
+      background: rgba(248, 113, 113, 0.12);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      color: #fecaca;
+    }
+
+    .formula-box {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    .formula-box code {
+      color: #bae6fd;
+      font-family: Consolas, monospace;
+    }
+
+    .row-actions button {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>採購單 CSV 處理器</h1>
+      <p class="subtitle">
+        上傳採購單 CSV 檔案，預覽並編輯明細後按「確認產出 CSV」，系統會依公式重算重量與金額，並下載處理後的 CSV 檔案。
+      </p>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-head"><h2>匯入 CSV</h2></div>
+        <div class="card-body">
+          <div id="fileDrop" class="file-drop" tabindex="0" role="button" aria-label="選擇或拖曳 CSV 檔案">
+            <p><strong>點擊選擇</strong> 或拖曳 CSV 到此處</p>
+            <p>支援 UTF-8 編碼的 .csv 檔</p>
+          </div>
+          <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
+
+          <div class="hint">
+            欄位格式參考：項次、品名、規格/料號、名稱、材質、備註、外徑、內徑、長度、數量、供應商、重量估算、重量小計、單價、單價小計、品名、廠內備註…
+          </div>
+
+          <div class="formula-box">
+            <div>紅十字（圓棒）：<code>直徑² × 0.00617 × 長度(m)</code></div>
+            <div>圓鐵管（有內徑或管料）：<code>(外徑 - 壁厚) × 壁厚 × 長度(m) × 0.02465</code></div>
+            <div>壁厚 = (外徑 - 內徑) ÷ 2；長度欄位以 mm 輸入，計算時自動換算為 m。</div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn-secondary" id="loadSampleBtn">載入範例</button>
+            <button type="button" class="btn-secondary" id="addRowBtn" disabled>新增明細</button>
+          </div>
+
+          <label for="outputFileName" style="margin-top:16px;">下載檔名</label>
+          <input id="outputFileName" type="text" value="purchase_order_output.csv">
+
+          <div class="actions">
+            <button type="button" class="btn-primary" id="confirmBtn" disabled>確認產出 CSV</button>
+            <button type="button" class="btn-secondary" id="recalcBtn" disabled>重新計算</button>
+          </div>
+
+          <div id="status" class="status" role="status"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>明細預覽</h2></div>
+        <div class="card-body">
+          <div class="summary">
+            <div class="stat">
+              <div class="label">明細筆數</div>
+              <div class="value" id="itemCount">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">重量總計 (kg)</div>
+              <div class="value" id="totalWeight">0</div>
+            </div>
+            <div class="stat">
+              <div class="label">金額總計</div>
+              <div class="value" id="totalPrice">0</div>
+            </div>
+          </div>
+
+          <div id="tableArea" class="empty-state">
+            請先上傳 CSV 檔案，或點「載入範例」查看格式。
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const COLUMNS = [
+      '項次', '品名', '規格/料號', '名稱', '材質', '備註',
+      '外徑', '內徑', '長度', '數量', '供應商',
+      '重量估算', '重量小計', '單價', '單價小計', '品名2', '廠內備註', 'extra1', 'extra2'
+    ];
+
+    const COLUMN_LABELS = {
+      品名2: '品名',
+      extra1: '',
+      extra2: ''
+    };
+
+    const DEFAULT_FOOTER = [
+      ['', '', '', '', '', '', '', '', '', '', '重量總計', '', '', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', '', '', '', '經辦採購', '', '覆核下單', '', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['下單前 確認 單價 次月帳 交期', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['紅十字公式： 直徑(mm) × 直徑(mm) × 0.00617 × 長度(M) = 重量(kg)', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['圓鐵管 基本公式： 重量(kg) = (外徑 - 壁厚) × 壁厚 ×  長度(m) × 0.02465= 重量(kg)', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['中大 電話 02-2594-1131 傳真 2595-0943 叫料 注意事項 尺寸預留', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['高田 叫料 注意事項 TEL：(03)3012361-3\n         FAX：(03)3012368\n         負責人: 江茂寅 0938-057-630 / 0918-136-942\n         聯絡人: 江小姐', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['正宇鍛造 電話 07-8714997 傳真 07-8717393', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['新益來 電話 03-383-9910 傳真 03-383-6300', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      ['楓昇鋼鐵企業有限公司\n電話：886-2-29092146\n傳真：886-2-22973113', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+    ];
+
+    const SAMPLE_CSV = `項次,品名,規格/料號,名稱,材質,備註,外徑,內徑,長度,數量,供應商,重量估算,重量小計,單價,單價小計,品名,廠內備註,,
+1,璟鋒紙業138X1810  70X283  2200,璟鋒紙業138X1810  70X283  2200,豪盈,中碳,,75,,303,1,楓昇,10.5,10.52,36,379,,,,
+2,璟鋒紙業138X1810  70X283  2200,璟鋒紙業138X1810  70X283  2200,,中碳,,115,,22,2,楓昇,1.8,3.59,36,129,,,,
+3,璟鋒紙業138X1810  70X283  2200,璟鋒紙業138X1810  70X283  2200,豪盈,鐵管,管料,141.3,110,225,1,新益來,10.9,10.91,53,578,,4665,實寸,138
+,,,,,,,,,,,重量總計,25.02,,1086,,,管厚,12
+,,,,,,,,,,經辦採購,,覆核下單,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+下單前 確認 單價 次月帳 交期,,,,,,,,,,,,,,,,,,,
+紅十字公式： 直徑(mm) × 直徑(mm) × 0.00617 × 長度(M) = 重量(kg),,,,,,,,,,,,,,,,,,,
+圓鐵管 基本公式： 重量(kg) = (外徑 - 壁厚) × 壁厚 ×  長度(m) × 0.02465= 重量(kg),,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+中大 電話 02-2594-1131 傳真 2595-0943 叫料 注意事項 尺寸預留,,,,,,,,,,,,,,,,,,,
+"高田 叫料 注意事項 TEL：(03)3012361-3
+         FAX：(03)3012368
+         負責人: 江茂寅 0938-057-630 / 0918-136-942
+         聯絡人: 江小姐""                                                                                                ",,,,,,,,,,,,,,,,,,,
+正宇鍛造 電話 07-8714997 傳真 07-8717393,,,,,,,,,,,,,,,,,,,
+新益來 電話 03-383-9910 傳真 03-383-6300,,,,,,,,,,,,,,,,,,,
+"楓昇鋼鐵企業有限公司
+電話：886-2-29092146
+傳真：886-2-22973113",,,,,,,,,,,,,,,,,,`;
+
+    let items = [];
+    let footerRows = structuredClone(DEFAULT_FOOTER);
+    let sourceFileName = 'purchase_order_output.csv';
+
+    const fileDrop = document.getElementById('fileDrop');
+    const csvFile = document.getElementById('csvFile');
+    const tableArea = document.getElementById('tableArea');
+    const statusEl = document.getElementById('status');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const recalcBtn = document.getElementById('recalcBtn');
+    const addRowBtn = document.getElementById('addRowBtn');
+
+    function showStatus(message, type = 'ok') {
+      statusEl.textContent = message;
+      statusEl.className = `status show ${type}`;
+    }
+
+    function clearStatus() {
+      statusEl.className = 'status';
+      statusEl.textContent = '';
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let field = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        const next = text[i + 1];
+
+        if (inQuotes) {
+          if (ch === '"' && next === '"') {
+            field += '"';
+            i += 1;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            field += ch;
+          }
+          continue;
+        }
+
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          row.push(field);
+          field = '';
+        } else if (ch === '\n') {
+          row.push(field);
+          rows.push(row);
+          row = [];
+          field = '';
+        } else if (ch === '\r') {
+          // ignore
+        } else {
+          field += ch;
+        }
+      }
+
+      if (field.length > 0 || row.length > 0) {
+        row.push(field);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function normalizeRow(row) {
+      const normalized = [...row];
+      while (normalized.length < COLUMNS.length) normalized.push('');
+      return normalized.slice(0, COLUMNS.length);
+    }
+
+    function isItemRow(row) {
+      const first = String(row[0] ?? '').trim();
+      return /^\d+$/.test(first);
+    }
+
+    function isSummaryRow(row) {
+      return row.some((cell) => String(cell).includes('重量總計'));
+    }
+
+    function rowToItem(row) {
+      const cells = normalizeRow(row);
+      return {
+        項次: cells[0],
+        品名: cells[1],
+        '規格/料號': cells[2],
+        名稱: cells[3],
+        材質: cells[4],
+        備註: cells[5],
+        外徑: cells[6],
+        內徑: cells[7],
+        長度: cells[8],
+        數量: cells[9],
+        供應商: cells[10],
+        重量估算: cells[11],
+        重量小計: cells[12],
+        單價: cells[13],
+        單價小計: cells[14],
+        品名2: cells[15],
+        廠內備註: cells[16],
+        extra1: cells[17],
+        extra2: cells[18]
+      };
+    }
+
+    function itemToRow(item) {
+      return COLUMNS.map((key) => item[key] ?? '');
+    }
+
+    function num(value) {
+      const n = Number(String(value ?? '').replace(/,/g, '').trim());
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function round(value, digits) {
+      const factor = 10 ** digits;
+      return Math.round(value * factor) / factor;
+    }
+
+    function isPipe(item) {
+      const note = String(item.備註 ?? '');
+      const inner = String(item.內徑 ?? '').trim();
+      return inner !== '' || note.includes('管');
+    }
+
+    function calcWeight(item) {
+      const od = num(item.外徑);
+      const id = num(item.內徑);
+      const lengthMm = num(item.長度);
+      const lengthM = lengthMm / 1000;
+
+      if (!od || !lengthM) return 0;
+
+      if (isPipe(item) && id > 0 && od > id) {
+        const wall = (od - id) / 2;
+        return (od - wall) * wall * lengthM * 0.02465;
+      }
+
+      return od * od * 0.00617 * lengthM;
+    }
+
+    function recalculateItems() {
+      let totalWeight = 0;
+      let totalPrice = 0;
+
+      items.forEach((item) => {
+        const weight = calcWeight(item);
+        const qty = Math.max(num(item.數量), 0) || 1;
+        const unitPrice = num(item.單價);
+        const weightSubtotal = round(weight * qty, 2);
+        const priceSubtotal = Math.round(weightSubtotal * unitPrice);
+
+        item.重量估算 = round(weight, 2);
+        item.重量小計 = weightSubtotal;
+        item.單價小計 = priceSubtotal;
+
+        totalWeight += weightSubtotal;
+        totalPrice += priceSubtotal;
+      });
+
+      document.getElementById('itemCount').textContent = String(items.length);
+      document.getElementById('totalWeight').textContent = round(totalWeight, 2).toFixed(2);
+      document.getElementById('totalPrice').textContent = String(Math.round(totalPrice));
+
+      return { totalWeight: round(totalWeight, 2), totalPrice: Math.round(totalPrice) };
+    }
+
+    function parseImportedCSV(text) {
+      const rows = parseCSV(text).map(normalizeRow);
+      if (!rows.length) throw new Error('CSV 內容為空');
+
+      const parsedItems = [];
+      const parsedFooter = [];
+      let headerSkipped = false;
+
+      rows.forEach((row, index) => {
+        if (!headerSkipped && index === 0 && String(row[0]).includes('項次')) {
+          headerSkipped = true;
+          return;
+        }
+
+        if (isItemRow(row)) {
+          parsedItems.push(rowToItem(row));
+          return;
+        }
+
+        if (isSummaryRow(row)) {
+          parsedFooter.push([...row]);
+          return;
+        }
+
+        if (parsedItems.length > 0 || index > 0) {
+          parsedFooter.push([...row]);
+        }
+      });
+
+      if (!parsedItems.length) {
+        throw new Error('找不到有效明細列（第一欄需為數字項次）');
+      }
+
+      items = parsedItems;
+      footerRows = parsedFooter.length ? parsedFooter.map(normalizeRow) : structuredClone(DEFAULT_FOOTER);
+      recalculateItems();
+      renderTable();
+      confirmBtn.disabled = false;
+      recalcBtn.disabled = false;
+      addRowBtn.disabled = false;
+    }
+
+    function renderTable() {
+      if (!items.length) {
+        tableArea.className = 'empty-state';
+        tableArea.innerHTML = '請先上傳 CSV 檔案，或點「載入範例」查看格式。';
+        return;
+      }
+
+      const editableKeys = [
+        '項次', '品名', '規格/料號', '名稱', '材質', '備註',
+        '外徑', '內徑', '長度', '數量', '供應商', '單價', '品名2', '廠內備註', 'extra1', 'extra2'
+      ];
+
+      const headers = COLUMNS.map((key) => {
+        const label = COLUMN_LABELS[key] ?? key;
+        return label ? `<th>${label}</th>` : '<th></th>';
+      }).join('');
+
+      const body = items.map((item, index) => {
+        const leadingKeys = editableKeys.slice(0, 11);
+        const tailKeys = editableKeys.slice(12);
+
+        const leadingCells = leadingKeys.map((key) => {
+          const wide = ['品名', '規格/料號'].includes(key);
+          return `<td><input class="${wide ? 'wide' : ''}" data-index="${index}" data-key="${key}" value="${escapeHtml(String(item[key] ?? ''))}"></td>`;
+        }).join('');
+
+        const tailCells = tailKeys.map((key) => {
+          const wide = ['品名2', '廠內備註'].includes(key);
+          return `<td><input class="${wide ? 'wide' : ''}" data-index="${index}" data-key="${key}" value="${escapeHtml(String(item[key] ?? ''))}"></td>`;
+        }).join('');
+
+        return `<tr>
+          ${leadingCells}
+          <td>${item.重量估算 ?? ''}</td>
+          <td>${item.重量小計 ?? ''}</td>
+          <td><input data-index="${index}" data-key="單價" value="${escapeHtml(String(item.單價 ?? ''))}"></td>
+          <td>${item.單價小計 ?? ''}</td>
+          ${tailCells}
+          <td class="row-actions"><button type="button" class="btn-danger" data-remove="${index}">刪除</button></td>
+        </tr>`;
+      }).join('');
+
+      tableArea.className = 'table-wrap';
+      tableArea.innerHTML = `
+        <table>
+          <thead>
+            <tr>${headers}<th>操作</th></tr>
+          </thead>
+          <tbody>${body}</tbody>
+        </table>
+      `;
+
+      tableArea.querySelectorAll('input[data-index]').forEach((input) => {
+        input.addEventListener('input', (event) => {
+          const idx = Number(event.target.dataset.index);
+          const key = event.target.dataset.key;
+          items[idx][key] = event.target.value;
+          recalculateItems();
+          renderTable();
+        });
+      });
+
+      tableArea.querySelectorAll('[data-remove]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const idx = Number(button.dataset.remove);
+          items.splice(idx, 1);
+          items.forEach((item, i) => { item.項次 = String(i + 1); });
+          recalculateItems();
+          renderTable();
+        });
+      });
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function csvEscape(value) {
+      const text = String(value ?? '');
+      if (/[",\n\r]/.test(text)) {
+        return `"${text.replace(/"/g, '""')}"`;
+      }
+      return text;
+    }
+
+    function buildOutputRows() {
+      const totals = recalculateItems();
+      const output = [];
+
+      output.push([
+        '項次', '品名', '規格/料號', '名稱', '材質', '備註',
+        '外徑', '內徑', '長度', '數量', '供應商',
+        '重量估算', '重量小計', '單價', '單價小計', '品名', '廠內備註', '', ''
+      ]);
+
+      items.forEach((item) => {
+        output.push(itemToRow(item));
+      });
+
+      const summaryRow = normalizeRow([]);
+      summaryRow[11] = '重量總計';
+      summaryRow[12] = totals.totalWeight.toFixed(2);
+      summaryRow[14] = String(totals.totalPrice);
+      output.push(summaryRow);
+
+      footerRows.forEach((row) => {
+        if (isSummaryRow(row)) return;
+        output.push(normalizeRow(row));
+      });
+
+      return output;
+    }
+
+    function rowsToCSV(rows) {
+      return rows.map((row) => row.map(csvEscape).join(',')).join('\n');
+    }
+
+    function downloadCSV(filename, content) {
+      const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function sanitizeFileName(name) {
+      const trimmed = (name || 'purchase_order_output.csv').trim() || 'purchase_order_output.csv';
+      return trimmed.toLowerCase().endsWith('.csv') ? trimmed : `${trimmed}.csv`;
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        showStatus('請選擇 .csv 檔案', 'error');
+        return;
+      }
+
+      sourceFileName = file.name.replace(/\.csv$/i, '_output.csv');
+      document.getElementById('outputFileName').value = sourceFileName;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          parseImportedCSV(String(reader.result || ''));
+          showStatus(`已載入 ${file.name}，共 ${items.length} 筆明細。`);
+        } catch (error) {
+          showStatus(error.message || 'CSV 解析失敗', 'error');
+        }
+      };
+      reader.onerror = () => showStatus('讀取檔案失敗', 'error');
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    fileDrop.addEventListener('click', () => csvFile.click());
+    fileDrop.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        csvFile.click();
+      }
+    });
+
+    csvFile.addEventListener('change', (event) => {
+      handleFile(event.target.files[0]);
+      csvFile.value = '';
+    });
+
+    ['dragenter', 'dragover'].forEach((type) => {
+      fileDrop.addEventListener(type, (event) => {
+        event.preventDefault();
+        fileDrop.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach((type) => {
+      fileDrop.addEventListener(type, (event) => {
+        event.preventDefault();
+        fileDrop.classList.remove('dragover');
+        if (type === 'drop') {
+          handleFile(event.dataTransfer.files[0]);
+        }
+      });
+    });
+
+    document.getElementById('loadSampleBtn').addEventListener('click', () => {
+      try {
+        parseImportedCSV(SAMPLE_CSV);
+        document.getElementById('outputFileName').value = 'purchase_order_sample_output.csv';
+        showStatus('已載入範例採購單。');
+      } catch (error) {
+        showStatus(error.message || '範例載入失敗', 'error');
+      }
+    });
+
+    document.getElementById('addRowBtn').addEventListener('click', () => {
+      const nextIndex = items.length + 1;
+      items.push(rowToItem([
+        String(nextIndex), '', '', '', '', '', '', '', '', '1', '', '', '', '', '', '', '', '', ''
+      ]));
+      recalculateItems();
+      renderTable();
+    });
+
+    document.getElementById('recalcBtn').addEventListener('click', () => {
+      recalculateItems();
+      renderTable();
+      showStatus('已重新計算重量與金額。');
+    });
+
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      if (!items.length) {
+        showStatus('沒有可輸出的明細', 'error');
+        return;
+      }
+
+      const rows = buildOutputRows();
+      const csv = rowsToCSV(rows);
+      const fileName = sanitizeFileName(document.getElementById('outputFileName').value);
+      downloadCSV(fileName, csv);
+      showStatus(`已產出 ${fileName}（${items.length} 筆明細，重量總計 ${document.getElementById('totalWeight').textContent} kg）。`);
+    });
+  </script>
+</body>
+</html>
